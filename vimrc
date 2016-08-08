@@ -92,6 +92,8 @@ nnoremap <leader>ww :w<CR>
 nnoremap <leader>qq :q<CR>
 nnoremap <leader>fi mzgg=G`z
 nnoremap <leader>it "= strftime('%b %d, %Y')<CR>p
+nnoremap <leader>er /error<CR>
+nnoremap <leader>wr /warning<CR>
 
 vnoremap <BS> d
 vnoremap <Space> zf
