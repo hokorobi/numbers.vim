@@ -40,10 +40,10 @@ fixdel
 
 " Addtional paths
 if has("unix")
-  set runtimepath+=$HOME/.vim/bundle/vim-*,$HOME/.vim/bundle/vim-*/after
+  set runtimepath+=$HOME/.vim/bundle/*,$HOME/.vim/bundle/*/after
   set viewdir=$HOME/.vim/view viewoptions-=options
 elseif has("win32")
-  set runtimepath+=$HOME/vimfiles/bundle/vim-*,$HOME/vimfiles/bundle/vim-*/after
+  set runtimepath+=$HOME/vimfiles/bundle/*,$HOME/vimfiles/bundle/*/after
   set viewdir=$HOME/vimfiles/view viewoptions-=options
 endif
 
