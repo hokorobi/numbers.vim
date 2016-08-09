@@ -25,7 +25,7 @@ endfunction
 function! KenySplitLineNicely()
   " Save previous value of last search register
   let l:saved_last_search_pattern = @/
-  " :substitute replaces the content of the register with the `\s\+` 
+  " :substitute replaces the content of the register with the `\s\+`
   " pattern highlighting all whitespaces in the file
   substitute /\s\+/\r/g
   " Restore previous search register
@@ -59,6 +59,13 @@ endif
 " Basic interface elements
 set number ruler wrap showcmd showmode wildmenu laststatus=2
 set guioptions-=T
+" Copied from cream-showinvisibles
+" http://www.vim.org/scripts/script.php?script_id=363
+exec 'set list listchars'
+      \ . '=eol:'       . nr2char(0182)
+      \ . ',trail:'     . nr2char(0183)
+      \ . ',precedes:'  . nr2char(8592)
+      \ . ',extends:'   . nr2char(8594)
 
 " Color and font
 set background=dark
@@ -90,6 +97,7 @@ nnoremap <leader>es :vsplit $MYVIMRC<CR>
 nnoremap <leader>ss :source $MYVIMRC<CR>
 nnoremap <leader>ww :w<CR>
 nnoremap <leader>qq :q<CR>
+nnoremap <leader>cd :cd %:p:h<CR>
 nnoremap <leader>fi mzgg=G`z
 nnoremap <leader>it "= strftime('%b %d, %Y')<CR>p
 nnoremap <leader>er /error<CR>
