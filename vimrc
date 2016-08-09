@@ -25,7 +25,7 @@ endfunction
 function! KenySplitLineNicely()
   " Save previous value of last search register
   let l:saved_last_search_pattern = @/
-  " :substitute replaces the content of the register with the `\s\+` 
+  " :substitute replaces the content of the register with the
   " pattern highlighting all whitespaces in the file
   substitute /\s\+/\r/g
   " Restore previous search register
@@ -90,6 +90,7 @@ nnoremap <leader>es :vsplit $MYVIMRC<CR>
 nnoremap <leader>ss :source $MYVIMRC<CR>
 nnoremap <leader>ww :w<CR>
 nnoremap <leader>qq :q<CR>
+nnoremap <leader>cd :cd %:p:h<CR>
 nnoremap <leader>fi mzgg=G`z
 nnoremap <leader>it "= strftime('%b %d, %Y')<CR>p
 nnoremap <leader>er /error<CR>
