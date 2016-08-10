@@ -64,7 +64,7 @@ set guioptions-=T
 set background=dark
 colorscheme gruvbox
 if has("gui_macvim")
-  set guifont=Source\ Code\ Pro\ Light:h14
+  set guifont=Source\ Code\ Pro:h14
 elseif has("gui_win32")
   set guifont=Consolas:h12:cANSI
 endif
