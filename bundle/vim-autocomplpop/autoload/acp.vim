@@ -29,6 +29,8 @@ function acp#enable()
     autocmd AcpGlobalAutoCommand CursorMovedI * call s:feedPopup()
   endif
 
+  " Trigger the popup menu
+  " when switching to Insert mode
   nnoremap <silent> i i<C-r>=<SID>feedPopup()<CR>
   nnoremap <silent> a a<C-r>=<SID>feedPopup()<CR>
   nnoremap <silent> R R<C-r>=<SID>feedPopup()<CR>
