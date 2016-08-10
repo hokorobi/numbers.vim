@@ -1,9 +1,9 @@
 " Automatic folding when reopening
-augroup sasview
+augroup SASView
   autocmd!
   au BufWritePost,BufLeave,WinLeave *.sas mkview 
   au BufWinEnter *.sas silent loadview
-augroup end
+augroup END
 
 " Key mappings
 nnoremap <buffer> <silent> <F2> :edit %<.sas<CR>
