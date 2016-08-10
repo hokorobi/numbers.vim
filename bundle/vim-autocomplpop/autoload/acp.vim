@@ -119,15 +119,12 @@ endfunction
 " Default 'meets' function for Ruby
 " to decide whether to attempt completion
 function acp#meetsForRubyOmni(context)
-  if !has('ruby')
-    return 0
-  endif
-  if g:acp_behaviorRubyOmniMethodLength >= 0 &&
+  if has('ruby') && g:acp_behaviorRubyOmniMethodLength >= 0 &&
         \ a:context =~ '[^. \t]\(\.\|::\)\k\{' .
         \              g:acp_behaviorRubyOmniMethodLength . ',}$'
     return 1
   endif
-  if g:acp_behaviorRubyOmniSymbolLength >= 0 &&
+  if has('ruby') && g:acp_behaviorRubyOmniSymbolLength >= 0 &&
         \ a:context =~ '\(^\|[^:]\):\k\{' .
         \              g:acp_behaviorRubyOmniSymbolLength . ',}$'
     return 1
@@ -145,7 +142,7 @@ endfunction
 " Default 'meets' function for Perl
 " to decide whether to attempt completion
 function acp#meetsForPerlOmni(context)
-  return g:acp_behaviorPerlOmniLength >= 0 &&
+  return has('perl') && g:acp_behaviorPerlOmniLength >= 0 &&
         \ a:context =~ '\w->\k\{' . g:acp_behaviorPerlOmniLength . ',}$'
 endfunction
 
