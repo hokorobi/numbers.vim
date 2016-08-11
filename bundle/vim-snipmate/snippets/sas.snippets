@@ -1,0 +1,96 @@
+snippet pre
+	options nodate nonotes pagesize = max dkricond = warn
+	fmtsearch = (self, export, allo, ted);
+	
+	%include macro(std style yeartxgp dnrinfo
+	ipss condint gvhdgp cytogene treatpr celldose sorror
+	relapse acgvhd engraftment report appendix lifetest
+	lifetestplot check dictmcr selection);
+
+	options notes mprint /* mlogic */ symbolgen;
+snippet other
+	ods tagsets.excelxp file = "condregi.xls" style = kenyxls
+	options(frozen_rowheaders = "1" frozen_headers = "1");
+	proc summary data = &final print n;
+	  class condint condlist othdrsp;
+	  types condint*condlist*othdrsp;
+	  var crid;
+	run;
+	ods tagsets.excelxp close;
+	
+	ods tagsets.excelxp file = "othgvhd.xls" style = kenyxls
+	options(frozen_rowheaders = "1" frozen_headers = "1");
+	proc freq data = &final;
+	  where gvhdgp = 20;
+	  table gvhdlist / nocol norow nopct missing;
+	run;
+	ods tagsets.excelxp close;
+snippet sex
+	* Gender;
+	if sex < 0 then call missing(sex);
+snippet graftype
+	* Graft type;
+	if graftype = 1 then graftypecat = 1; * Bone marrow;
+	else if graftype in (22, 30) then graftypecat = 2; * Peripheral blood;
+	else if graftype in (23, 31, 33) then graftypecat = 3; * Cord blood;
+snippet lifetest
+	%lifetest(indata = ${1:dataset}, strata = ${2:strata}, event = anc, competerisk = dwoanc, intv = intxanc, timelist = 0.921 3.28);
+	%lifetest(indata = $1, strata = $2, event = platelet, competerisk = dwoplatelet, intv = intxplatelet, timelist = 0.921 3.28);
+	%lifetest(indata = $1, strata = $2, event = agvhd24, competerisk = dwoagvhd24, intv = intxagvhd24, timelist = 3.28);
+	%lifetest(indata = $1, strata = $2, event = agvhd34, competerisk = dwoagvhd34, intv = intxagvhd34, timelist = 3.28);
+	%lifetest(indata = $1, strata = $2, event = cgvhd, competerisk = dwocgvhd, intv = intxcgvhd, timelist = 12 36 60);
+	%lifetest(indata = $1, strata = $2, event = rel, competerisk = trm, intv = intxrel, timelist = 12 36 60);
+	%lifetest(indata = $1, strata = $2, event = trm, competerisk = rel, intv = intxrel, timelist = 12 36 60);
+	%lifetest(indata = $1, strata = $2, event = dfs, intv = intxrel, timelist = 12 36 60);
+	%lifetest(indata = $1, strata = $2, event = dead, timelist = 12 36 60);
+	%lifetestexport(rtftitle = ${3:"Table 2: Univariate analysis"});${4}
+# Keywords
+snippet co
+	/* ${1} */${2}
+snippet let
+	%let cache = ${1};
+	%let final = ${2};${3}
+snippet final
+	&final
+snippet cache
+	&cache
+snippet data
+	data ${1:&cache};${2}
+snippet if
+	if ${1} then ${2};${3}
+snippet else
+	else ${1};${2}
+snippet select
+	select (${1});
+	  when (${2}) ${3};${4}
+	  otherwise;
+	end;
+snippet when
+	when (${1}) ${2};${3}
+snippet do
+	do ${1:i} = ${2:1} to ${3};
+	  ${4}
+	end;
+snippet array
+	array ${1} {${3}} ${2};${4}
+snippet infile
+	infile ${1} dlm = "," dsd firstobs = 2;
+	input ${2};${3}
+snippet declare
+	declare hash ${1}(dataset: "${2}");
+	rc = $1.definekey("${3}"${4});
+	rc = $1.definedata(${5:all: "yes"});
+	$1.definedone();${6}
+snippet proc
+	proc ${1} data = ${2:&final}${3};${4}
+snippet table
+	table ${1} / nocol norow nopct missing;${2}
+snippet odsxls
+	ods tagsets.excelxp file = "${1}"  style = kenyxls
+	options(frozen_rowheaders = "1" frozen_headers = "1");${2}
+snippet odsrtf
+	ods rtf file = "${1}"  style = kenyxls;${2}
+snippet odsxlsclose
+	ods tagsets.excelxp close;
+snippet odsrtfclose
+	ods rtf close;
