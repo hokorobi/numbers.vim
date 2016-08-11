@@ -96,8 +96,9 @@ nnoremap <leader>it "= strftime('%b %d, %Y')<CR>p
 nnoremap <leader>er /error<CR>
 nnoremap <leader>wr /warning<CR>
 
+nnoremap <leader><Space> za
+vnoremap <leader><Space> zf
 vnoremap <BS> d
-vnoremap <Space> zf
 
 if !has("macunix")
   nnoremap <C-z> u
