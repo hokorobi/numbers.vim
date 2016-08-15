@@ -1,6 +1,8 @@
 " Maintainer: Zhenhuan Hu <zhu@mcw.edu>
 " Version: Aug 05, 2016
 
+" set verbose=15 vfile=$HOME/vfile.txt
+
 " Self-defined functions
 function! KenyToggleComment(leader, tail)
   let l:save_cpo   = &cpo
