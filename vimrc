@@ -99,6 +99,8 @@ vnoremap <BS> d
 xnoremap ( c(<C-r>")
 xnoremap [ c[<C-r>"]
 xnoremap { c{<C-r>"}
+xnoremap ' c'<C-r>"'
+xnoremap " c"<C-r>""
 
 if !has("macunix")
   nnoremap <C-z> u
