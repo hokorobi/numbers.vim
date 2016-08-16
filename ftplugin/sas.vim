@@ -5,17 +5,17 @@ function s:KenyRunSAS()
   if v:shell_error ==# 0
     echo 'All steps terminated normally'
   elseif v:shell_error ==# 1
-    echo 'SAS System issued warnings'
+    echo 'SAS System issued warning(s)'
   elseif v:shell_error ==# 2
-    echo 'SAS System issued errors'
+    echo 'SAS System issued error(s)'
   elseif v:shell_error ==# 3
-    echo 'User issued ABORT statement'
+    echo 'User issued the ABORT statement'
   elseif v:shell_error ==# 4
-    echo 'User issued ABORT RETURN statement'
+    echo 'User issued the ABORT RETURN statement'
   elseif v:shell_error ==# 5
-    echo 'User issued ABORT ABEND statement'
+    echo 'User issued the ABORT ABEND statement'
   elseif v:shell_error ==# 6
-    echo 'SAS could not initialize because of a severe error'
+    echo 'SAS internal error'
   else
     echo 'Exit status code: ' . v:shell_error
   endif
