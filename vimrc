@@ -96,6 +96,10 @@ nnoremap <leader><Space> za
 vnoremap <leader><Space> zf
 vnoremap <BS> d
 
+xnoremap ( xi()<Esc>P
+xnoremap [ xi[]<Esc>P
+xnoremap { xi{}<Esc>P
+
 if !has("macunix")
   nnoremap <C-z> u
   vnoremap <C-z> <Esc>ugv
