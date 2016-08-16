@@ -68,7 +68,7 @@ colorscheme gruvbox
 if has("gui_macvim")
   set guifont=Source\ Code\ Pro:h14
 elseif has("gui_win32")
-  set guifont=Consolas:h12:cANSI
+  set guifont=Consolas:h11:cANSI
 endif
 set linespace=2
 
