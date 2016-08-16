@@ -1,3 +1,26 @@
+" Local functions
+function s:KenyRunSAS()
+  w
+  call system("sas -sysin '" . expand('%:p') . "'")
+  if v:shell_error ==# 0
+    echo 'All steps terminated normally'
+  elseif v:shell_error ==# 1
+    echo 'SAS System issued warnings'
+  elseif v:shell_error ==# 2
+    echo 'SAS System issued errors'
+  elseif v:shell_error ==# 3
+    echo 'User issued ABORT statement'
+  elseif v:shell_error ==# 4
+    echo 'User issued ABORT RETURN statement'
+  elseif v:shell_error ==# 5
+    echo 'User issued ABORT ABEND statement'
+  elseif v:shell_error ==# 6
+    echo 'SAS could not initialize because of a severe error'
+  else
+    echo 'Exit status code: ' . v:shell_error
+  endif
+endfunction
+
 " Automatic folding when reopening
 augroup SASView
   autocmd!
@@ -19,9 +42,9 @@ vnoremap <buffer> <silent> <F4> :<C-u>view %<.lst<CR>
 inoremap <buffer> <silent> <F4> <C-o>:view %<.lst<CR>
 
 " Set compiler
-nnoremap <buffer> <silent> <F8> :w<Bar>call system("sas -sysin '" . expand('%:p') . "'")<Bar>echo v:shell_error<CR>
-vnoremap <buffer> <silent> <F8> :<C-u>w<Bar>call system("sas -sysin '" . expand('%:p') . "'")<Bar>echo v:shell_error<CR>
-inoremap <buffer> <silent> <F8> <C-o>:w<Bar>call system("sas -sysin '" . expand('%:p') . "'")<Bar>echo v:shell_error<CR>
+nnoremap <buffer> <silent> <F8> :call <SID>KenyRunSAS()<CR>
+vnoremap <buffer> <silent> <F8> :<C-u>call <SID>KenyRunSAS()<CR>
+inoremap <buffer> <silent> <F8> <C-o>:call <SID>KenyRunSAS()<CR>
 
 " Set comment toggle
 nnoremap <buffer> <silent> <F5> :call KenyToggleComment('/* ', ' */')<CR>
