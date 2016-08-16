@@ -70,6 +70,7 @@ if has("gui_macvim")
 elseif has("gui_win32")
   set guifont=Consolas:h12:cANSI
 endif
+set linespace=2
 
 " Syntax
 if version >= 500
