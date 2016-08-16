@@ -96,9 +96,9 @@ nnoremap <leader><Space> za
 vnoremap <leader><Space> zf
 vnoremap <BS> d
 
-xnoremap ( xi()<Esc>P
-xnoremap [ xi[]<Esc>P
-xnoremap { xi{}<Esc>P
+xnoremap ( c(<C-r>")
+xnoremap [ c[<C-r>"]
+xnoremap { c{<C-r>"}
 
 if !has("macunix")
   nnoremap <C-z> u
