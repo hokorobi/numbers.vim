@@ -4,10 +4,11 @@ set guioptions-=T
 " Font
 if has("gui_macvim")
   set guifont=Source\ Code\ Pro:h14
+  set linespace=2
 elseif has("gui_win32")
   set guifont=Consolas:h11:cANSI
+  set linespace=3
 endif
-set linespace=2
 
 " Menus
 if has("gui_macvim")
