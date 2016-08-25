@@ -1,7 +1,7 @@
 " Local functions
 function! s:KenyRunSAS()
   w
-  call system("sas -sysin '" . expand('%:p') . "'")
+  call system("sas -noverbose -sysin '" . expand('%:p') . "'")
   if v:shell_error ==# 0
     echo 'All steps terminated normally'
   elseif v:shell_error ==# 1
