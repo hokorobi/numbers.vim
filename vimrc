@@ -9,14 +9,16 @@ function! KenyToggleComment(leader, tail)
   let l:save_paste = &paste
   set cpo&vim
   set paste
-  let l:leader = escape(a:leader, '\/*')
-  let l:tail   = escape(a:tail, '\/*')
-  " Add or remove commenting syntax depending on
-  " whether there is commenting syntax at the beginning of a line
-  if getline(".") =~ '^' . l:leader . '\(.*\)' . l:tail . '$'
-    silent exec 's/^' . l:leader . '\(.*\)' . l:tail . '$/\1/'
-  else
-    silent exec 's/^\(.*\)$/' . l:leader . '\1' . l:tail . '/'
+  if getline('.') !=# ''
+    let l:leader = escape(a:leader, '\/*')
+    let l:tail   = escape(a:tail, '\/*')
+    " Add or remove commenting syntax depending on
+    " whether there is commenting syntax at the beginning of a line
+    if getline('.') =~ '^' . l:leader . '\(.*\)' . l:tail . '$'
+      silent exec 's/^' . l:leader . '\(.*\)' . l:tail . '$/\1/'
+    else
+      silent exec 's/^\(.*\)$/' . l:leader . '\1' . l:tail . '/'
+    endif
   endif
   " Move cursor to the beginning of the next line
   silent exec 'normal! +'
