@@ -1,5 +1,5 @@
 " Local functions
-function s:KenyRunSAS()
+function! s:KenyRunSAS()
   w
   call system("sas -sysin '" . expand('%:p') . "'")
   if v:shell_error ==# 0
