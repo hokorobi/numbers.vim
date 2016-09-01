@@ -7,7 +7,7 @@
 " by Hamish Stuart Macpherson
 " And OneDark theme for the UI colors
 
-" Initialization
+" Initialization {{{
 if version > 580
   hi clear
   if exists("syntax_on")
@@ -16,8 +16,9 @@ if version > 580
 endif
 
 let g:colors_name="waikiki"
+" }}}
 
-" Functions
+" Functions {{{
 fu! s:SetColor(name, fg, bg, ...)
   execute "hi" a:name
         \ "guifg=" . a:fg
@@ -42,6 +43,7 @@ fu! s:SetSpColor(name, color, ...)
         \ "guisp=" . a:color
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
 endf
+" }}}
 
 " Palette
 let s:uih = 220 " Hue
@@ -266,3 +268,5 @@ end
 " Must be at the end, because of ctermbg=234 bug.
 " https://groups.google.com/forum/#!msg/vim_dev/afPqwAFNdrU/nqh6tOM87QUJ
 set background=dark
+
+" vim: set sw=2 ts=2 sts=2 et tw=80 ft=vim fdm=marker:
