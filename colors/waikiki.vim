@@ -56,7 +56,7 @@ let s:bg = color#HSLtoHex(s:uih, s:uis, s:uil)                            " #282
 let s:light = color#Lighten(s:fg, 28) " #D1D5DC
 let s:grey1 = color#Lighten(s:fg, 8)  " #ABB2BF
 let s:grey2 = s:fg                    " #9DA5B4
-let s:grey3 = color#Darken(s:fg, 48)  " #4B5362 
+let s:grey3 = color#Darken(s:fg, 48)  " #4B5362
 let s:grey4 = color#Lighten(s:bg, 48) " #3C424E
 let s:dark1 = color#Lighten(s:bg, 28) " #333842
 let s:dark2 = s:bg                    " #282C34
@@ -228,14 +228,14 @@ if &t_Co > 255
   hi SpecialChar     ctermfg=161               cterm=bold
   hi SpecialComment  ctermfg=245               cterm=bold
   hi Special         ctermfg=81
-  
+
   if has("spell")
     hi SpellBad                  ctermbg=52
     hi SpellCap                  ctermbg=17
     hi SpellLocal                ctermbg=17
     hi SpellRare    ctermfg=none ctermbg=none  cterm=reverse
   endif
-  
+
   hi Statement       ctermfg=161               cterm=bold
   hi StatusLine      ctermfg=238 ctermbg=253
   hi StatusLineNC    ctermfg=244 ctermbg=232
