@@ -65,7 +65,7 @@ set number ruler wrap showcmd showmode wildmenu laststatus=2
 
 " Color
 set background=dark
-colorscheme gruvbox
+colorscheme waikiki
 
 " Syntax
 if version >= 500
