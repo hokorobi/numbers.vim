@@ -1,4 +1,6 @@
 snippet pre
+	* vim: set fdm=marker:;
+	* Preamble {{{;
 	options nodate nonotes pagesize = max dkricond = warn
 	fmtsearch = (self, export, allo, ted);
 	
@@ -8,6 +10,7 @@ snippet pre
 	lifetestplot check dictmcr selection);
 
 	options notes mprint /* mlogic */ symbolgen;
+	* Preamble END }}};
 snippet other
 	ods tagsets.excelxp file = "condregi.xls" style = kenyxls
 	options(frozen_rowheaders = "1" frozen_headers = "1");
