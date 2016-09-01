@@ -53,7 +53,7 @@ let s:uil = 18  " Lightness
 let s:fg = color#HSLtoHex(s:uih, min([s:uis, 18]), max([s:uil * 3, 66]))  " #9DA5B4
 let s:bg = color#HSLtoHex(s:uih, s:uis, s:uil)                            " #282C34
 
-let s:light = color#Lighten(s:fg, 40) " #E8EAED
+let s:light = color#Lighten(s:fg, 28) " #D1D5DC
 let s:grey1 = color#Lighten(s:fg, 8)  " #ABB2BF
 let s:grey2 = s:fg                    " #9DA5B4
 let s:grey3 = color#Darken(s:fg, 48)  " #4B5362 
@@ -63,38 +63,37 @@ let s:dark2 = s:bg                    " #282C34
 let s:dark3 = color#Darken(s:bg, 16)  " #21252B
 let s:black = color#Darken(s:bg, 40)  " #181B20
 
-let s:wine     = '#960050'
-let s:magenta  = '#F92672'
-let s:orange   = '#FD971F'
-let s:yellow   = '#E6DB74'
-let s:green    = '#A6E22E'
-let s:cyan     = '#66D9EF'
-let s:lavender = '#AE81FF'
-let s:ash      = '#6A717C'
+let s:orchid    = '#F92672'
+let s:orange    = '#FD971F'
+let s:banana    = '#E6DB74'
+let s:green     = '#A6E22E'
+let s:cyan      = '#66D9EF'
+let s:lavender  = '#AE81FF'
+let s:ash       = '#6A717C'
 
-let s:bgmagenta = color#HSLtoHex(color#HexToHSL(s:magenta)[0], s:uis, s:uil)
+let s:bgorchid  = color#HSLtoHex(color#HexToHSL(s:orchid)[0], s:uis, s:uil)
 let s:bgorange  = color#HSLtoHex(color#HexToHSL(s:orange)[0], s:uis, s:uil)
-let s:bgyellow  = color#HSLtoHex(color#HexToHSL(s:yellow)[0], s:uis, s:uil)
+let s:bgbanana   = color#HSLtoHex(color#HexToHSL(s:banana)[0], s:uis, s:uil)
 let s:bggreen   = color#HSLtoHex(color#HexToHSL(s:green)[0], s:uis, s:uil)
 
 call s:SetColor("Normal", s:light, s:bg)
 call s:SetColor("Cursor", s:black, s:light)
-call s:SetColor("CursorLine", "NONE", s:dark1)
-call s:SetColor("CursorColumn", "NONE", s:dark1)
-call s:SetColor("Visual", "NONE", s:grey4)
-call s:SetColor("VisualNOS", "NONE", s:grey4)
-call s:SetColor("ColorColumn", "NONE", s:dark3)
+call s:SetBgColor("CursorLine", s:dark1)
+call s:SetBgColor("CursorColumn", s:dark1)
+call s:SetBgColor("Visual", s:grey4)
+call s:SetBgColor("VisualNOS", s:grey4)
+call s:SetBgColor("ColorColumn", s:dark3)
 call s:SetColor("SignColumn", s:green, s:dark3)
 call s:SetColor("LineNr", s:grey3, s:dark3)
-call s:SetColor("CursorLineNr", s:orange, "NONE")
+call s:SetFgColor("CursorLineNr", s:orange)
 call s:SetColor("VertSplit", s:grey3, s:dark3)
 call s:SetColor("FoldColumn", s:grey3, s:dark3)
 call s:SetColor("Folded", s:fg, s:black)
 call s:SetColor("MatchParen", s:black, s:orange, "bold")
 call s:SetColor("Pmenu", s:black, s:fg)
 call s:SetColor("PmenuSel", s:black, s:cyan)
-call s:SetColor("PmenuSbar", "NONE", s:dark3)
-call s:SetColor("PmenuThumb", s:cyan, "NONE")
+call s:SetBgColor("PmenuSbar", s:dark3)
+call s:SetFgColor("PmenuThumb", s:cyan)
 call s:SetColor("TabLine", s:fg, s:black)
 call s:SetColor("TabLineFill", s:black, s:black)
 call s:SetColor("TabLineSel", s:black, s:fg)
@@ -108,17 +107,17 @@ call s:SetFgColor("SpecialKey", s:grey3, "italic")
 call s:SetFgColor("Title", s:green, "bold")
 call s:SetFgColor("Directory", s:green, "bold")
 call s:SetFgColor("Question", s:cyan, "bold")
-call s:SetFgColor("ErrorMsg", s:magenta, "bold")
-call s:SetFgColor("ModeMsg", s:yellow, "bold")
-call s:SetFgColor("MoreMsg", s:yellow, "bold")
+call s:SetFgColor("ErrorMsg", s:orchid, "bold")
+call s:SetFgColor("ModeMsg", s:banana, "bold")
+call s:SetFgColor("MoreMsg", s:banana, "bold")
 call s:SetFgColor("WarningMsg", s:orange, "bold")
 call s:SetColor("DiffAdd", s:fg, s:bggreen)
-call s:SetColor("DiffDelete", s:fg, s:bgmagenta)
-call s:SetColor("DiffChange", s:fg, s:bgyellow)
-call s:SetColor("DiffText", s:orange, s:bgyellow)
+call s:SetColor("DiffDelete", s:fg, s:bgorchid)
+call s:SetColor("DiffChange", s:fg, s:bgbanana)
+call s:SetColor("DiffText", s:orange, s:bgbanana)
 
 if has("spell")
-  call s:SetSpColor("SpellBad", s:magenta, "undercurl")
+  call s:SetSpColor("SpellBad", s:orchid, "undercurl")
   call s:SetSpColor("SpellCap", s:lavender, "undercurl")
   call s:SetSpColor("SpellLocal", s:lavender, "undercurl")
   call s:SetSpColor("SpellRare", s:light, "undercurl")
@@ -128,22 +127,22 @@ endif
 call s:SetFgColor("Comment", s:ash, "italic")
 " Constant
 call s:SetFgColor("Boolean", s:lavender)
-call s:SetFgColor("Character", s:yellow)
+call s:SetFgColor("Character", s:banana)
 call s:SetFgColor("Constant", s:lavender)
 call s:SetFgColor("Float", s:lavender)
 call s:SetFgColor("Number", s:lavender)
-call s:SetFgColor("String", s:yellow)
+call s:SetFgColor("String", s:banana)
 " Identifier
 call s:SetFgColor("Function", s:green)
 call s:SetFgColor("Identifier", s:orange)
 " Statement
-call s:SetFgColor("Conditional", s:magenta, "bold")
-call s:SetFgColor("Exception", s:magenta, "bold")
-call s:SetFgColor("Keyword", s:magenta, "bold")
-call s:SetFgColor("Label", s:yellow, "italic")
-call s:SetFgColor("Operator", s:magenta)
-call s:SetFgColor("Repeat", s:magenta, "bold")
-call s:SetFgColor("Statement", s:magenta, "bold")
+call s:SetFgColor("Conditional", s:orchid, "bold")
+call s:SetFgColor("Exception", s:orchid, "bold")
+call s:SetFgColor("Keyword", s:orchid, "bold")
+call s:SetFgColor("Label", s:banana, "italic")
+call s:SetFgColor("Operator", s:orchid)
+call s:SetFgColor("Repeat", s:orchid, "bold")
+call s:SetFgColor("Statement", s:orchid, "bold")
 " Preprocessor
 call s:SetFgColor("Define", s:cyan)
 call s:SetFgColor("Include", s:cyan)
@@ -161,9 +160,9 @@ call s:SetFgColor("Debug", s:green, "italic")
 call s:SetFgColor("Special", s:cyan, "italic")
 call s:SetFgColor("SpecialChar", s:lavender, "italic")
 call s:SetFgColor("SpecialComment", s:ash, "bold,italic")
-call s:SetFgColor("Tag", s:magenta, "italic")
+call s:SetFgColor("Tag", s:orchid, "italic")
 " Other
-call s:SetFgColor("Error", s:magenta, "undercurl")
+call s:SetFgColor("Error", s:orchid, "undercurl")
 call s:SetFgColor("Ignore", s:ash)
 call s:SetFgColor("Todo", s:ash, "bold,italic")
 call s:SetFgColor("Underlined", s:ash, "underline")
