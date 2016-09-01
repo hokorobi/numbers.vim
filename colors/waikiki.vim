@@ -1,11 +1,17 @@
-" Vim color file
+"  __      __        .__ __   .__ __   .__ 
+" /  \    /  \_____  |__|  | _|__|  | _|__|
+" \   \/\/   /\__  \ |  |  |/ /  |  |/ /  |
+"  \        /  / __ \|  |    <|  |    <|  |
+"   \__/\  /  (____  /__|__|_ \__|__|_ \__|
+"        \/        \/        \/       \/   
 "
 " Author: Zhenhuan Hu <zhu@mcw.edu>
-"
+" Date: Sep 01, 2016
+" License: GPL
 " Note: Based on the Monokai theme for TextMate
 " by Wimer Hazenberg and its darker variant
 " by Hamish Stuart Macpherson
-" And OneDark theme for the UI colors
+" And OneDark UI theme for Atom
 
 " Initialization {{{
 if version > 580
