@@ -21,27 +21,48 @@ let g:colors_name="waikiki"
 " Functions {{{
 fu! s:SetColor(name, fg, bg, ...)
   execute "hi" a:name
-        \ "guifg=" . a:fg
-        \ "guibg=" . a:bg
+        \ "guifg=" . a:fg[0]
+        \ "guibg=" . a:bg[0]
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
+  if &t_Co > 255
+    execute "hi" a:name
+          \ "ctermfg=" . a:fg[1]
+          \ "ctermbg=" . a:bg[1]
+          \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
+  end
 endf
 
-fu! s:SetFgColor(name, color, ...)
+fu! s:SetFgColor(name, fg, ...)
   execute "hi" a:name
-        \ "guifg=" . a:color
+        \ "guifg=" . a:fg[0]
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
+  if &t_Co > 255
+    execute "hi" a:name
+          \ "ctermfg=" . a:fg[1]
+          \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
+  end
 endf
 
-fu! s:SetBgColor(name, color, ...)
+fu! s:SetBgColor(name, bg, ...)
   execute "hi" a:name
-        \ "guibg=" . a:color
+        \ "guibg=" . a:bg[0]
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
+  if &t_Co > 255
+    execute "hi" a:name
+          \ "ctermbg=" . a:bg[1]
+          \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
+  end
 endf
 
-fu! s:SetSpColor(name, color, ...)
+fu! s:SetSpColor(name, sp)
   execute "hi" a:name
-        \ "guisp=" . a:color
-        \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
+        \ "guisp=" . a:sp[0]
+        \ "gui=undercurl"
+  if &t_Co > 255
+    execute "hi" a:name
+          \ "ctermfg=bg"
+          \ "ctermbg=" . a:sp[1]
+  end
 endf
 " }}}
 
@@ -50,31 +71,31 @@ let s:uih = 220 " Hue
 let s:uis = 13  " Saturation
 let s:uil = 18  " Lightness
 
-let s:fg = color#HSLtoHex(s:uih, min([s:uis, 18]), max([s:uil * 3, 66]))  " #9DA5B4
-let s:bg = color#HSLtoHex(s:uih, s:uis, s:uil)                            " #282C34
+let s:fg = [color#HSLtoHex(s:uih, min([s:uis, 18]), max([s:uil * 3, 66])), 248] " #9DA5B4
+let s:bg = [color#HSLtoHex(s:uih, s:uis, s:uil)                          , 236] " #282C34
 
-let s:light = color#Lighten(s:fg, 28) " #D1D5DC
-let s:grey1 = color#Lighten(s:fg, 8)  " #ABB2BF
-let s:grey2 = s:fg                    " #9DA5B4
-let s:grey3 = color#Darken(s:fg, 48)  " #4B5362
-let s:grey4 = color#Lighten(s:bg, 48) " #3C424E
-let s:dark1 = color#Lighten(s:bg, 28) " #333842
-let s:dark2 = s:bg                    " #282C34
-let s:dark3 = color#Darken(s:bg, 16)  " #21252B
-let s:black = color#Darken(s:bg, 40)  " #181B20
+let s:light = [color#Lighten(s:fg, 28), 252] " #D1D5DC
+let s:grey1 = [color#Lighten(s:fg, 8 ), 249] " #ABB2BF
+let s:grey2 = s:fg                           " #9DA5B4
+let s:grey3 = [ color#Darken(s:fg, 48), 240] " #4B5362
+let s:grey4 = [color#Lighten(s:bg, 48), 238] " #3C424E
+let s:dark1 = [color#Lighten(s:bg, 28), 237] " #333842
+let s:dark2 = s:bg                           " #282C34
+let s:dark3 = [ color#Darken(s:bg, 16), 235] " #21252B
+let s:black = [ color#Darken(s:bg, 40), 234] " #181B20
 
-let s:pink      = '#F92672'
-let s:orange    = '#FD971F'
-let s:yellow    = '#E6DB74'
-let s:green     = '#A6E22E'
-let s:cyan      = '#66D9EF'
-let s:lavender  = '#AE81FF'
-let s:ash       = '#6A717C'
+let s:pink      = ['#F92672', 161]
+let s:orange    = ['#FD971F', 208]
+let s:yellow    = ['#E6DB74', 227]
+let s:green     = ['#A6E22E', 118]
+let s:cyan      = ['#66D9EF', 81 ]
+let s:lavender  = ['#AE81FF', 141]
+let s:ash       = ['#6A717C', 242]
 
-let s:bgpink    = color#HSLtoHex(color#HexToHSL(s:pink)[0], s:uis, s:uil)
-let s:bgorange  = color#HSLtoHex(color#HexToHSL(s:orange)[0], s:uis, s:uil)
-let s:bgyellow  = color#HSLtoHex(color#HexToHSL(s:yellow)[0], s:uis, s:uil)
-let s:bggreen   = color#HSLtoHex(color#HexToHSL(s:green)[0], s:uis, s:uil)
+let s:bgpink    = [color#HSLtoHex(color#HexToHSL(s:pink  )[0], s:uis, s:uil), 52 ]
+let s:bgorange  = [color#HSLtoHex(color#HexToHSL(s:orange)[0], s:uis, s:uil), 94 ]
+let s:bgyellow  = [color#HSLtoHex(color#HexToHSL(s:yellow)[0], s:uis, s:uil), 100]
+let s:bggreen   = [color#HSLtoHex(color#HexToHSL(s:green )[0], s:uis, s:uil), 22 ]
 
 call s:SetColor("Normal", s:light, s:bg)
 call s:SetColor("Cursor", s:black, s:light)
@@ -117,10 +138,10 @@ call s:SetColor("DiffChange", s:fg, s:bgyellow)
 call s:SetColor("DiffText", s:orange, s:bgyellow)
 
 if has("spell")
-  call s:SetSpColor("SpellBad", s:pink, "undercurl")
-  call s:SetSpColor("SpellCap", s:lavender, "undercurl")
-  call s:SetSpColor("SpellLocal", s:lavender, "undercurl")
-  call s:SetSpColor("SpellRare", s:light, "undercurl")
+  call s:SetSpColor("SpellBad", s:pink)
+  call s:SetSpColor("SpellCap", s:lavender)
+  call s:SetSpColor("SpellLocal", s:lavender)
+  call s:SetSpColor("SpellRare", s:light)
 endif
 
 " Comment
@@ -166,103 +187,6 @@ call s:SetFgColor("Error", s:pink, "undercurl")
 call s:SetFgColor("Ignore", s:ash)
 call s:SetFgColor("Todo", s:ash, "bold,italic")
 call s:SetFgColor("Underlined", s:ash, "underline")
-
-" Support for 256-color terminal
-" This part was copied from molokai color scheme
-if &t_Co > 255
-  hi Normal          ctermfg=252 ctermbg=233
-  hi CursorLine                  ctermbg=234   cterm=none
-  hi CursorLineNr    ctermfg=208               cterm=none
-  hi Boolean         ctermfg=135
-  hi Character       ctermfg=144
-  hi Number          ctermfg=135
-  hi String          ctermfg=144
-  hi Conditional     ctermfg=161               cterm=bold
-  hi Constant        ctermfg=135               cterm=bold
-  hi Cursor          ctermfg=16  ctermbg=253
-  hi Debug           ctermfg=225               cterm=bold
-  hi Define          ctermfg=81
-  hi Delimiter       ctermfg=241
-
-  hi DiffAdd                     ctermbg=24
-  hi DiffChange      ctermfg=181 ctermbg=239
-  hi DiffDelete      ctermfg=162 ctermbg=53
-  hi DiffText                    ctermbg=102   cterm=bold
-
-  hi Directory       ctermfg=118               cterm=bold
-  hi Error           ctermfg=219 ctermbg=89
-  hi ErrorMsg        ctermfg=199 ctermbg=16    cterm=bold
-  hi Exception       ctermfg=118               cterm=bold
-  hi Float           ctermfg=135
-  hi FoldColumn      ctermfg=67  ctermbg=16
-  hi Folded          ctermfg=67  ctermbg=16
-  hi Function        ctermfg=118
-  hi Identifier      ctermfg=208               cterm=none
-  hi Ignore          ctermfg=244 ctermbg=232
-  hi IncSearch       ctermfg=193 ctermbg=16
-
-  hi Keyword         ctermfg=161               cterm=bold
-  hi Label           ctermfg=229               cterm=none
-  hi Macro           ctermfg=193
-  hi SpecialKey      ctermfg=81
-
-  hi MatchParen      ctermfg=233 ctermbg=208   cterm=bold
-  hi ModeMsg         ctermfg=229
-  hi MoreMsg         ctermfg=229
-  hi Operator        ctermfg=161
-
-  " Complete menu
-  hi Pmenu           ctermfg=81  ctermbg=16
-  hi PmenuSel        ctermfg=255 ctermbg=242
-  hi PmenuSbar                   ctermbg=232
-  hi PmenuThumb      ctermfg=81
-
-  hi PreCondit       ctermfg=118               cterm=bold
-  hi PreProc         ctermfg=118
-  hi Question        ctermfg=81
-  hi Repeat          ctermfg=161               cterm=bold
-  hi Search          ctermfg=0   ctermbg=222   cterm=NONE
-
-  " Marks column
-  hi SignColumn      ctermfg=118 ctermbg=235
-  hi SpecialChar     ctermfg=161               cterm=bold
-  hi SpecialComment  ctermfg=245               cterm=bold
-  hi Special         ctermfg=81
-
-  if has("spell")
-    hi SpellBad                  ctermbg=52
-    hi SpellCap                  ctermbg=17
-    hi SpellLocal                ctermbg=17
-    hi SpellRare    ctermfg=none ctermbg=none  cterm=reverse
-  endif
-
-  hi Statement       ctermfg=161               cterm=bold
-  hi StatusLine      ctermfg=238 ctermbg=253
-  hi StatusLineNC    ctermfg=244 ctermbg=232
-  hi StorageClass    ctermfg=208
-  hi Structure       ctermfg=81
-  hi Tag             ctermfg=161
-  hi Title           ctermfg=166
-  hi Todo            ctermfg=231 ctermbg=232   cterm=bold
-
-  hi Typedef         ctermfg=81
-  hi Type            ctermfg=81                cterm=none
-  hi Underlined      ctermfg=244               cterm=underline
-
-  hi VertSplit       ctermfg=244 ctermbg=232   cterm=bold
-  hi VisualNOS                   ctermbg=238
-  hi Visual                      ctermbg=235
-  hi WarningMsg      ctermfg=231 ctermbg=238   cterm=bold
-  hi WildMenu        ctermfg=81  ctermbg=16
-
-  hi Comment         ctermfg=59
-  hi CursorColumn                ctermbg=236
-  hi ColorColumn                 ctermbg=236
-  hi LineNr          ctermfg=250 ctermbg=236
-  hi NonText         ctermfg=59
-
-  hi SpecialKey      ctermfg=59
-end
 
 " Must be at the end, because of ctermbg=234 bug.
 " https://groups.google.com/forum/#!msg/vim_dev/afPqwAFNdrU/nqh6tOM87QUJ
