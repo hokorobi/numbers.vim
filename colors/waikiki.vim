@@ -63,17 +63,17 @@ let s:dark2 = s:bg                    " #282C34
 let s:dark3 = color#Darken(s:bg, 16)  " #21252B
 let s:black = color#Darken(s:bg, 40)  " #181B20
 
-let s:orchid    = '#F92672'
+let s:pink      = '#F92672'
 let s:orange    = '#FD971F'
-let s:banana    = '#E6DB74'
+let s:yellow    = '#E6DB74'
 let s:green     = '#A6E22E'
 let s:cyan      = '#66D9EF'
 let s:lavender  = '#AE81FF'
 let s:ash       = '#6A717C'
 
-let s:bgorchid  = color#HSLtoHex(color#HexToHSL(s:orchid)[0], s:uis, s:uil)
+let s:bgpink    = color#HSLtoHex(color#HexToHSL(s:pink)[0], s:uis, s:uil)
 let s:bgorange  = color#HSLtoHex(color#HexToHSL(s:orange)[0], s:uis, s:uil)
-let s:bgbanana   = color#HSLtoHex(color#HexToHSL(s:banana)[0], s:uis, s:uil)
+let s:bgyellow  = color#HSLtoHex(color#HexToHSL(s:yellow)[0], s:uis, s:uil)
 let s:bggreen   = color#HSLtoHex(color#HexToHSL(s:green)[0], s:uis, s:uil)
 
 call s:SetColor("Normal", s:light, s:bg)
@@ -107,17 +107,17 @@ call s:SetFgColor("SpecialKey", s:grey3, "italic")
 call s:SetFgColor("Title", s:green, "bold")
 call s:SetFgColor("Directory", s:green, "bold")
 call s:SetFgColor("Question", s:cyan, "bold")
-call s:SetFgColor("ErrorMsg", s:orchid, "bold")
-call s:SetFgColor("ModeMsg", s:banana, "bold")
-call s:SetFgColor("MoreMsg", s:banana, "bold")
+call s:SetFgColor("ErrorMsg", s:pink, "bold")
+call s:SetFgColor("ModeMsg", s:yellow, "bold")
+call s:SetFgColor("MoreMsg", s:yellow, "bold")
 call s:SetFgColor("WarningMsg", s:orange, "bold")
 call s:SetColor("DiffAdd", s:fg, s:bggreen)
-call s:SetColor("DiffDelete", s:fg, s:bgorchid)
-call s:SetColor("DiffChange", s:fg, s:bgbanana)
-call s:SetColor("DiffText", s:orange, s:bgbanana)
+call s:SetColor("DiffDelete", s:fg, s:bgpink)
+call s:SetColor("DiffChange", s:fg, s:bgyellow)
+call s:SetColor("DiffText", s:orange, s:bgyellow)
 
 if has("spell")
-  call s:SetSpColor("SpellBad", s:orchid, "undercurl")
+  call s:SetSpColor("SpellBad", s:pink, "undercurl")
   call s:SetSpColor("SpellCap", s:lavender, "undercurl")
   call s:SetSpColor("SpellLocal", s:lavender, "undercurl")
   call s:SetSpColor("SpellRare", s:light, "undercurl")
@@ -127,22 +127,22 @@ endif
 call s:SetFgColor("Comment", s:ash, "italic")
 " Constant
 call s:SetFgColor("Boolean", s:lavender)
-call s:SetFgColor("Character", s:banana)
+call s:SetFgColor("Character", s:yellow)
 call s:SetFgColor("Constant", s:lavender)
 call s:SetFgColor("Float", s:lavender)
 call s:SetFgColor("Number", s:lavender)
-call s:SetFgColor("String", s:banana)
+call s:SetFgColor("String", s:yellow)
 " Identifier
 call s:SetFgColor("Function", s:green)
 call s:SetFgColor("Identifier", s:orange)
 " Statement
-call s:SetFgColor("Conditional", s:orchid, "bold")
-call s:SetFgColor("Exception", s:orchid, "bold")
-call s:SetFgColor("Keyword", s:orchid, "bold")
-call s:SetFgColor("Label", s:banana, "italic")
-call s:SetFgColor("Operator", s:orchid)
-call s:SetFgColor("Repeat", s:orchid, "bold")
-call s:SetFgColor("Statement", s:orchid, "bold")
+call s:SetFgColor("Conditional", s:pink, "bold")
+call s:SetFgColor("Exception", s:pink, "bold")
+call s:SetFgColor("Keyword", s:pink, "bold")
+call s:SetFgColor("Label", s:yellow, "italic")
+call s:SetFgColor("Operator", s:pink)
+call s:SetFgColor("Repeat", s:pink, "bold")
+call s:SetFgColor("Statement", s:pink, "bold")
 " Preprocessor
 call s:SetFgColor("Define", s:cyan)
 call s:SetFgColor("Include", s:cyan)
@@ -160,9 +160,9 @@ call s:SetFgColor("Debug", s:green, "italic")
 call s:SetFgColor("Special", s:cyan, "italic")
 call s:SetFgColor("SpecialChar", s:lavender, "italic")
 call s:SetFgColor("SpecialComment", s:ash, "bold,italic")
-call s:SetFgColor("Tag", s:orchid, "italic")
+call s:SetFgColor("Tag", s:pink, "italic")
 " Other
-call s:SetFgColor("Error", s:orchid, "undercurl")
+call s:SetFgColor("Error", s:pink, "undercurl")
 call s:SetFgColor("Ignore", s:ash)
 call s:SetFgColor("Todo", s:ash, "bold,italic")
 call s:SetFgColor("Underlined", s:ash, "underline")
