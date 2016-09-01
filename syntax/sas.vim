@@ -169,7 +169,7 @@ if version >= 508 || !exists("did_sas_syntax_inits")
   hi def link sasMacroReserved Macro
   hi def link sasMacroFunction Define
   hi def link sasMacroVariable Define
-  hi def link sasFormatTag Tag
+  hi def link sasFormatTag SpecialChar
   hi def link sasSpecialName Special
 endif
 

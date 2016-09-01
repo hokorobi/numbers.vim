@@ -25,8 +25,8 @@ syn region saslogSymbolGen    matchgroup=saslogMacroKwd start=/^SYMBOLGEN:/    s
 
 " The default highlighting.
 hi def link saslogNote Comment
-hi def link saslogMacroLogic Comment
 hi def link saslogSymbolGen Comment
+hi def link saslogMacroLogic ModeMsg
 hi def link saslogError ErrorMsg
 hi def link saslogWarning WarningMsg
 hi def link saslogNumber Number
