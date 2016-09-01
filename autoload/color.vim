@@ -136,7 +136,7 @@ fu! color#RGBtoHSL(...)
   else
     let c = max - min
     if max == r
-      let hf = (g - b) / c - float2nr((g - b) / c) + float2nr((g - b) / c) % 6
+      let hf = (g - b) / c + (g < b ? 6.0 : 0.0)
     elseif max == g
       let hf = (b - r) / c + 2.0
     elseif max == b
