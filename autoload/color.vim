@@ -1,7 +1,9 @@
 " File: color.vim
-" Author: romgrk, Zhenhuan Hu <https://github.com/akanosora>
+" Author: Zhenhuan Hu <https://github.com/akanosora>
 " Date: Aug 31, 2016
+" License: GPL
 " Description: vimscript RGB/HSL color parsing
+" Based on romgrk's vimscript for color parsing
 
 " Definitions: {{{1
 
@@ -185,4 +187,3 @@ fu! color#Darken(color, ...)
 endfu
 
 " }}}
-
