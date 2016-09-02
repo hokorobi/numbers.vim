@@ -4,14 +4,18 @@
 " set verbose=15 vfile=$HOME/vfile.txt
 
 " Self-defined functions
-function! KenyToggleComment(leader, tail)
+function! KenyToggleComment(leader, ...)
   let l:save_cpo   = &cpo
   let l:save_paste = &paste
   set cpo&vim
   set paste
   if getline('.') !=# ''
     let l:leader = escape(a:leader, '\/*')
-    let l:tail   = escape(a:tail, '\/*')
+    if a:0 > 0
+      let l:tail = escape(a:1, '\/*')
+    else
+      let l:tail = ''
+    end
     " Add or remove commenting syntax depending on
     " whether there is commenting syntax at the beginning of a line
     if getline('.') =~ '^' . l:leader . '\(.*\)' . l:tail . '$'
