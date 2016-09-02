@@ -193,10 +193,10 @@ call s:SetFgColor("SpecialChar", s:lavender, "italic")
 call s:SetFgColor("SpecialComment", s:ash, "bold,italic")
 call s:SetFgColor("Tag", s:pink, "italic")
 " Other
-call s:SetFgColor("Error", s:pink, "undercurl")
+call s:SetColor("Error", s:pink, s:bg, "undercurl")
 call s:SetFgColor("Ignore", s:ash)
 call s:SetFgColor("Todo", s:ash, "bold,italic")
-call s:SetFgColor("Underlined", s:ash, "underline")
+call s:SetColor("Underlined", s:light, s:bg, "underline")
 
 " Must be at the end, because of ctermbg=234 bug.
 " https://groups.google.com/forum/#!msg/vim_dev/afPqwAFNdrU/nqh6tOM87QUJ
