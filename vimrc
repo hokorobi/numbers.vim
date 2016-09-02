@@ -65,7 +65,7 @@ if has("multi_byte")
 endif
 
 " Basic interface elements
-set number ruler wrap showcmd showmode wildmenu laststatus=2
+set number ruler showcmd showmode wildmenu laststatus=2
 
 " Color
 set background=dark
@@ -79,8 +79,10 @@ if version >= 500
   syntax sync fromstart
 endif
 
-" Indentation
+" Indentation, wrap, and white spaces
 set autoindent softtabstop=2 shiftwidth=2 expandtab
+set wrap | let &showbreak = "\u2192"
+" set list | let &listchars = "eol:\u00AC"
 
 " Searching behaviors
 set hlsearch incsearch ignorecase smartcase
