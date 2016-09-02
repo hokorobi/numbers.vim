@@ -127,9 +127,15 @@ if !has("macunix")
   vnoremap <C-c> "+y
   cnoremap <C-c> <C-y>
   nnoremap <C-v> "+gP
-  cnoremap <C-v> <C-r>+aa
+  cnoremap <C-v> <C-r>+
+
+  " Pasting blockwise and linewise selections is not possible in Insert and
+  " Visual mode without the +virtualedit feature. They are pasted as if they
+  " were characterwise instead.
+  " Uses the paste.vim autoload script.
+  " Use CTRL-G u to have CTRL-Z only undo the paste.
   exec 'vnoremap <script> <C-v>' paste#paste_cmd['v']
-  exec 'inoremap <script> <C-v>' paste#paste_cmd['i']
+  exec 'inoremap <script> <C-v>' '<C-g>u' . paste#paste_cmd['i']
 
   nnoremap <silent> <C-a> gggH<C-o>G
   vnoremap <C-a> <Esc>gggH<C-o>G
