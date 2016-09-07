@@ -212,7 +212,7 @@ call s:SetFgColor("SpecialComment", s:ash, "bold,italic")
 call s:SetFgColor("Tag", s:pink, "italic")
 " Other
 call s:SetColor("Error", s:pink, s:bg, "undercurl")
-call s:SetFgColor("Ignore", s:ash)
+call s:SetFgColor("Ignore", s:bg)
 call s:SetFgColor("Todo", s:ash, "bold,italic")
 call s:SetColor("Underlined", s:light, s:bg, "underline")
 

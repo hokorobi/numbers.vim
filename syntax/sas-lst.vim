@@ -18,11 +18,8 @@ syn case match
 syn match saslstNumber display "\v<\-=(\d+\.=\d*|\.\d+)(e\-=\d+)=>"
 syn match saslstRtfTag display "\\R'\(\\tab\)\+'"
 
-" The default highlighting.
-hi! RtfTag ctermfg=bg guifg=bg
-
 hi def link saslstNumber Number
-hi def link saslstRtfTag RtfTag
+hi def link saslstRtfTag Ignore
 
 let b:current_syntax = "sas-lst"
 
