@@ -1,8 +1,8 @@
 " Vim syntax file
 " Language:     SAS
 " Maintainer:   Zhen-Huan Hu <wildkeny@gmail.com>
-" Version:      2.0.0
-" Last Change:  Aug 08, 2016
+" Version:      2.0.2
+" Last Change:  9/7/2016 12:16:59 PM
 "
 " 2016 Jun 14 by Zhen-Huan Hu
 "
@@ -69,8 +69,8 @@ setlocal iskeyword+=&
 syn case ignore
 
 " String
-syn region sasString start=+'+ end=+'+
-syn region sasString start=+"+ end=+"+ contains=sasMacroVariable
+syn region sasString start=+'+ end=+'+ contains=@Spell
+syn region sasString start=+"+ end=+"+ contains=sasMacroVariable,@Spell
 
 " Number
 syn match sasNumber display "\v<\-=(\d+\.=\d*|\.\d+)(e\-=\d+)=>"
@@ -144,34 +144,32 @@ syn match sasFormatTag display contained "\v\w+\."
 syn region sasFormat contained matchgroup=sasFormatStatement start="\v(^|;)@<=\s*(attrib|format|input|put)>" end=";"me=e-1 contains=@sasBasicSyntax,sasFormatTag 
 
 " Define default highlighting
-if version >= 508 || !exists("did_sas_syntax_inits")
-  hi def link sasComment Comment
-  hi def link sasDataStepControl Keyword
-  hi def link sasProcSQLClause Keyword
-  hi def link sasProcTemplateControl Keyword
-  hi def link sasODSControl Keyword
-  hi def link sasDS2Control Keyword
-  hi def link sasIMLControl Keyword
-  hi def link sasOperator Operator
-  hi def link sasNumber Number
-  hi def link sasString String
-  hi def link sasFunction Function
-  hi def link sasDataStepStatement Function
-  hi def link sasFormatStatement Function
-  hi def link sasProcStatement Function
-  hi def link sasGraphProcStatement Function
-  hi def link sasAnalyticalProcStatement Function
-  hi def link sasProcSQLStatement Function
-  hi def link sasProcTemplateStatement Function
-  hi def link sasGTLStatement Function
-  hi def link sasDS2Statement Function
-  hi def link sasIMLStatement Function
-  hi def link sasMacroReserved Macro
-  hi def link sasMacroFunction Define
-  hi def link sasMacroVariable Define
-  hi def link sasFormatTag SpecialChar
-  hi def link sasSpecialName Special
-endif
+hi def link sasComment Comment
+hi def link sasDataStepControl Keyword
+hi def link sasProcSQLClause Keyword
+hi def link sasProcTemplateControl Keyword
+hi def link sasODSControl Keyword
+hi def link sasDS2Control Keyword
+hi def link sasIMLControl Keyword
+hi def link sasOperator Operator
+hi def link sasNumber Number
+hi def link sasString String
+hi def link sasFunction Function
+hi def link sasDataStepStatement Function
+hi def link sasFormatStatement Function
+hi def link sasProcStatement Function
+hi def link sasGraphProcStatement Function
+hi def link sasAnalyticalProcStatement Function
+hi def link sasProcSQLStatement Function
+hi def link sasProcTemplateStatement Function
+hi def link sasGTLStatement Function
+hi def link sasDS2Statement Function
+hi def link sasIMLStatement Function
+hi def link sasMacroReserved Macro
+hi def link sasMacroFunction Define
+hi def link sasMacroVariable Define
+hi def link sasFormatTag SpecialChar
+hi def link sasSpecialName Special
 
 " Syncronize from beginning to keep large blocks from losing
 " syntax coloring while moving through code.
