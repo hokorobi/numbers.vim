@@ -78,6 +78,7 @@ syn match sasNumber display "\v<\-=(\d+\.=\d*|\.\d+)(e\-=\d+)=>"
 " Comment
 syn region sasComment start="/\*" end="\*/" " Block comment
 syn region sasComment start="\v(^|;)@<=\s*\%=\*" end="\v;@="
+syn region sasSectionLabel matchgroup=sasSectionLabelEnds start="/\*\*\s*" end="\s*\*\*/" concealends
 
 " Base SAS keywords, 8.1
 syn keyword sasOperator and eq ge gt in le lt ne not of or
@@ -145,6 +146,8 @@ syn region sasFormat contained matchgroup=sasFormatStatement start="\v(^|;)@<=\s
 
 " Define default highlighting
 hi def link sasComment Comment
+hi def link sasSectionLabel Title
+hi def link sasSectionLabelEnds Comment
 hi def link sasDataStepControl Keyword
 hi def link sasProcSQLClause Keyword
 hi def link sasProcTemplateControl Keyword
