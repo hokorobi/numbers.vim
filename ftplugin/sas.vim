@@ -5,9 +5,9 @@ function! s:KenyRunSAS()
   if v:shell_error ==# 0
     echo 'All steps terminated normally'
   elseif v:shell_error ==# 1
-    echo 'SAS System issued warning(s)'
+    echohl WarningMsg | echo 'SAS System issued warning(s)' | echohl None
   elseif v:shell_error ==# 2
-    echo 'SAS System issued error(s)'
+    echohl ErrorMsg | echo 'SAS System issued error(s)' | echohl None
   elseif v:shell_error ==# 3
     echo 'User issued the ABORT statement'
   elseif v:shell_error ==# 4
@@ -15,7 +15,7 @@ function! s:KenyRunSAS()
   elseif v:shell_error ==# 5
     echo 'User issued the ABORT ABEND statement'
   elseif v:shell_error ==# 6
-    echo 'SAS internal error'
+    echohl ErrorMsg | echo 'SAS internal error' | echohl None
   else
     echo 'Exit status code: ' . v:shell_error
   endif
