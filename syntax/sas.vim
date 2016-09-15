@@ -1,10 +1,21 @@
 " Vim syntax file
 " Language:     SAS
 " Maintainer:   Zhen-Huan Hu <wildkeny@gmail.com>
-" Version:      2.0.2
-" Last Change:  9/7/2016 12:16:59 PM
+" Version:      2.0.3
+" Last Change:  9/14/2016 2:49:32 PM
+" 
+" 2016 Sep 14
 "
-" 2016 Jun 14 by Zhen-Huan Hu
+" Change the implementation of syntaxing
+" macro function names so that macro parameters same
+" as SAS keywords won't be highlighted
+" (Thank Joug Raw for the suggestion)
+" Add section highlighting:
+" - Use /** and **/ to define a section
+" - It functions the same as a comment but
+"   with different highlighting
+"
+" 2016 Jun 14
 "
 " Major changes so upgrade version number to 2.0
 " Overhaul the entire script (again). Improvements include:
@@ -20,14 +31,14 @@
 " - Many other improvements and bug fixes
 " Drop support for earlier versions of VIM
 "
-" 2012 Feb 27 by Zhen-Huan Hu 
+" 2012 Feb 27 
 "
 " Rewrite the entire matching algorithm 
 " Add keywords in Base SAS 9.3 and SAS/Stat
 " Fix issues in highlighting procedure names and internal variables
 " Add highlighting for hash and hiter objects
 "
-" 2011 Apr 1 by Zhen-Huan Hu
+" 2011 Apr 1
 "
 " Simplify matching algorithm
 " Fix mis-matching of some keywords and function names
@@ -87,7 +98,7 @@ syn keyword sasSpecialName _all_ _automatic_ _char_ _character_ _data_ _infile_ 
 " Macro
 syn match sasMacroReserved "\v\%(abort|by|copy|display|do|else|end|global|goto|if|include|input|let|list|local|macro|mend|put|return|run|symdel|syscall|sysexec|syslput|sysrput|then|to|until|window|while)>"
 syn match sasMacroVariable display "\v\&+\w+(\.\w+)="
-syn match sasMacroFunction display "\v\%\w+\("me=e-1
+syn region sasMacroFunction matchgroup=sasMacroFunctionName start="\v\%\w+\("me=e-1 end="\v\)"me=e-1 contains=sasNumber,sasString,sasMacroVariable
 " Macro definition
 syn region sasMacro start="\v\%macro>" end="\v\%mend>" contains=@sasBasicSyntax,sasFormat,sasFunction,sasDataStepControl,sasDataStepStatement,sasProcStatement,sasGraphProc,sasAnalyticalProc,sasProcSQL,sasProcTemplate,sasDS2,sasIML
 
@@ -169,7 +180,7 @@ hi def link sasGTLStatement Function
 hi def link sasDS2Statement Function
 hi def link sasIMLStatement Function
 hi def link sasMacroReserved Macro
-hi def link sasMacroFunction Define
+hi def link sasMacroFunctionName Define
 hi def link sasMacroVariable Define
 hi def link sasFormatTag SpecialChar
 hi def link sasSpecialName Special
