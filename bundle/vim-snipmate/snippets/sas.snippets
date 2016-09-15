@@ -82,7 +82,7 @@ snippet infile
 	infile ${1} dlm = "," dsd firstobs = 2;
 	input ${2};${3}
 snippet declare
-	declare hash ${1}(dataset: "${2}");
+	declare hash ${1:}(dataset: "${2}");
 	rc = $1.definekey("${3}"${4});
 	rc = $1.definedata(${5:all: "yes"});
 	$1.definedone();${6}
