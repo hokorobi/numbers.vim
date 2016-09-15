@@ -6,7 +6,12 @@ if has("gui_macvim")
   set guifont=Source\ Code\ Pro:h14
   set linespace=2
 elseif has("gui_win32")
-  set guifont=Consolas:h11:cANSI
+  if version < 800
+    set guifont=Consolas:h11:cANSI
+  else
+    set guifont=Source_Code_Pro:h10:cANSI,Consolas:h11:cANSI
+    set renderoptions=type:directx
+  endif
   set linespace=3
 endif
 
