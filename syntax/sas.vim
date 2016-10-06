@@ -98,7 +98,7 @@ syn keyword sasSpecialName _all_ _automatic_ _char_ _character_ _data_ _infile_ 
 " Macro
 syn match sasMacroReserved "\v\%(abort|by|copy|display|do|else|end|global|goto|if|include|input|let|list|local|macro|mend|put|return|run|symdel|syscall|sysexec|syslput|sysrput|then|to|until|window|while)>"
 syn match sasMacroVariable display "\v\&+\w+(\.\w+)="
-syn region sasMacroFunction matchgroup=sasMacroFunctionName start="\v\%\w+\("me=e-1 end="\v\)"me=e-1 contains=sasNumber,sasString,sasMacroVariable
+syn region sasMacroFunction matchgroup=sasMacroFunctionName start="\v\%\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasMacroVariable
 " Macro definition
 syn region sasMacro start="\v\%macro>" end="\v\%mend>" contains=@sasBasicSyntax,sasFormat,sasGlobalStatement,sasDataStepControl,sasDataStepStatement,sasProcStatement,sasGraphProc,sasAnalyticalProc,sasProcSQL,sasProcTemplate,sasDS2,sasIML
 
