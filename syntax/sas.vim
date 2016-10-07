@@ -79,6 +79,13 @@ set cpo&vim
 setlocal iskeyword+=&
 syn case ignore
 
+" Macro
+syn match sasMacroReserved "\v\%(abort|by|copy|display|do|else|end|global|goto|if|include|input|let|list|local|macro|mend|put|return|run|symdel|syscall|sysexec|syslput|sysrput|then|to|until|window|while)>"
+syn match sasMacroVariable display "\v\&+\w+(\.\w+)="
+syn region sasMacroFunction matchgroup=sasMacroFunctionName start="\v\%\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasMacroVariable
+" Macro definition
+syn region sasMacro start="\v\%macro>" end="\v\%mend>" contains=@sasBasicSyntax,sasFormat,sasGlobalStatement,sasDataStepControl,sasDataStepStatement,sasProcStatement,sasGraphProc,sasAnalyticalProc,sasProcSQL,sasProcTemplate,sasDS2,sasIML
+
 " String
 syn region sasString start=+'+ end=+'+ contains=@Spell
 syn region sasString start=+"+ end=+"+ contains=sasMacroVariable,@Spell
@@ -91,19 +98,15 @@ syn region sasComment start="/\*" end="\*/" " Block comment
 syn region sasComment start="\v(^|;)@<=\s*\%=\*" end="\v;@="
 syn region sasSectionLabel matchgroup=sasSectionLabelEnds start="/\*\*\s*" end="\s*\*\*/" concealends
 
-" Base SAS keywords, 8.1
+" Function
+syn region sasFunction matchgroup=sasFunctionName start="\v<(call )=\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasMacroVariable
+
+" Keyword
 syn keyword sasOperator and eq ge gt in le lt ne not of or
 syn keyword sasSpecialName _all_ _automatic_ _char_ _character_ _data_ _infile_ _last_ _n_ _name_ _null_ _num_ _numeric_ _temporary_ _user_ _webout_
 
-" Macro
-syn match sasMacroReserved "\v\%(abort|by|copy|display|do|else|end|global|goto|if|include|input|let|list|local|macro|mend|put|return|run|symdel|syscall|sysexec|syslput|sysrput|then|to|until|window|while)>"
-syn match sasMacroVariable display "\v\&+\w+(\.\w+)="
-syn region sasMacroFunction matchgroup=sasMacroFunctionName start="\v\%\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasMacroVariable
-" Macro definition
-syn region sasMacro start="\v\%macro>" end="\v\%mend>" contains=@sasBasicSyntax,sasFormat,sasGlobalStatement,sasDataStepControl,sasDataStepStatement,sasProcStatement,sasGraphProc,sasAnalyticalProc,sasProcSQL,sasProcTemplate,sasDS2,sasIML
-
 " sasBasicSyntax allows adding basic SAS syntaxes
-syn cluster sasBasicSyntax contains=sasString,sasNumber,sasComment,sasOperator,sasSpecialName,sasMacroReserved,sasMacroFunction,sasMacroVariable,sasSectionLabel
+syn cluster sasBasicSyntax contains=sasString,sasNumber,sasComment,sasFunction,sasOperator,sasSpecialName,sasMacroReserved,sasMacroFunction,sasMacroVariable,sasSectionLabel
 
 " Define statements that can be accessed out of data step or procedure sections
 syn match sasGlobalStatement display "\v(^|;)@<=\s*(catname|data|dm|endsas|filename|footnote\d*|libname|lock|options|page|proc( \w+)=|quit|run|run cancel|sasfile|skip|sysecho|title\d*)>" " Global statements
@@ -168,6 +171,7 @@ hi def link sasIMLControl Keyword
 hi def link sasOperator Operator
 hi def link sasNumber Number
 hi def link sasString String
+hi def link sasFunctionName Function
 hi def link sasGlobalStatement Function
 hi def link sasDataStepStatement Function
 hi def link sasFormatStatement Function
