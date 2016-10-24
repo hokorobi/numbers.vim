@@ -43,6 +43,13 @@ snippet tedconsent
 snippet crfconsent
 	if yeartx <= 2007 and sgirbres = 0 then delete; 
 	else if yeartx > 2007 and (sgirbres <= 0 or sgirbres = 3) then delete;
+snippet mds
+	* 50 MDS, NOS | 51 RA | 52 RAEB | 54 CMML | 55 RARS
+	* 61 RAEB-1 | 62 RAEB-2 | 64 RCMD | 65 RCMD/RS | 66 5q syndrome | 67 MDS, other specified;
+	if fabdx not in (50: 52, 54, 55, 61, 62, 64: 67) then delete;
+	else if fabtrans in (1, 2) and fabpr not in (50: 52, 54, 55, 61, 62, 64: 67) then delete;
+	else if blbmdx >= 20 or blbmpr >= 20 then delete; * AML per Wael;
+	else if blbldx >= 20 or blblpr >= 20 then delete; * AML per Wael;
 snippet lifetest
 	%lifetest(indata = ${1:dataset}, strata = ${2:strata}, event = anc, competerisk = dwoanc, intv = intxanc, timelist = 0.921 3.28);
 	%lifetest(indata = $1, strata = $2, event = platelet, competerisk = dwoplatelet, intv = intxplatelet, timelist = 0.921 3.28);
