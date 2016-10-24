@@ -4,7 +4,6 @@ set guioptions-=T
 " Font
 if has("gui_macvim")
   set guifont=Source\ Code\ Pro:h14
-  set linespace=2
 elseif has("gui_win32")
   if version < 800
     set guifont=Consolas:h11:cANSI
