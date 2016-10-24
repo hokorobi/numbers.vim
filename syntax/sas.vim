@@ -1,9 +1,13 @@
 " Vim syntax file
 " Language:     SAS
 " Maintainer:   Zhen-Huan Hu <wildkeny@gmail.com>
-" Version:      2.0.3
-" Last Change:  9/14/2016 2:49:32 PM
-" 
+" Version:      2.0.4
+" Last Change:  10/10/2016 9:28:10 AM
+"
+" 2016 Oct 10
+"
+" Add highlighting for functions
+"
 " 2016 Sep 14
 "
 " Change the implementation of syntaxing
@@ -82,7 +86,7 @@ syn case ignore
 " Macro
 syn match sasMacroReserved "\v\%(abort|by|copy|display|do|else|end|global|goto|if|include|input|let|list|local|macro|mend|put|return|run|symdel|syscall|sysexec|syslput|sysrput|then|to|until|window|while)>"
 syn match sasMacroVariable display "\v\&+\w+(\.\w+)="
-syn region sasMacroFunction matchgroup=sasMacroFunctionName start="\v\%\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasMacroVariable
+syn region sasMacroFunction matchgroup=sasMacroFunctionName start="\v\%\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasMacroVariable,sasMacroFunction
 " Macro definition
 syn region sasMacro start="\v\%macro>" end="\v\%mend>" contains=@sasBasicSyntax,sasFormat,sasGlobalStatement,sasDataStepControl,sasDataStepStatement,sasProcStatement,sasGraphProc,sasAnalyticalProc,sasProcSQL,sasProcTemplate,sasDS2,sasIML
 
@@ -99,7 +103,7 @@ syn region sasComment start="\v(^|;)@<=\s*\%=\*" end="\v;@="
 syn region sasSectionLabel matchgroup=sasSectionLabelEnds start="/\*\*\s*" end="\s*\*\*/" concealends
 
 " Function
-syn region sasFunction matchgroup=sasFunctionName start="\v<(call )=\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasMacroVariable
+syn region sasFunction matchgroup=sasFunctionName start="\v<(call )=\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasMacroVariable,sasFunction
 
 " Keyword
 syn keyword sasOperator and eq ge gt in le lt ne not of or
