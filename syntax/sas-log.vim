@@ -18,7 +18,7 @@ syn match saslogNumber display "\v<\-=(\d+\.=\d*|\.\d+)(e\-=\d+)=>" contained
 syn match saslogSplCmt display "\v<(uninitialized)>" contained
 syn region saslogNote         matchgroup=saslogKeyword  start=/^NOTE:/         skip=/\n \{6}/  end=/$/ contains=saslogSplCmt
 syn region saslogError        matchgroup=saslogKeyword  start=/^ERROR:/        skip=/\n \{7}/  end=/$/ contains=saslogSplCmt
-syn region saslogWarning      matchgroup=saslogKeyword  start=/^WARNING:/      skip=/\n \{9}/  end=/$/ contains=saslogSplCmt
+syn region saslogWarning      matchgroup=saslogKeyword  start=/^WARNING:/      skip=/\n \{6}/  end=/$/ contains=saslogSplCmt
 syn region saslogMacroSource  matchgroup=saslogMacroKwd start=/^MPRINT(\w\+):/ end=/$/ contains=saslogNumber
 syn region saslogMacroLogic   matchgroup=saslogMacroKwd start=/^MLOGIC(\w\+):/ skip=/\n \{6}/  end=/$/
 syn region saslogSymbolGen    matchgroup=saslogMacroKwd start=/^SYMBOLGEN:/    skip=/\n \{11}/ end=/$/
