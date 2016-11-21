@@ -84,10 +84,8 @@ setlocal iskeyword+=&
 syn case ignore
 
 " Macro
-syn match sasMacroReserved "\v\%(abort|by|copy|display|do|else|end|global|goto|if|include|input|let|list|local|macro|mend|put|return|run|symdel|syscall|sysexec|syslput|sysrput|then|to|until|window|while)>"
 syn match sasMacroVariable display "\v\&+\w+(\.\w+)="
-syn region sasMacroFunction matchgroup=sasMacroFunctionName start="\v\%\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasMacroVariable,sasMacroFunction
-" Macro definition
+syn match sasMacroReserved "\v\%(abort|by|copy|display|do|else|end|global|goto|if|include|input|let|list|local|macro|mend|put|return|run|symdel|syscall|sysexec|syslput|sysrput|then|to|until|window|while)>"
 syn region sasMacro start="\v\%macro>" end="\v\%mend>" contains=@sasBasicSyntax,sasFormat,sasGlobalStatement,sasDataStepControl,sasDataStepStatement,sasProcStatement,sasGraphProc,sasAnalyticalProc,sasProcSQL,sasProcTemplate,sasDS2,sasIML
 
 " String
@@ -103,7 +101,8 @@ syn region sasComment start="\v(^|;)@<=\s*\%=\*" end="\v;@="
 syn region sasSectionLabel matchgroup=sasSectionLabelEnds start="/\*\*\s*" end="\s*\*\*/" concealends
 
 " Function
-syn region sasFunction matchgroup=sasFunctionName start="\v<(call )=\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasMacroVariable,sasFunction
+syn region sasMacroFunction matchgroup=sasMacroFunctionName start="\v\%\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasComment,sasFunction,sasMacroVariable,sasMacroFunction
+syn region sasFunction matchgroup=sasFunctionName start="\v<(call )=\w+\(@=" end="\v\)@<=" contains=sasNumber,sasString,sasComment,sasFunction,sasMacroVariable
 
 " Keyword
 syn keyword sasOperator and eq ge gt in le lt ne not of or
@@ -141,7 +140,7 @@ syn region sasAnalyticalProc start="\v(^|;)@<=\s*proc (aceclus|adaptivereg|anova
 " Proc TEMPLATE, 9.4
 syn match sasProcTemplateStatement display contained "\v(^|;)@<=\s*(block|break|cellstyle|cellvalue|class|close|column|compute|continue|define( (column|crosstabs|event|footer|header|statgraph|style|table|tagset))=|delete|delstream|do|done|dynamic|edit|else|end|eval|flush|footer|header|import|iterate|link|list|mvar|ndent|next|nmvar|notes|open|path|put|putl|putlog|putstream|putvars|replace|set|source|stop|style|test|text[23]=|translate|trigger|unblock|unset|xdent)>"
 syn match sasGTLStatement display contained "\v(^|;)@<=\s*(axislegend|axistable|bandplot|barchart|barchartparm|begingraph|beginpolygon|beginpolyline|bihistogram3dparm|blockplot|boxplot|boxplotparm|bubbleplot|continuouslegend|contourplotparm|dendrogram|discretelegend|drawarrow|drawimage|drawline|drawoval|drawrectangle|drawtext|dropline|ellipse|ellipseparm|endgraph|endinnermargin|endlayout|endpolygon|endpolyline|endsidebar|entry|entryfootnote|entrytitle|fringeplot|heatmap|heatmapparm|highlowplot|histogram|histogramparm|innermargin|layout( (datalattice|datapanel|globallegend|gridded|lattice|overlay|overlayequated|overlay3d|region))=|legenditem|legendtextitems|linechart|lineparm|loessplot|mergedlegend|modelband|needleplot|pbsplineplot|polygonplot|referenceline|regressionplot|scatterplot|seriesplot|sidebar|stepplot|surfaceplotparm|symbolchar|symbolimage|textplot|vectorplot|waterfallchart)>"
-syn region sasProcTemplate start="\v(^|;)@<=\s*proc template>" end="\v(^|;)@<=(\s*(data|endsas|proc|quit|run)>)@=" contains=@sasBasicSyntax,sasFormat,sasGlobalStatement,sasProcTemplateControl,sasProcTemplateStatement,sasGTLStatement
+syn region sasProcTemplate start="\v(^|;)@<=\s*proc template>" end="\v(^|;)@<=(\s*(data|endsas|proc|quit|run)>)@=" contains=@sasBasicSyntax,sasFormat,sasGlobalStatement,sasProcTemplateStatement,sasGTLStatement
 
 " Proc SQL, 9.4
 syn keyword sasProcSQLClause contained add as asc between by calculated cascade case check connection constraint cross delete desc distinct drop else end escape except exists foreign from full group having in inner intersect into is join key left libname like modify natural newline notrim null on order outer references restrict right select separated set then to trimmed union unique update user using values when where
@@ -168,7 +167,6 @@ hi def link sasSectionLabel Title
 hi def link sasSectionLabelEnds Comment
 hi def link sasDataStepControl Keyword
 hi def link sasProcSQLClause Keyword
-hi def link sasProcTemplateControl Keyword
 hi def link sasODSControl Keyword
 hi def link sasDS2Control Keyword
 hi def link sasIMLControl Keyword
