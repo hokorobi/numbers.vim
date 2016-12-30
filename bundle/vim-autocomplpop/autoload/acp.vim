@@ -320,13 +320,24 @@ function s:MakeCurrentBehaviorSet()
     return 0
   endif
   let s:behav_idx = 0
-  let word = s:GetCurrentWord()
-  if word ==# ''
-    " Clear s:last_uncompletable at a non-keyword character
-    unlet! s:last_uncompletable
+  let text = s:GetCurrentText()
+  call filter(s:current_behavs, 'call(v:val.meets, [text])')
+  " Improve the response by not to attempt another completion
+  " after a word found with no completion candidate at the last attempt
+  if exists('s:last_uncompletable') &&
+        \ stridx(s:GetCurrentWord(), s:last_uncompletable.word) == 0 &&
+        \ map(copy(s:current_behavs), 'v:val.command') ==# s:last_uncompletable.commands
+    call s:ClearCurrentBehaviorSet()
+    return 0
+  else
+    if empty(s:current_behavs)
+      unlet! s:last_uncompletable
+      call s:ClearCurrentBehaviorSet()
+      return 0
+    else
+      return 1
+    endif
   endif
-  call filter(s:current_behavs, 'call(v:val.meets, [word])')
-  return !empty(s:current_behavs)
 endfunction
 
 " Clear current behavior set s:current_behavs
@@ -347,33 +358,24 @@ function s:FeedPopup()
     endif
     return ''
   elseif s:MakeCurrentBehaviorSet()
-    " Improve the response by not to attempt another completion
-    " after a word found with no completion candidate at the last attempt
-    if exists('s:last_uncompletable') &&
-          \ stridx(s:GetCurrentWord(), s:last_uncompletable.word) == 0 &&
-          \ map(copy(s:current_behavs), 'v:val.command') ==# s:last_uncompletable.commands
-      call s:FinishPopup(0)
-      return ''
-    else
-      " In case of words divided by symbols (e.g.: 'for(int', 'ab=cd') while a
-      " popup menu is visible, another popup is not possible without pressing <C-e>
-      " or trying to popup at least once
-      " First completion behavior is doubled to circumvent this
-      call insert(s:current_behavs, s:current_behavs[0])
-      " Set temporary options before attempting to popup menu
-      call s:SetTempOption(s:L_0, '&complete', g:acp_complete_option)
-      call s:SetTempOption(s:L_0, '&completeopt', 'menuone' . (g:acp_completeopt_preview ? ',preview' : ''))
-      call s:SetTempOption(s:L_0, '&completefunc', (exists('s:current_behavs[0].completefunc') ? s:current_behavs[0].completefunc : eval('&completefunc')))
-      call s:SetTempOption(s:L_0, '&ignorecase', g:acp_ignorecase_option)
-      call s:SetTempOption(s:L_0, '&spell', 0)
-      " If autocmd driven, set 'lazyredraw' to avoid flickering,
-      " If key mapping driven, set 'nolazyredraw' to make the popup menu visible
-      call s:SetTempOption(s:L_0, '&lazyredraw', !g:acp_mapping_driven)
-      " Unlike other options, &textwidth must be restored after each final <C-e>
-      call s:SetTempOption(s:L_1, '&textwidth', 0)
-      call feedkeys(printf("%s\<C-r>=%sOnPopup()\<CR>", s:current_behavs[0].command, s:PREFIX_SID), 'n')
-      return ''
-    endif
+    " In case of words divided by symbols (e.g.: 'for(int', 'ab=cd') while a
+    " popup menu is visible, another popup is not possible without pressing <C-e>
+    " or trying to popup at least once
+    " First completion behavior is doubled to circumvent this
+    call insert(s:current_behavs, s:current_behavs[0])
+    " Set temporary options before attempting to popup menu
+    call s:SetTempOption(s:L_0, '&complete', g:acp_complete_option)
+    call s:SetTempOption(s:L_0, '&completeopt', 'menuone' . (g:acp_completeopt_preview ? ',preview' : ''))
+    call s:SetTempOption(s:L_0, '&completefunc', (exists('s:current_behavs[0].completefunc') ? s:current_behavs[0].completefunc : eval('&completefunc')))
+    call s:SetTempOption(s:L_0, '&ignorecase', g:acp_ignorecase_option)
+    call s:SetTempOption(s:L_0, '&spell', 0)
+    " If autocmd driven, set 'lazyredraw' to avoid flickering,
+    " If key mapping driven, set 'nolazyredraw' to make the popup menu visible
+    call s:SetTempOption(s:L_0, '&lazyredraw', !g:acp_mapping_driven)
+    " Unlike other options, &textwidth must be restored after each final <C-e>
+    call s:SetTempOption(s:L_1, '&textwidth', 0)
+    call feedkeys(printf("%s\<C-r>=%sOnPopup()\<CR>", s:current_behavs[0].command, s:PREFIX_SID), 'n')
+    return ''
   else
     call s:FinishPopup(1)
     return ''
@@ -416,12 +418,12 @@ function s:OnPopup()
 endfunction
 
 " Cleaning function after popup
-function s:FinishPopup(level)
+function s:FinishPopup(level) 
+  inoremap <C-h> <Nop> | iunmap <C-h>
+  inoremap <BS>  <Nop> | iunmap <BS>
   if a:level >= 0
     call s:ClearCurrentBehaviorSet()
     call s:RestoreTempOptions(s:L_0)
-    inoremap <C-h> <Nop> | iunmap <C-h>
-    inoremap <BS>  <Nop> | iunmap <BS>
   endif
   if a:level >= 1
     call s:RestoreTempOptions(s:L_1)
