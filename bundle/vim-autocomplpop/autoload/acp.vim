@@ -278,46 +278,16 @@ function s:GetCurrentWord()
   return matchstr(s:GetCurrentText(), '\k*$')
 endfunction
 
-" Check if the buffer is modified
-function s:IsModifiedSinceLastCall()
-  if exists('s:pos_last')
-    let pos_prev     = s:pos_last
-    let n_lines_prev = s:n_lines_last
-    let text_prev    = s:text_last
-  endif
-  let s:pos_last     = getpos('.')
-  let s:n_lines_last = line('$')
-  let s:text_last    = getline('.')
-  if !exists('pos_prev')
-    return 1
-  elseif pos_prev[1] != s:pos_last[1] || n_lines_prev != s:n_lines_last
-    return (pos_prev[1] - s:pos_last[1] == n_lines_prev - s:n_lines_last)
-  elseif text_prev ==# s:text_last
-    return 0
-  elseif pos_prev[2] > s:pos_last[2]
-    return 1
-  elseif has('gui_running') && has('multi_byte')
-    " NOTE: auto-popup causes a strange behavior when IME/XIM is working
-    return pos_prev[2] + 1 == s:pos_last[2]
-  endif
-  return pos_prev[2] != s:pos_last[2]
-endfunction
-
 " Make current behavior set s:current_behavs
 " Return 1 if a new behavior set is created, 0 if otherwise
 function s:MakeCurrentBehaviorSet()
   if exists('s:current_behavs[s:behav_idx].repeat')
         \ && s:current_behavs[s:behav_idx].repeat
     let s:current_behavs = [ s:current_behavs[s:behav_idx] ]
-  elseif s:IsModifiedSinceLastCall()
-    " Make a behavior set only if the buffer has been modified since last call
+  else
     let s:current_behavs = copy(exists('g:acp_behavior[&filetype]')
           \ ? g:acp_behavior[&filetype]
           \ : g:acp_behavior['*'])
-  else
-    " No need to create a behavior set if the buffer is unchanged
-    call s:ClearCurrentBehaviorSet()
-    return 0
   endif
   let s:behav_idx = 0
   let text = s:GetCurrentText()
