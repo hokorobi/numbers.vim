@@ -11,23 +11,30 @@ snippet pre
 	
 	options notes mprint /* mlogic */ symbolgen;
 	* Preamble END }}};
-snippet other
-	ods tagsets.excelxp file = "condregi.xls" style = kenyxls
-	options(frozen_rowheaders = "1" frozen_headers = "1");
-	proc summary data = &final print n;
-		class condint condlist othdrsp;
-		types condint*condlist*othdrsp;
-		var crid;
-	run;
-	ods tagsets.excelxp close;
-	
-	ods tagsets.excelxp file = "othgvhd.xls" style = kenyxls
-	options(frozen_rowheaders = "1" frozen_headers = "1");
-	proc freq data = &final;
-		where gvhdgp = 20;
-		table gvhdlist / nocol norow nopct missing;
-	run;
-	ods tagsets.excelxp close;
+snippet tedconsent
+	if consenrs < 0 and sgirbres >= 0 then consenrs = sgirbres; 
+	if yeartx <= 2007 and consenrs = 0 then delete; 
+	else if yeartx > 2007 and (consenrs <= 0 or consenrs = 3) then delete;
+snippet crfconsent
+	if yeartx <= 2007 and sgirbres = 0 then delete; 
+	else if yeartx > 2007 and (sgirbres <= 0 or sgirbres = 3) then delete;
+snippet mds
+	* 50: MDS, unclassified | 51: RA | 52: RAEB | 54: CMML | 55: RARS
+	* 61: RAEB-1 | 62: RAEB-2 | 64: RCMD | 65: RCMD/RS | 66: 5q- syndrome
+	* 67: MDS, other specified (legacy only);
+	if fabdx not in (50: 52, 54, 55, 61, 62, 64: 67) then delete;
+	else if fabtrans in (1, 2) and fabpr not in (50: 52, 54, 55, 61, 62, 64: 67) then delete;
+	else if blbmdx >= 20 or blbmpr >= 20 then delete; * AML per Wael;
+	else if blbldx >= 20 or blblpr >= 20 then delete; * AML per Wael;
+snippet mps
+	* 57: polycythemia vera | 58: essential/primary thrombocythemia
+	* 59: myelofibrosis (legacy) | 160: myelofibrosis (ver. 1) | 167: myelofibrosis (ver. 3).
+	if fabdx not in (57: 59, 160, 167) then delete;
+	else if fabdx in (57, 58) and fabpr not in (59, 160, 167) then delete; * Post-PV, ET;
+	else if fabtrans > 0 and fabpr not in (59, 160, 167) then delete;
+	if missing(fabtrans) and missing(fabpr) then delete;
+	else if blbmdx >= 20 or blbmpr >= 20 then delete; * AML per Wael;
+	else if blbldx >= 20 or blblpr >= 20 then delete; * AML per Wael;
 snippet age
 	* Age;
 	if 0 < age < 10 then agegp = 0;
@@ -54,20 +61,23 @@ snippet graftype
 	if graftype = 1 then graftypecat = 1; * Bone marrow;
 	else if graftype in (22, 30) then graftypecat = 2; * Peripheral blood;
 	else if graftype in (23, 31, 33) then graftypecat = 3; * Cord blood;
-snippet tedconsent
-	if consenrs < 0 and sgirbres >= 0 then consenrs = sgirbres; 
-	if yeartx <= 2007 and consenrs = 0 then delete; 
-	else if yeartx > 2007 and (consenrs <= 0 or consenrs = 3) then delete;
-snippet crfconsent
-	if yeartx <= 2007 and sgirbres = 0 then delete; 
-	else if yeartx > 2007 and (sgirbres <= 0 or sgirbres = 3) then delete;
-snippet mds
-	* 50 MDS, NOS | 51 RA | 52 RAEB | 54 CMML | 55 RARS
-	* 61 RAEB-1 | 62 RAEB-2 | 64 RCMD | 65 RCMD/RS | 66 5q syndrome | 67 MDS, other specified;
-	if fabdx not in (50: 52, 54, 55, 61, 62, 64: 67) then delete;
-	else if fabtrans in (1, 2) and fabpr not in (50: 52, 54, 55, 61, 62, 64: 67) then delete;
-	else if blbmdx >= 20 or blbmpr >= 20 then delete; * AML per Wael;
-	else if blbldx >= 20 or blblpr >= 20 then delete; * AML per Wael;
+snippet other
+	ods tagsets.excelxp file = "condregi.xls" style = kenyxls
+	options(frozen_rowheaders = "1" frozen_headers = "1");
+	proc summary data = &final print n;
+		class condint condlist othdrsp;
+		types condint*condlist*othdrsp;
+		var crid;
+	run;
+	ods tagsets.excelxp close;
+	
+	ods tagsets.excelxp file = "othgvhd.xls" style = kenyxls
+	options(frozen_rowheaders = "1" frozen_headers = "1");
+	proc freq data = &final;
+		where gvhdgp = 20;
+		table gvhdlist / nocol norow nopct missing;
+	run;
+	ods tagsets.excelxp close;
 snippet lifetest
 	%lifetest(indata = ${1:dataset}, strata = ${2:strata}, event = anc, competerisk = dwoanc, intv = intxanc, timelist = 0.921 3.28);
 	%lifetest(indata = $1, strata = $2, event = platelet, competerisk = dwoplatelet, intv = intxplatelet, timelist = 0.921 3.28);
