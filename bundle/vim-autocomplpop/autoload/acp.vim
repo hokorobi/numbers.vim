@@ -278,16 +278,49 @@ function s:GetCurrentWord()
   return matchstr(s:GetCurrentText(), '\k*$')
 endfunction
 
+"
+function s:IsModifiedSinceLastCall()
+  if exists('s:pos_last')
+    let pos_prev = s:pos_last
+    let n_lines_prev = s:n_lines_last
+    let text_prev = s:text_last
+    echom pos_prev[2] . ' ' . getpos('.')[2]
+  endif
+  let s:pos_last = getpos('.')
+  let s:n_lines_last = line('$')
+  let s:text_last = getline('.')
+  if !exists('pos_prev')
+    return 1
+  elseif n_lines_prev != s:n_lines_last
+    return 1
+  elseif text_prev ==# s:text_last
+    return 0
+  elseif pos_prev[2] > s:pos_last[2]
+    return 1
+  elseif has('gui_running') && has('multi_byte')
+    " NOTE: a strange behavior when IME/XIM is working
+    return pos_prev[2] + 1 == s:pos_last[2]
+  else
+    return pos_prev[2] != s:pos_last[2]
+  endif
+endfunction
+
 " Make current behavior set s:current_behavs
 " Return 1 if a new behavior set is created, 0 if otherwise
 function s:MakeCurrentBehaviorSet()
   if exists('s:current_behavs[s:behav_idx].repeat')
         \ && s:current_behavs[s:behav_idx].repeat
     let s:current_behavs = [ s:current_behavs[s:behav_idx] ]
-  else
+  elseif exists('s:current_behavs[s:behav_idx]')
+    call s:ClearCurrentBehaviorSet()
+    return 0
+  elseif s:IsModifiedSinceLastCall()
     let s:current_behavs = copy(exists('g:acp_behavior[&filetype]')
           \ ? g:acp_behavior[&filetype]
           \ : g:acp_behavior['*'])
+  else
+    call s:ClearCurrentBehaviorSet()
+    return 0
   endif
   let s:behav_idx = 0
   let text = s:GetCurrentText()
