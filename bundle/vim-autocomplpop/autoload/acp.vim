@@ -284,7 +284,6 @@ function s:IsModifiedSinceLastCall()
     let pos_prev = s:pos_last
     let n_lines_prev = s:n_lines_last
     let text_prev = s:text_last
-    echom pos_prev[2] . ' ' . getpos('.')[2]
   endif
   let s:pos_last = getpos('.')
   let s:n_lines_last = line('$')
