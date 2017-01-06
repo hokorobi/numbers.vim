@@ -18,10 +18,10 @@ let g:loaded_autoload_acp = 1
 function acp#enable()
   augroup AcpGlobalAutoCommand
     autocmd!
-    autocmd InsertEnter * call s:ResetLastPosition()
-    autocmd InsertLeave * call s:FinishPopup(1)
-    autocmd CursorMovedI * call s:FeedPopup()
-    autocmd CompleteDone * call s:ResetLastPosition()
+    autocmd InsertEnter  * call s:ResetLastCursorPosition()
+    autocmd TextChangedI * call s:FeedPopup()
+    autocmd CompleteDone * call s:ResetLastCursorPosition()
+    autocmd InsertLeave  * call s:FinishPopup(1)
   augroup END
 endfunction
 
@@ -232,31 +232,21 @@ function s:GetCurrentWord()
 endfunction
 
 " Reset the last cursor position
-function s:ResetLastPosition()
+function s:ResetLastCursorPosition()
   let s:pos_last = getpos('.')
   let s:n_lines_last = line('$')
   let s:text_last = getline('.')
 endfunction
 
-" Check if a new character entered
-function s:IsModifiedSinceLastCall()
+" Check if the cursor only moved a single position
+function s:CursorMovedSinglePosition()
   if exists('s:pos_last')
     let pos_prev = s:pos_last
     let n_lines_prev = s:n_lines_last
     let text_prev = s:text_last
   endif
-  call s:ResetLastPosition()
-  if !exists('pos_prev')
-    return 1
-  elseif n_lines_prev != s:n_lines_last
-    return 1
-  elseif text_prev ==# s:text_last
-    return 0
-  elseif abs(pos_prev[2] - s:pos_last[2]) == 1
-    return 1
-  else
-    return 0
-  endif
+  call s:ResetLastCursorPosition()
+  return abs(pos_prev[2] - s:pos_last[2]) == 1
 endfunction
 
 " Make current behavior set s:current_behavs
@@ -265,7 +255,7 @@ function s:MakeCurrentBehaviorSet()
   if exists('s:current_behavs[s:behav_idx].repeat')
         \ && s:current_behavs[s:behav_idx].repeat
     let s:current_behavs = [ s:current_behavs[s:behav_idx] ]
-  elseif s:IsModifiedSinceLastCall()
+  elseif s:CursorMovedSinglePosition()
     let s:current_behavs = copy(exists('g:acp_behavior[&filetype]')
           \ ? g:acp_behavior[&filetype]
           \ : g:acp_behavior['*'])
