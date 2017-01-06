@@ -291,9 +291,7 @@ endfunction
 
 " Feed keys to popup menu
 function s:FeedPopup()
-  " CursorMovedI event will not be triggered while the popup menu is visible
-  " It will be triggered once popup menu has disappeared (aka: end of a word)
-  if s:lock_count > 0 || pumvisible() || &paste
+  if s:lock_count > 0 || &paste
     return ''
   elseif exists('s:current_behavs[s:behav_idx].closef')
     if !call(s:current_behavs[s:behav_idx].closef, [])
