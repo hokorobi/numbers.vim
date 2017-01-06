@@ -171,10 +171,10 @@ call s:DefineVariableDefault('g:acp_behavior', {})
 "-----------------------------------------------------------------------------
 call extend(g:acp_behavior, s:MakeDefaultBehavior(), 'keep')
 "-----------------------------------------------------------------------------
-command! -bar -narg=0 AcpEnable  call acp#enable()
-command! -bar -narg=0 AcpDisable call acp#disable()
-command! -bar -narg=0 AcpLock    call acp#lock()
-command! -bar -narg=0 AcpUnlock  call acp#unlock()
+command! -bar -narg=0 AcpEnable  call acp#Enable()
+command! -bar -narg=0 AcpDisable call acp#Disable()
+command! -bar -narg=0 AcpLock    call acp#Lock()
+command! -bar -narg=0 AcpUnlock  call acp#Unlock()
 "-----------------------------------------------------------------------------
 " legacy commands
 command! -bar -narg=0 AutoComplPopEnable  AcpEnable

@@ -15,7 +15,7 @@ let g:loaded_autoload_acp = 1
 " GLOBAL FUNCTIONS: {{{1
 
 " Enable auto-popup
-function acp#enable()
+function acp#Enable()
   augroup AcpGlobalAutoCommand
     autocmd!
     autocmd InsertEnter  * call s:ResetLastCursorPosition()
@@ -26,19 +26,19 @@ function acp#enable()
 endfunction
 
 " Disable auto-popup
-function acp#disable()
+function acp#Disable()
   augroup AcpGlobalAutoCommand
     autocmd!
   augroup END
 endfunction
 
 " Suspend auto-popup
-function acp#lock()
+function acp#Lock()
   let s:lock_count += 1
 endfunction
 
 " Release auto-popup from suspension
-function acp#unlock()
+function acp#Unlock()
   let s:lock_count -= 1
   if s:lock_count < 0
     let s:lock_count = 0
