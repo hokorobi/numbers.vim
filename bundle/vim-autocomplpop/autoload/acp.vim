@@ -140,15 +140,8 @@ endfunction
 " Default 'meets' function for Python
 " to decide whether to attempt completion
 function s:MeetsForPythonOmni(context)
-  if g:acp_python_omni_length == 0
-    return has('python') &&
-          \ a:context =~ '\k\.$'
-  elseif g:acp_python_omni_length > 0
-    return has('python') &&
-          \ a:context =~ '\k\.\k\{' . g:acp_python_omni_length . ',}$'
-  else
-    return 0
-  endif
+  return has('python') && g:acp_python_omni_length >= 0 &&
+        \ a:context =~ '\k\.\k\{' . g:acp_python_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Perl
