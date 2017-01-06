@@ -148,7 +148,6 @@ endfunction
 
 "-----------------------------------------------------------------------------
 call s:DefineVariableDefault('g:acp_enable_at_startup', 1)
-call s:DefineVariableDefault('g:acp_mapping_driven', 0)
 call s:DefineVariableDefault('g:acp_select_first_item', 1)
 call s:DefineVariableDefault('g:acp_ignorecase_option', 1)
 call s:DefineVariableDefault('g:acp_complete_option', '.,w,b,k')

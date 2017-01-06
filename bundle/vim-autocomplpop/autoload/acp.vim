@@ -16,27 +16,16 @@ let g:loaded_autoload_acp = 1
 
 " To enable auto-popup
 function acp#enable()
-  call acp#disable()
-
   augroup AcpGlobalAutoCommand
     autocmd!
     autocmd InsertEnter * unlet! s:pos_last s:last_uncompletable
     autocmd InsertLeave * call s:FinishPopup(1)
+    autocmd CursorMovedI * call s:FeedPopup()
   augroup END
-
-  if g:acp_mapping_driven
-    " Use key mappings to trigger the popup menu
-    call s:MapForMappingDriven()
-  else
-    " Otherwise trigger the popup menu 
-    " after the cursor was moved in Insert mode
-    autocmd AcpGlobalAutoCommand CursorMovedI * call s:FeedPopup()
-  endif
 endfunction
 
 " To disable auto-popup
 function acp#disable()
-  call s:UnMapForMappingDriven()
   augroup AcpGlobalAutoCommand
     autocmd!
   augroup END
@@ -200,34 +189,6 @@ function s:MeetsForCssOmni(context)
     return 1
   endif
   return 0
-endfunction
-
-" Map keys to s:FeedPopup()
-function s:MapForMappingDriven()
-  call s:UnMapForMappingDriven()
-  let s:mapping_driven_keys = [
-        \ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-        \ 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-        \ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-        \ 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-        \ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-        \ '-', '_', '~', '^', '.', ',', ':', '!', '#', '=', '%', '$', '@', '<', '>', '/', '\',
-        \ '<Space>', '<C-h>', '<BS>', ]
-  for key in s:mapping_driven_keys
-    execute printf('inoremap <silent> %s %s<C-r>=<SID>FeedPopup()<CR>',
-          \        key, key)
-  endfor
-endfunction
-
-" Unmap keys
-function s:UnMapForMappingDriven()
-  if !exists('s:mapping_driven_keys')
-    return
-  endif
-  for key in s:mapping_driven_keys
-    execute 'iunmap' key
-  endfor
-  unlet s:mapping_driven_keys
 endfunction
 
 " Set variable with temporary value
@@ -421,16 +382,6 @@ function s:FinishPopup(level)
   if a:level >= 1
     call s:RestoreTempOptions(s:L_1)
   endif
-endfunction
-
-"
-function s:OnBS()
-  " Use "matchstr" instead of "strpart" to handle multi-byte characters
-  if call(s:current_behavs[s:behav_idx].meets,
-        \ [matchstr(s:GetCurrentText(), '.*.\@=')])
-    return "\<BS>"
-  endif
-  return "\<C-e>\<BS>"
 endfunction
 
 "
