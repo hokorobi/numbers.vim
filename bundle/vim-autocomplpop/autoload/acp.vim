@@ -14,7 +14,7 @@ let g:loaded_autoload_acp = 1
 "=============================================================================
 " GLOBAL FUNCTIONS: {{{1
 
-" To enable auto-popup
+" Enable auto-popup
 function acp#enable()
   augroup AcpGlobalAutoCommand
     autocmd!
@@ -24,19 +24,19 @@ function acp#enable()
   augroup END
 endfunction
 
-" To disable auto-popup
+" Disable auto-popup
 function acp#disable()
   augroup AcpGlobalAutoCommand
     autocmd!
   augroup END
 endfunction
 
-" To suspend auto-popup temporarily
+" Suspend auto-popup
 function acp#lock()
   let s:lock_count += 1
 endfunction
 
-" To resume auto-popup from suspension
+" Release auto-popup from suspension
 function acp#unlock()
   let s:lock_count -= 1
   if s:lock_count < 0
@@ -322,9 +322,8 @@ function s:FeedPopup()
     call s:SetTempOption(s:L_0, '&completeopt', 'menuone' . (g:acp_completeopt_preview ? ',preview' : ''))
     call s:SetTempOption(s:L_0, '&completefunc', (exists('s:current_behavs[0].completefunc') ? s:current_behavs[0].completefunc : eval('&completefunc')))
     call s:SetTempOption(s:L_0, '&ignorecase', g:acp_ignorecase_option)
-    call s:SetTempOption(s:L_0, '&spell', 0)
-    " Set 'lazyredraw' to avoid flickering,
     call s:SetTempOption(s:L_0, '&lazyredraw', 1)
+    call s:SetTempOption(s:L_0, '&spell', 0)
     " Unlike other options, &textwidth must be restored after each final <C-e>
     call s:SetTempOption(s:L_1, '&textwidth', 0)
     call feedkeys(printf("%s\<C-r>=%sOnPopup()\<CR>", s:current_behavs[0].command, s:PREFIX_SID), 'n')
