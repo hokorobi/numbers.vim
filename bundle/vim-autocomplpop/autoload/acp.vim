@@ -192,6 +192,13 @@ function s:MeetsForCssOmni(context)
   return 0
 endfunction
 
+" Default 'meets' function for SAS
+" to decide whether to attempt completion
+function s:MeetsForSAS(context)
+  return (&ft ==# 'sas') && g:acp_sas_length >= 0 &&
+        \ a:context =~ '\<proc \k\{' . g:acp_sas_length . ',}$'
+endfunction
+
 " Set variable with temporary value
 function s:SetTempOption(group, name, value)
   if !exists('s:orig_map[a:group]')

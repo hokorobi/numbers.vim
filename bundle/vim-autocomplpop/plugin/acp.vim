@@ -38,6 +38,7 @@ function s:MakeDefaultBehavior()
         \   'coffee'      : [],
         \   'ls'          : [],
         \   'css'         : [],
+        \   'sas'         : [],
         \ }
   "---------------------------------------------------------------------------
   if !empty(g:acp_user_defined_completefunc) &&
@@ -138,6 +139,12 @@ function s:MakeDefaultBehavior()
         \   'repeat'  : 0,
         \ })
   "---------------------------------------------------------------------------
+  call add(behavs.sas, {
+        \   'command' : "\<C-x>\<C-u>",
+        \   'meets'   : 's:MeetsForSAS',
+        \   'repeat'  : 0,
+        \ })
+  "---------------------------------------------------------------------------
   return behavs
 endfunction
 
@@ -167,6 +174,7 @@ call s:DefineVariableDefault('g:acp_html_omni_length', 0)
 call s:DefineVariableDefault('g:acp_javascript_omni_length', 1)
 call s:DefineVariableDefault('g:acp_css_omni_property_length', 1)
 call s:DefineVariableDefault('g:acp_css_omni_value_length', 0)
+call s:DefineVariableDefault('g:acp_sas_length', 0)
 call s:DefineVariableDefault('g:acp_behavior', {})
 "-----------------------------------------------------------------------------
 call extend(g:acp_behavior, s:MakeDefaultBehavior(), 'keep')
