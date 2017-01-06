@@ -142,7 +142,7 @@ endfunction
 function s:MeetsForPythonOmni(context)
   if g:acp_python_omni_length == 0
     return has('python') &&
-          \ a:context =~ '\k\.$'
+          \ a:context =~ '\k\.\k\{}$'
   elseif g:acp_python_omni_length > 0
     return has('python') &&
           \ a:context =~ '\k\.\k\{' . g:acp_python_omni_length . ',}$'
