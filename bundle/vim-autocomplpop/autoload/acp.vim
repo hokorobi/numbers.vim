@@ -91,7 +91,7 @@ function s:MeetsForKeyword(context)
   if g:acp_keyword_length < 0
     return 0
   endif
-  let matches = matchlist(a:context, '\(\k\{' . g:acp_keyword_length . ',}\)$')
+  let matches = matchlist(a:context, '\k\{' . g:acp_keyword_length . ',}$')
   if empty(matches)
     return 0
   endif
@@ -300,19 +300,15 @@ function s:FeedPopup()
     endif
     return ''
   elseif s:MakeCurrentBehaviorSet()
-    " In case of words divided by symbols (e.g.: 'for(int', 'ab=cd') while a
-    " popup menu is visible, another popup is not possible without pressing <C-e>
-    " or trying to popup at least once
-    " First completion behavior is doubled to circumvent this
-    call insert(s:current_behavs, s:current_behavs[0])
-    " Set temporary options before attempting to popup menu
     call s:SetTempOption(s:L_0, '&complete', g:acp_complete_option)
     call s:SetTempOption(s:L_0, '&completeopt', 'menuone' . (g:acp_completeopt_preview ? ',preview' : ''))
-    call s:SetTempOption(s:L_0, '&completefunc', (exists('s:current_behavs[0].completefunc') ? s:current_behavs[0].completefunc : eval('&completefunc')))
+    call s:SetTempOption(s:L_0, '&completefunc',
+          \ (exists('s:current_behavs[0].completefunc') ?
+          \ s:current_behavs[0].completefunc :
+          \ eval('&completefunc')))
     call s:SetTempOption(s:L_0, '&ignorecase', g:acp_ignorecase_option)
     call s:SetTempOption(s:L_0, '&lazyredraw', 1)
     call s:SetTempOption(s:L_0, '&spell', 0)
-    " Unlike other options, &textwidth must be restored after each final <C-e>
     call s:SetTempOption(s:L_1, '&textwidth', 0)
     call feedkeys(printf("%s\<C-r>=%sOnPopup()\<CR>", s:current_behavs[0].command, s:PREFIX_SID), 'n')
     return ''
@@ -329,12 +325,16 @@ function s:OnPopup()
     " When a popup menu appears
     if g:acp_select_first_item
       " To restore the original text and select the first match
-      return (s:current_behavs[s:behav_idx].command =~# "\<C-p>" ? "\<C-n>\<Up>"
-            \                                                    : "\<C-p>\<Down>")
+      return (s:current_behavs[s:behav_idx].command =~#
+            \ "\<C-p>" ?
+            \ "\<C-n>\<Up>" :
+            \ "\<C-p>\<Down>")
     else
       " To restore the original text
-      return (s:current_behavs[s:behav_idx].command =~# "\<C-p>" ? "\<C-n>"
-            \                                                    : "\<C-p>")
+      return (s:current_behavs[s:behav_idx].command =~#
+            \ "\<C-p>" ?
+            \ "\<C-n>" :
+            \ "\<C-p>")
     endif
   elseif s:behav_idx < len(s:current_behavs) - 1
     " When popup menu impossible for the current completion behavior,
@@ -342,13 +342,15 @@ function s:OnPopup()
     let s:behav_idx += 1
     " Need to update &completefunc each time before a new behavior is tried
     call s:SetTempOption(s:L_0, '&completefunc',
-          \ (exists('s:current_behavs[s:behav_idx].completefunc') ? s:current_behavs[s:behav_idx].completefunc : eval('&completefunc')))
+          \ (exists('s:current_behavs[s:behav_idx].completefunc') ?
+          \ s:current_behavs[s:behav_idx].completefunc :
+          \ eval('&completefunc')))
     return printf("\<C-e>%s\<C-r>=%sOnPopup()\<CR>", s:current_behavs[s:behav_idx].command, s:PREFIX_SID)
   else
     " After all attempts have failed
     let s:last_uncompletable = {
-          \   'word': s:GetCurrentWord(),
-          \   'commands': map(copy(s:current_behavs), 'v:val.command')[1:],
+          \ 'word': s:GetCurrentWord(),
+          \ 'commands': map(copy(s:current_behavs), 'v:val.command')[1:],
           \ }
     call s:FinishPopup(0)
     return "\<C-e>"
@@ -374,9 +376,9 @@ function s:MakeSnipmateItem(key, snip)
   else
     let formatted_snip = substitute(a:snip, '\(\n\|\s\)\+', ' ', 'g')
   endif
-  return  {
-        \   'word': a:key,
-        \   'menu': strpart(formatted_snip, 0, 80),
+  return {
+        \ 'word': a:key,
+        \ 'menu': strpart(formatted_snip, 0, 80),
         \ }
 endfunction
 
