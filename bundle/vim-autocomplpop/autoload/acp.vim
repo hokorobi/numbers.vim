@@ -18,9 +18,10 @@ let g:loaded_autoload_acp = 1
 function acp#enable()
   augroup AcpGlobalAutoCommand
     autocmd!
-    autocmd InsertEnter * unlet! s:pos_last s:last_uncompletable
+    autocmd InsertEnter * call s:ResetLastPosition()
     autocmd InsertLeave * call s:FinishPopup(1)
     autocmd CursorMovedI * call s:FeedPopup()
+    autocmd CompleteDone * call s:ResetLastPosition()
   augroup END
 endfunction
 
@@ -230,29 +231,31 @@ function s:GetCurrentWord()
   return matchstr(s:GetCurrentText(), '\k*$')
 endfunction
 
-"
+" Reset the last cursor position
+function s:ResetLastPosition()
+  let s:pos_last = getpos('.')
+  let s:n_lines_last = line('$')
+  let s:text_last = getline('.')
+endfunction
+
+" Check if a new character entered
 function s:IsModifiedSinceLastCall()
   if exists('s:pos_last')
     let pos_prev = s:pos_last
     let n_lines_prev = s:n_lines_last
     let text_prev = s:text_last
   endif
-  let s:pos_last = getpos('.')
-  let s:n_lines_last = line('$')
-  let s:text_last = getline('.')
+  call s:ResetLastPosition()
   if !exists('pos_prev')
     return 1
   elseif n_lines_prev != s:n_lines_last
     return 1
   elseif text_prev ==# s:text_last
     return 0
-  elseif pos_prev[2] > s:pos_last[2]
+  elseif abs(pos_prev[2] - s:pos_last[2]) == 1
     return 1
-  elseif has('gui_running') && has('multi_byte')
-    " NOTE: a strange behavior when IME/XIM is working
-    return pos_prev[2] + 1 == s:pos_last[2]
   else
-    return pos_prev[2] != s:pos_last[2]
+    return 0
   endif
 endfunction
 
@@ -262,9 +265,6 @@ function s:MakeCurrentBehaviorSet()
   if exists('s:current_behavs[s:behav_idx].repeat')
         \ && s:current_behavs[s:behav_idx].repeat
     let s:current_behavs = [ s:current_behavs[s:behav_idx] ]
-  elseif exists('s:current_behavs[s:behav_idx]')
-    call s:ClearCurrentBehaviorSet()
-    return 0
   elseif s:IsModifiedSinceLastCall()
     let s:current_behavs = copy(exists('g:acp_behavior[&filetype]')
           \ ? g:acp_behavior[&filetype]
@@ -339,8 +339,6 @@ endfunction
 function s:OnPopup()
   if pumvisible()
     " When a popup menu appears
-"     inoremap <silent> <expr> <C-h> <SID>OnBS()
-"     inoremap <silent> <expr> <BS>  <SID>OnBS()
     if g:acp_select_first_item
       " To restore the original text and select the first match
       return (s:current_behavs[s:behav_idx].command =~# "\<C-p>" ? "\<C-n>\<Up>"
@@ -371,8 +369,6 @@ endfunction
 
 " Cleaning function after popup
 function s:FinishPopup(level) 
-"   inoremap <C-h> <Nop> | iunmap <C-h>
-"   inoremap <BS>  <Nop> | iunmap <BS>
   if a:level >= 0
     call s:ClearCurrentBehaviorSet()
     call s:RestoreTempOptions(s:L_0)
