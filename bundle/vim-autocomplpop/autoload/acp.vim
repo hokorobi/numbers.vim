@@ -323,9 +323,8 @@ function s:FeedPopup()
     call s:SetTempOption(s:L_0, '&completefunc', (exists('s:current_behavs[0].completefunc') ? s:current_behavs[0].completefunc : eval('&completefunc')))
     call s:SetTempOption(s:L_0, '&ignorecase', g:acp_ignorecase_option)
     call s:SetTempOption(s:L_0, '&spell', 0)
-    " If autocmd driven, set 'lazyredraw' to avoid flickering,
-    " If key mapping driven, set 'nolazyredraw' to make the popup menu visible
-    call s:SetTempOption(s:L_0, '&lazyredraw', !g:acp_mapping_driven)
+    " Set 'lazyredraw' to avoid flickering,
+    call s:SetTempOption(s:L_0, '&lazyredraw', 1)
     " Unlike other options, &textwidth must be restored after each final <C-e>
     call s:SetTempOption(s:L_1, '&textwidth', 0)
     call feedkeys(printf("%s\<C-r>=%sOnPopup()\<CR>", s:current_behavs[0].command, s:PREFIX_SID), 'n')
