@@ -1,14 +1,13 @@
 "=============================================================================
 " Copyright (c) 2007-2009 Takeshi NISHIDA
-" Copyright (c) 2016      Zhen-Huan Hu
+" Copyright (c) 2016-2017 Zhen-Huan Hu
 "
-" GetLatestVimScripts: 1879 1 :AutoInstall: AutoComplPop
 "=============================================================================
 " LOAD GUARD {{{1
 
 if exists('g:loaded_acp')
   finish
-elseif v:version < 702
+elseif v:version < 800
   echoerr 'AutoComplPop does not support this version of vim (' . v:version . ').'
   finish
 endif
