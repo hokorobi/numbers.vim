@@ -32,12 +32,6 @@ function acp#enable()
     " after the cursor was moved in Insert mode
     autocmd AcpGlobalAutoCommand CursorMovedI * call s:FeedPopup()
   endif
-
-  " Trigger the popup menu
-  " when switching to Insert mode
-  nnoremap <silent> i i<C-r>=<SID>FeedPopup()<CR>
-  nnoremap <silent> a a<C-r>=<SID>FeedPopup()<CR>
-  nnoremap <silent> R R<C-r>=<SID>FeedPopup()<CR>
 endfunction
 
 " To disable auto-popup
@@ -46,9 +40,6 @@ function acp#disable()
   augroup AcpGlobalAutoCommand
     autocmd!
   augroup END
-  nnoremap i <Nop> | nunmap i
-  nnoremap a <Nop> | nunmap a
-  nnoremap R <Nop> | nunmap R
 endfunction
 
 " To suspend auto-popup temporarily
@@ -389,8 +380,8 @@ endfunction
 function s:OnPopup()
   if pumvisible()
     " When a popup menu appears
-    inoremap <silent> <expr> <C-h> <SID>OnBS()
-    inoremap <silent> <expr> <BS>  <SID>OnBS()
+"     inoremap <silent> <expr> <C-h> <SID>OnBS()
+"     inoremap <silent> <expr> <BS>  <SID>OnBS()
     if g:acp_select_first_item
       " To restore the original text and select the first match
       return (s:current_behavs[s:behav_idx].command =~# "\<C-p>" ? "\<C-n>\<Up>"
@@ -421,8 +412,8 @@ endfunction
 
 " Cleaning function after popup
 function s:FinishPopup(level) 
-  inoremap <C-h> <Nop> | iunmap <C-h>
-  inoremap <BS>  <Nop> | iunmap <BS>
+"   inoremap <C-h> <Nop> | iunmap <C-h>
+"   inoremap <BS>  <Nop> | iunmap <BS>
   if a:level >= 0
     call s:ClearCurrentBehaviorSet()
     call s:RestoreTempOptions(s:L_0)
