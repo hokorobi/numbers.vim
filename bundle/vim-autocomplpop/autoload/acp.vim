@@ -50,7 +50,7 @@ endfunction
 "=============================================================================
 " LOCAL FUNCTIONS: {{{1
 
-" Default completion funciton for snipMate
+" Default completion function for snipMate
 function s:CompleteFuncForSnipmate(findstart, base)
   if a:findstart
     let s:snip_completion_pos = len(matchstr(s:GetCurrentText(), '.*\U'))
@@ -241,16 +241,12 @@ endfunction
 " Reset the last cursor position
 function s:ResetLastCursorPosition()
   let s:pos_last = getpos('.')
-  let s:n_lines_last = line('$')
-  let s:text_last = getline('.')
 endfunction
 
 " Check if the cursor only moved a single position
 function s:CursorMovedSinglePosition()
   if exists('s:pos_last')
     let pos_prev = s:pos_last
-    let n_lines_prev = s:n_lines_last
-    let text_prev = s:text_last
   endif
   call s:ResetLastCursorPosition()
   return abs(pos_prev[2] - s:pos_last[2]) == 1
