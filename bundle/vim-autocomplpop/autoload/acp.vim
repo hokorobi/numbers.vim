@@ -274,7 +274,8 @@ function s:CursorMovedSinglePosition()
     let pos_prev = s:pos_last
   endif
   call s:ResetLastCursorPosition()
-  return abs(pos_prev[2] - s:pos_last[2]) == 1
+  return pos_prev[1] ==# s:pos_last[1] &&
+        \ abs(pos_prev[2] - s:pos_last[2]) == 1
 endfunction
 
 " Make current behavior set s:current_behavs
