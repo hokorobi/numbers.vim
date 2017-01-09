@@ -275,7 +275,7 @@ OPTIONS                                                          *acp-options*
           completion. It will be attempted if this function returns non-zero.
           This function takes a text before the cursor.
 
-        "onPopupClose":                          *g:acp_behavior-onPopupClose*
+        "closefunc":                          *g:acp_behavior-closefunc*
           Name of the function which is called when popup menu for this
           completion is closed. Following completions will be suppressed if
           this function returns zero.

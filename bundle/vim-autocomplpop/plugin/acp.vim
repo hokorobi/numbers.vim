@@ -58,7 +58,7 @@ function s:MakeDefaultBehavior()
           \   'command'      : "\<C-x>\<C-u>",
           \   'completefunc' : 's:CompleteFuncForSnipmate',
           \   'meets'        : 's:MeetsForSnipmate',
-          \   'closefunc'    : 's:OnPopupCloseForSnipmate',
+          \   'closefunc'    : 's:CloseFuncForSnipmate',
           \   'repeat'       : 0,
           \ })
   endfor

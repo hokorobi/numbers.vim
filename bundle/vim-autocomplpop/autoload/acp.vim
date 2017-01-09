@@ -73,8 +73,8 @@ function s:MeetsForSnipmate(context)
   return !empty(matches) && !empty(s:GetMatchingSnipItems(matches[2]))
 endfunction
 
-" Default 'OnPopupClose' function for snipMate
-function s:OnPopupCloseForSnipmate()
+" Default close function for snipMate
+function s:CloseFuncForSnipmate()
   let word = s:GetCurrentText()[s:snip_completion_pos :]
   for trigger in keys(GetSnipsInCurrentScope())
     if word ==# trigger
@@ -296,8 +296,8 @@ endfunction
 function s:FeedPopup()
   if s:lock_count > 0 || &paste
     return ''
-  elseif exists('s:current_behavs[s:behav_idx].closef')
-    if !call(s:current_behavs[s:behav_idx].closef, [])
+  elseif exists('s:current_behavs[s:behav_idx].closefunc')
+    if !call(s:current_behavs[s:behav_idx].closefunc, [])
       " Fallback to s:FinishPopup if not successful
       call s:FinishPopup(1)
     endif
