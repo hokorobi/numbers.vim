@@ -147,8 +147,8 @@ function s:MakeDefaultBehavior()
         \ })
   "---------------------------------------------------------------------------
   call add(behavs.sas, {
-        \   'command' : "\<C-x>\<C-u>",
-        \   'meets'   : 's:MeetsForSAS',
+        \   'command' : "\<C-x>\<C-o>",
+        \   'meets'   : 's:MeetsForSASOmni',
         \   'repeat'  : 0,
         \ })
   "---------------------------------------------------------------------------
@@ -182,7 +182,7 @@ call s:DefineVariableDefault('g:acp_css_omni_property_length', 1)
 call s:DefineVariableDefault('g:acp_css_omni_value_length', 0)
 call s:DefineVariableDefault('g:acp_javascript_omni_length', 0)
 call s:DefineVariableDefault('g:acp_php_omni_length', 0)
-call s:DefineVariableDefault('g:acp_sas_length', 0)
+call s:DefineVariableDefault('g:acp_sas_omni_length', 0)
 call s:DefineVariableDefault('g:acp_behavior', {})
 "-----------------------------------------------------------------------------
 call extend(g:acp_behavior, s:MakeDefaultBehavior(), 'keep')

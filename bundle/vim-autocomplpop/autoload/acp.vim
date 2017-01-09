@@ -226,9 +226,9 @@ endfunction
 
 " Default 'meets' function for SAS
 " to determine whether to attempt completion
-function s:MeetsForSAS(context)
-  return g:acp_sas_length >= 0 &&
-        \ a:context =~ '\<proc \k\{' . g:acp_sas_length . ',}$'
+function s:MeetsForSASOmni(context)
+  return g:acp_sas_omni_length >= 0 &&
+        \ a:context =~ '\<proc \k\{' . g:acp_sas_omni_length . ',}$'
 endfunction
 
 " Set variable with temporary value

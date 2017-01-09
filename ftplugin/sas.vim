@@ -22,7 +22,7 @@ function! s:KenyRunSAS()
 endfunction
 
 " Local settings
-setlocal conceallevel=3 completefunc=sascomplete#Complete
+setlocal conceallevel=3 omnifunc=sascomplete#Complete
 
 " Automatic folding when reopening
 augroup SASView
