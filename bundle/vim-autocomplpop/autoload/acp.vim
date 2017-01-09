@@ -220,7 +220,7 @@ endfunction
 " Default 'meets' function for SAS
 " to decide whether to attempt completion
 function s:MeetsForSAS(context)
-  return (&ft ==# 'sas') && g:acp_sas_length >= 0 &&
+  return g:acp_sas_length >= 0 &&
         \ a:context =~ '\<proc \k\{' . g:acp_sas_length . ',}$'
 endfunction
 
