@@ -120,10 +120,10 @@ function s:MeetsForKeyword(context)
   if empty(matches)
     return 0
   endif
-  for ignore in g:acp_ignore_keywords
+  for ignore in g:acp_keyword_ignored
     if stridx(ignore, matches[1]) == 0
       " Do not attempt completion
-      " if the start of the match occurs in 'ignore'
+      " if the start of a match occurs in 'ignore'
       return 0
     endif
   endfor
@@ -193,14 +193,6 @@ function s:MeetsForHtmlOmni(context)
         \              g:acp_html_omni_length . ',}$'
 endfunction
 
-" Default 'meets' function for JavaScript
-" to decide whether to attempt completion
-function s:MeetsForJavaScriptOmni(context)
-  return g:acp_javascript_omni_length >= 0 &&
-        \ a:context =~ '\k\.\k\{' .
-        \              g:acp_javascript_omni_length . ',}$'
-endfunction
-
 " Default 'meets' function for Css
 " to decide whether to attempt completion
 function s:MeetsForCssOmni(context)
@@ -215,6 +207,14 @@ function s:MeetsForCssOmni(context)
     return 1
   endif
   return 0
+endfunction
+
+" Default 'meets' function for JavaScript
+" to decide whether to attempt completion
+function s:MeetsForJavaScriptOmni(context)
+  return g:acp_javascript_omni_length >= 0 &&
+        \ a:context =~ '\k\.\k\{' .
+        \              g:acp_javascript_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for SAS
@@ -386,7 +386,7 @@ function s:OnPopup()
   endif
 endfunction
 
-" Cleaning function after popup
+" Finishing function
 function s:FinishPopup(level) 
   if a:level >= 0
     call s:ClearCurrentBehaviorSet()

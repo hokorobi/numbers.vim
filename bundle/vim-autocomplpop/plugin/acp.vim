@@ -115,6 +115,12 @@ function s:MakeDefaultBehavior()
         \   'repeat'  : 1,
         \ })
   "---------------------------------------------------------------------------
+  call add(behavs.css, {
+        \   'command' : "\<C-x>\<C-o>",
+        \   'meets'   : 's:MeetsForCssOmni',
+        \   'repeat'  : 0,
+        \ })
+  "---------------------------------------------------------------------------
   call add(behavs.javascript, {
         \   'command' : "\<C-x>\<C-o>",
         \   'meets'   : 's:MeetsForJavaScriptOmni',
@@ -130,12 +136,6 @@ function s:MakeDefaultBehavior()
   call add(behavs.ls, {
         \   'command' : "\<C-x>\<C-o>",
         \   'meets'   : 's:MeetsForJavaScriptOmni',
-        \   'repeat'  : 0,
-        \ })
-  "---------------------------------------------------------------------------
-  call add(behavs.css, {
-        \   'command' : "\<C-x>\<C-o>",
-        \   'meets'   : 's:MeetsForCssOmni',
         \   'repeat'  : 0,
         \ })
   "---------------------------------------------------------------------------
@@ -163,7 +163,7 @@ call s:DefineVariableDefault('g:acp_user_defined_meets', '')
 call s:DefineVariableDefault('g:acp_snipmate_length', -1)
 call s:DefineVariableDefault('g:acp_keyword_command', "\<C-n>")
 call s:DefineVariableDefault('g:acp_keyword_length', 3)
-call s:DefineVariableDefault('g:acp_ignore_keywords', [])
+call s:DefineVariableDefault('g:acp_keyword_ignored', [])
 call s:DefineVariableDefault('g:acp_file_length', 0)
 call s:DefineVariableDefault('g:acp_ruby_omni_method_length', 0)
 call s:DefineVariableDefault('g:acp_ruby_omni_symbol_length', 1)
@@ -171,9 +171,9 @@ call s:DefineVariableDefault('g:acp_python_omni_length', 0)
 call s:DefineVariableDefault('g:acp_perl_omni_length', 0)
 call s:DefineVariableDefault('g:acp_xml_omni_length', 0)
 call s:DefineVariableDefault('g:acp_html_omni_length', 0)
-call s:DefineVariableDefault('g:acp_javascript_omni_length', 1)
 call s:DefineVariableDefault('g:acp_css_omni_property_length', 1)
 call s:DefineVariableDefault('g:acp_css_omni_value_length', 0)
+call s:DefineVariableDefault('g:acp_javascript_omni_length', 0)
 call s:DefineVariableDefault('g:acp_sas_length', 0)
 call s:DefineVariableDefault('g:acp_behavior', {})
 "-----------------------------------------------------------------------------
