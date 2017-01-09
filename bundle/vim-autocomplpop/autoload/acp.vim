@@ -50,6 +50,31 @@ endfunction
 "=============================================================================
 " LOCAL FUNCTIONS: {{{1
 
+"
+function s:MakeSnipmateItem(key, snip)
+  if type(a:snip) == type([])
+    let descriptions = map(copy(a:snip), 'v:val[0]')
+    let formatted_snip = '[MULTI] ' . join(descriptions, ', ')
+  else
+    let formatted_snip = substitute(a:snip, '\(\n\|\s\)\+', ' ', 'g')
+  endif
+  return {
+        \ 'word': a:key,
+        \ 'menu': strpart(formatted_snip, 0, 80),
+        \ }
+endfunction
+
+"
+function s:GetMatchingSnipItems(base)
+  let key = a:base . "\n"
+  if !exists('s:snip_items[key]')
+    let s:snip_items[key] = items(GetSnipsInCurrentScope())
+    call filter(s:snip_items[key], 'strpart(v:val[0], 0, len(a:base)) ==? a:base')
+    call map(s:snip_items[key], 's:MakeSnipmateItem(v:val[0], v:val[1])')
+  endif
+  return s:snip_items[key]
+endfunction
+
 " Default completion function for snipMate
 function s:CompleteFuncForSnipmate(findstart, base)
   if a:findstart
@@ -369,31 +394,6 @@ function s:FinishPopup(level)
   if a:level >= 1
     call s:RestoreTempOptions(s:L_1)
   endif
-endfunction
-
-"
-function s:MakeSnipmateItem(key, snip)
-  if type(a:snip) == type([])
-    let descriptions = map(copy(a:snip), 'v:val[0]')
-    let formatted_snip = '[MULTI] ' . join(descriptions, ', ')
-  else
-    let formatted_snip = substitute(a:snip, '\(\n\|\s\)\+', ' ', 'g')
-  endif
-  return {
-        \ 'word': a:key,
-        \ 'menu': strpart(formatted_snip, 0, 80),
-        \ }
-endfunction
-
-"
-function s:GetMatchingSnipItems(base)
-  let key = a:base . "\n"
-  if !exists('s:snip_items[key]')
-    let s:snip_items[key] = items(GetSnipsInCurrentScope())
-    call filter(s:snip_items[key], 'strpart(v:val[0], 0, len(a:base)) ==? a:base')
-    call map(s:snip_items[key], 's:MakeSnipmateItem(v:val[0], v:val[1])')
-  endif
-  return s:snip_items[key]
 endfunction
 
 function s:GetSidPrefix()
