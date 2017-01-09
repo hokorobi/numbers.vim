@@ -38,17 +38,17 @@ text before the cursor. The supported behaviors are as follows:
         kind      filetype    text before the cursor ~
         Keyword   *           three keyword characters
         Filename  *           a filename character + a path separator 
-                              + 0 or more filename character
-        Omni      ruby        ".", "::" or non-word character + ":"
+                              + 0 or more filename characters
+        Omni      ruby        ".", "::" or non-word characters + ":"
                               (|+ruby| required.)
         Omni      python      "." (|+python| required.)
         Omni      perl        "->" (|+perl| required.)
         Omni      xml         "<", "</" or ("<" + non-">" characters + " ")
         Omni      html/xhtml  "<", "</" or ("<" + non-">" characters + " ")
-        Omni      css         (":", ";", "{", "^", "@", or "!")
-                              + 0 or 1 space
+        Omni      css         ":", ";", "{", "^", "@", or "!" (+- 1 space)
         Omni      javascript  "."
-        User      sas         "proc"
+        Omni      php         "->", "::"
+        User      sas         "proc "
 
 The plugin also allows users to make user-defined completion and snipMate's
 trigger completion (See: |acp-snipmate|) auto-popup if the options are set.
@@ -265,6 +265,22 @@ OPTIONS                                                          *acp-options*
         The length of keyword characters before the cursor, which is needed to
         trigger JavaScript omni-completion. If the value is negative, the
         completion will not be attempted.
+
+                                                       *g:acp_php_omni_length*
+>
+  let g:acp_php_omni_length = 0
+<
+        The length of keyword characters before the cursor, which is needed to
+        trigger Php omni-completion. If the value is negative, the completion
+        will not be attempted.
+
+                                                            *g:acp_sas_length*
+>
+  let g:acp_sas_length = 0
+<
+        The length of keyword characters before the cursor, which is needed to
+        trigger SAS omni-completion. If the value is negative, the completion
+        will not be attempted.
 
                                                               *g:acp_behavior*
 >

@@ -88,7 +88,7 @@ function s:CompleteFuncForSnipmate(findstart, base)
 endfunction
 
 " Default 'meets' function for snipMate
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForSnipmate(context)
   if g:acp_snipmate_length < 0
     return 0
@@ -111,7 +111,7 @@ function s:CloseFuncForSnipmate()
 endfunction
 
 " Default 'meets' function for anything that is a keyword
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForKeyword(context)
   if g:acp_keyword_length < 0
     return 0
@@ -131,7 +131,7 @@ function s:MeetsForKeyword(context)
 endfunction
 
 " Default 'meets' function for file names
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForFile(context)
   if g:acp_file_length < 0
     return 0
@@ -148,7 +148,7 @@ function s:MeetsForFile(context)
 endfunction
 
 " Default 'meets' function for Ruby
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForRubyOmni(context)
   if has('ruby') && g:acp_ruby_omni_method_length >= 0 &&
         \ a:context =~ '[^. \t]\(\.\|::\)\k\{' .
@@ -164,21 +164,21 @@ function s:MeetsForRubyOmni(context)
 endfunction
 
 " Default 'meets' function for Python
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForPythonOmni(context)
   return has('python') && g:acp_python_omni_length >= 0 &&
         \ a:context =~ '\k\.\k\{' . g:acp_python_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Perl
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForPerlOmni(context)
   return has('perl') && g:acp_perl_omni_length >= 0 &&
         \ a:context =~ '\w->\k\{' . g:acp_perl_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Xml
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForXmlOmni(context)
   return g:acp_xml_omni_length >= 0 &&
         \ a:context =~ '\(<\|<\/\|<[^>]\+ \|<[^>]\+=\"\)\k\{' .
@@ -186,7 +186,7 @@ function s:MeetsForXmlOmni(context)
 endfunction
 
 " Default 'meets' function for Html
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForHtmlOmni(context)
   return g:acp_html_omni_length >= 0 &&
         \ a:context =~ '\(<\|<\/\|<[^>]\+ \|<[^>]\+=\"\)\k\{' .
@@ -194,7 +194,7 @@ function s:MeetsForHtmlOmni(context)
 endfunction
 
 " Default 'meets' function for Css
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForCssOmni(context)
   if g:acp_css_omni_property_length >= 0 &&
         \ a:context =~ '\(^\s\|[;{]\)\s*\k\{' .
@@ -210,15 +210,22 @@ function s:MeetsForCssOmni(context)
 endfunction
 
 " Default 'meets' function for JavaScript
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForJavaScriptOmni(context)
   return g:acp_javascript_omni_length >= 0 &&
         \ a:context =~ '\k\.\k\{' .
         \              g:acp_javascript_omni_length . ',}$'
 endfunction
 
+" Default 'meets' function for Php
+" to determine whether to attempt completion
+function s:MeetsForPhpOmni(context)
+  return g:acp_php_omni_length >= 0 &&
+        \ a:context =~ '\w\(->\|::\)\k\{' . g:acp_php_omni_length . ',}$'
+endfunction
+
 " Default 'meets' function for SAS
-" to decide whether to attempt completion
+" to determine whether to attempt completion
 function s:MeetsForSAS(context)
   return g:acp_sas_length >= 0 &&
         \ a:context =~ '\<proc \k\{' . g:acp_sas_length . ',}$'

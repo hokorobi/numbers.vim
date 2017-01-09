@@ -38,6 +38,7 @@ function s:MakeDefaultBehavior()
         \   'coffee'      : [],
         \   'ls'          : [],
         \   'css'         : [],
+        \   'php'         : [],
         \   'sas'         : [],
         \ }
   "---------------------------------------------------------------------------
@@ -139,6 +140,12 @@ function s:MakeDefaultBehavior()
         \   'repeat'  : 0,
         \ })
   "---------------------------------------------------------------------------
+  call add(behavs.php, {
+        \   'command' : "\<C-x>\<C-o>",
+        \   'meets'   : 's:MeetsForPhpOmni',
+        \   'repeat'  : 0,
+        \ })
+  "---------------------------------------------------------------------------
   call add(behavs.sas, {
         \   'command' : "\<C-x>\<C-u>",
         \   'meets'   : 's:MeetsForSAS',
@@ -174,6 +181,7 @@ call s:DefineVariableDefault('g:acp_html_omni_length', 0)
 call s:DefineVariableDefault('g:acp_css_omni_property_length', 1)
 call s:DefineVariableDefault('g:acp_css_omni_value_length', 0)
 call s:DefineVariableDefault('g:acp_javascript_omni_length', 0)
+call s:DefineVariableDefault('g:acp_php_omni_length', 0)
 call s:DefineVariableDefault('g:acp_sas_length', 0)
 call s:DefineVariableDefault('g:acp_behavior', {})
 "-----------------------------------------------------------------------------
