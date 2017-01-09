@@ -329,13 +329,16 @@ function s:FeedPopup()
     endif
     return ''
   elseif s:MakeCurrentBehaviorSet()
-    call s:SetTempOption(s:L_0, '&complete', g:acp_complete_option)
-    call s:SetTempOption(s:L_0, '&completeopt', 'menuone' . (g:acp_completeopt_preview ? ',preview' : ''))
+    call s:SetTempOption(s:L_0, '&complete', g:acp_set_complete)
+    call s:SetTempOption(s:L_0, '&completeopt',
+          \ (g:acp_set_completeopt_preview ?
+          \ 'menuone,preview' :
+          \ 'menuone'))
     call s:SetTempOption(s:L_0, '&completefunc',
           \ (exists('s:current_behavs[0].completefunc') ?
           \ s:current_behavs[0].completefunc :
           \ eval('&completefunc')))
-    call s:SetTempOption(s:L_0, '&ignorecase', g:acp_ignorecase_option)
+    call s:SetTempOption(s:L_0, '&ignorecase', g:acp_set_ignorecase)
     call s:SetTempOption(s:L_0, '&lazyredraw', 1)
     call s:SetTempOption(s:L_0, '&spell', 0)
     call s:SetTempOption(s:L_1, '&textwidth', 0)

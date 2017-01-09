@@ -155,9 +155,9 @@ endfunction
 "-----------------------------------------------------------------------------
 call s:DefineVariableDefault('g:acp_enable_at_startup', 1)
 call s:DefineVariableDefault('g:acp_select_first_item', 1)
-call s:DefineVariableDefault('g:acp_ignorecase_option', 1)
-call s:DefineVariableDefault('g:acp_complete_option', '.,w,b,k')
-call s:DefineVariableDefault('g:acp_completeopt_preview', 0)
+call s:DefineVariableDefault('g:acp_set_ignorecase', 1)
+call s:DefineVariableDefault('g:acp_set_complete', '.,w,b,k')
+call s:DefineVariableDefault('g:acp_set_completeopt_preview', 0)
 call s:DefineVariableDefault('g:acp_user_defined_completefunc', '')
 call s:DefineVariableDefault('g:acp_user_defined_meets', '')
 call s:DefineVariableDefault('g:acp_snipmate_length', -1)
