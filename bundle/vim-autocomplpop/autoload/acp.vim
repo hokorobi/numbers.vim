@@ -197,7 +197,7 @@ endfunction
 " to decide whether to attempt completion
 function s:MeetsForJavaScriptOmni(context)
   return g:acp_javascript_omni_length >= 0 &&
-        \ a:context =~ '\k\{' .
+        \ a:context =~ '\k\.\k\{' .
         \              g:acp_javascript_omni_length . ',}$'
 endfunction
 
