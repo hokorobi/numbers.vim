@@ -26,6 +26,8 @@ Many improvements have been made in this fork, including:
   - Fix various bugs in the original plugin.
   - Remove reliability to L9 library.
   - Add support for JavaScript, Php, and SAS completion.
+  - Add a new option |acp_select_first_item| to control whether to select the
+    first item on the popup menu.
     (See also: |acp-changelog|)
 
 ==============================================================================
@@ -334,6 +336,8 @@ CHANGELOG                                                      *acp-changelog*
 3.0-fork
   - Remove reliability to L9 library.
   - Add support for JavaScript, Php, and SAS completion.
+  - Add a new option |acp_select_first_item| to control whether to select the
+    first item on the popup menu.
   - Use |TextChangedI| event to trigger auto-popup (This also makes the entire
     key-mapping mechanism obsolete, therefore remove the corresponding code).
   - Rename methods and variables based on VIM naming conventions.
