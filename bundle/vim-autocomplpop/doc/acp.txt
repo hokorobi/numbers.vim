@@ -83,7 +83,7 @@ plugin/snipMate.vim:
 <
 And set |g:acp_snipmate_length| option to 1.
 
-It is a restriction of auto-popup that the word before cursor must only
+It is the limitation of auto-popup that the texts before cursor must only
 consist of uppercase letters.
 
                                                                *acp-perl-omni*
