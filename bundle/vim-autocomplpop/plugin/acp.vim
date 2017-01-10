@@ -89,7 +89,7 @@ function s:MakeDefaultBehavior()
   call add(behavs.python, {
         \   'command' : "\<C-x>\<C-o>",
         \   'meets'   : 's:MeetsForPythonOmni',
-        \   'repeat'  : 0,
+        \   'repeat'  : 1,
         \ })
   "---------------------------------------------------------------------------
   call add(behavs.perl, {
@@ -101,19 +101,19 @@ function s:MakeDefaultBehavior()
   call add(behavs.xml, {
         \   'command' : "\<C-x>\<C-o>",
         \   'meets'   : 's:MeetsForXmlOmni',
-        \   'repeat'  : 1,
+        \   'repeat'  : 0,
         \ })
   "---------------------------------------------------------------------------
   call add(behavs.html, {
         \   'command' : "\<C-x>\<C-o>",
         \   'meets'   : 's:MeetsForHtmlOmni',
-        \   'repeat'  : 1,
+        \   'repeat'  : 0,
         \ })
   "---------------------------------------------------------------------------
   call add(behavs.xhtml, {
         \   'command' : "\<C-x>\<C-o>",
         \   'meets'   : 's:MeetsForHtmlOmni',
-        \   'repeat'  : 1,
+        \   'repeat'  : 0,
         \ })
   "---------------------------------------------------------------------------
   call add(behavs.css, {

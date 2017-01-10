@@ -112,7 +112,7 @@ endfunction
 
 " Default 'meets' function for anything that is a keyword
 " to determine whether to attempt completion
-function s:MeetsForKeyword(context)
+function s:MeetsForKeyword(context, ...)
   if g:acp_keyword_length < 0
     return 0
   endif
@@ -132,16 +132,14 @@ endfunction
 
 " Default 'meets' function for file names
 " to determine whether to attempt completion
-function s:MeetsForFile(context)
+function s:MeetsForFile(context, ...)
   if g:acp_file_length < 0
     return 0
   endif
-  if has('win32') || has('win64')
-    let separator = '[/\\]'
-  else
-    let separator = '\/'
-  endif
-  if a:context !~ '\f' . separator . '\f\{' . g:acp_file_length . ',}$'
+  let separator = (has('win32') || has('win64')) ? '[/\\]' : '\/'
+  if a:0 > 0 ?
+        \ a:context !~ '\f' . separator . '\f\{' . a:1 . '}$' :
+        \ a:context !~ '\f' . separator . '\f\{' . g:acp_file_length . ',}$'
     return 0
   endif
   return a:context !~ '[*/\\][/\\]\f*$\|[^[:print:]]\f*$'
@@ -149,15 +147,13 @@ endfunction
 
 " Default 'meets' function for Ruby
 " to determine whether to attempt completion
-function s:MeetsForRubyOmni(context)
+function s:MeetsForRubyOmni(context, ...)
   if has('ruby') && g:acp_ruby_omni_method_length >= 0 &&
-        \ a:context =~ '[^. \t]\(\.\|::\)\k\{' .
-        \              g:acp_ruby_omni_method_length . ',}$'
+        \ a:context =~ '[^. \t]\(\.\|::\)\k\{' . g:acp_ruby_omni_method_length . ',}$'
     return 1
   endif
   if has('ruby') && g:acp_ruby_omni_symbol_length >= 0 &&
-        \ a:context =~ '\(^\|[^:]\):\k\{' .
-        \              g:acp_ruby_omni_symbol_length . ',}$'
+        \ a:context =~ '\(^\|[^:]\):\k\{' . g:acp_ruby_omni_symbol_length . ',}$'
     return 1
   endif
   return 0
@@ -165,45 +161,43 @@ endfunction
 
 " Default 'meets' function for Python
 " to determine whether to attempt completion
-function s:MeetsForPythonOmni(context)
+function s:MeetsForPythonOmni(context, ...)
   return has('python') && g:acp_python_omni_length >= 0 &&
+        \ a:0 > 0 ?
+        \ a:context =~ '\k\.\k\{' . a:1 . '}$'
         \ a:context =~ '\k\.\k\{' . g:acp_python_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Perl
 " to determine whether to attempt completion
-function s:MeetsForPerlOmni(context)
+function s:MeetsForPerlOmni(context, ...)
   return has('perl') && g:acp_perl_omni_length >= 0 &&
         \ a:context =~ '\w->\k\{' . g:acp_perl_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Xml
 " to determine whether to attempt completion
-function s:MeetsForXmlOmni(context)
+function s:MeetsForXmlOmni(context, ...)
   return g:acp_xml_omni_length >= 0 &&
-        \ a:context =~ '\(<\|<\/\|<[^>]\+ \|<[^>]\+=\"\)\k\{' .
-        \              g:acp_xml_omni_length . ',}$'
+        \ a:context =~ '<\(\|\/\|\k\+ \)\k\{' . g:acp_xml_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Html
 " to determine whether to attempt completion
-function s:MeetsForHtmlOmni(context)
+function s:MeetsForHtmlOmni(context, ...)
   return g:acp_html_omni_length >= 0 &&
-        \ a:context =~ '\(<\|<\/\|<[^>]\+ \|<[^>]\+=\"\)\k\{' .
-        \              g:acp_html_omni_length . ',}$'
+        \ a:context =~ '<\(\|\/\|\k\+ \)\k\{' . g:acp_html_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Css
 " to determine whether to attempt completion
-function s:MeetsForCssOmni(context)
+function s:MeetsForCssOmni(context, ...)
   if g:acp_css_omni_property_length >= 0 &&
-        \ a:context =~ '\(^\s\|[;{]\)\s*\k\{' .
-        \              g:acp_css_omni_property_length . ',}$'
+        \ a:context =~ '\(^\s\|[;{]\)\s*\k\{' . g:acp_css_omni_property_length . ',}$'
     return 1
   endif
   if g:acp_css_omni_value_length >= 0 &&
-        \ a:context =~ '[:@!]\s*\k\{' .
-        \              g:acp_css_omni_value_length . ',}$'
+        \ a:context =~ '[:@!]\s*\k\{' . g:acp_css_omni_value_length . ',}$'
     return 1
   endif
   return 0
@@ -211,22 +205,21 @@ endfunction
 
 " Default 'meets' function for JavaScript
 " to determine whether to attempt completion
-function s:MeetsForJavaScriptOmni(context)
+function s:MeetsForJavaScriptOmni(context, ...)
   return g:acp_javascript_omni_length >= 0 &&
-        \ a:context =~ '\k\.\k\{' .
-        \              g:acp_javascript_omni_length . ',}$'
+        \ a:context =~ '\k\.\k\{' . g:acp_javascript_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Php
 " to determine whether to attempt completion
-function s:MeetsForPhpOmni(context)
+function s:MeetsForPhpOmni(context, ...)
   return g:acp_php_omni_length >= 0 &&
         \ a:context =~ '\w\(->\|::\)\k\{' . g:acp_php_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for SAS
 " to determine whether to attempt completion
-function s:MeetsForSASOmni(context)
+function s:MeetsForSASOmni(context, ...)
   return g:acp_sas_omni_length >= 0 &&
         \ a:context =~ '\<proc \k\{' . g:acp_sas_omni_length . ',}$'
 endfunction
@@ -285,6 +278,7 @@ endfunction
 function s:MakeCurrentBehaviorSet()
   if exists('s:current_behavs[s:behav_idx].repeat')
         \ && s:current_behavs[s:behav_idx].repeat
+        \ && call(s:current_behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
     let s:current_behavs = [ s:current_behavs[s:behav_idx] ]
   elseif s:CursorMovedSinglePosition()
     let s:current_behavs = copy(exists('g:acp_behavior[&filetype]')
