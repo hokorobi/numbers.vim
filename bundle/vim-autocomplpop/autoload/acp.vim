@@ -288,15 +288,17 @@ function s:MakeCurrentBehaviorSet()
   let text = s:GetCurrentText()
   call filter(s:current_behavs, 'call(v:val.meets, [text])')
   " Improve responsiveness by not to attempt another completion
-  " after the last attempt found no completion candidate
-  if exists('s:last_uncompletable') &&
-        \ stridx(s:GetCurrentWord(), s:last_uncompletable.word) == 0 &&
-        \ map(copy(s:current_behavs), 'v:val.command') ==# s:last_uncompletable.commands
-    call s:ClearCurrentBehaviorSet()
-    return 0
+  " after the last attempt failed to find any completion candidate
+  if exists('s:last_uncompletable')
+    if stridx(s:GetCurrentWord(), s:last_uncompletable.word) == 0 &&
+          \ map(copy(s:current_behavs), 'v:val.command') ==# s:last_uncompletable.commands
+      call s:ClearCurrentBehaviorSet()
+      return 0
+    else
+      unlet! s:last_uncompletable
+    endif
   endif
-  if empty(s:current_behavs)
-    unlet! s:last_uncompletable
+  if empty(s:current_behavs) 
     call s:ClearCurrentBehaviorSet()
     return 0
   endif
