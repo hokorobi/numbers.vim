@@ -87,17 +87,6 @@ function s:CompleteFuncForSnipmate(findstart, base)
   return map(sort(items(items)), 's:MakeSnipmateItem(v:val[0], v:val[1])')
 endfunction
 
-" Default 'meets' function for snipMate
-" to determine whether to attempt completion
-function s:MeetsForSnipmate(context)
-  if g:acp_snipmate_length < 0
-    return 0
-  endif
-  let matches = matchlist(a:context, '\(^\|\s\|\<\)\(\u\{' .
-        \                            g:acp_snipmate_length . ',}\)$')
-  return !empty(matches) && !empty(s:GetMatchingSnipItems(matches[2]))
-endfunction
-
 " Default close function for snipMate
 function s:CloseFuncForSnipmate()
   let word = s:GetCurrentText()[s:snip_completion_pos :]
@@ -108,6 +97,17 @@ function s:CloseFuncForSnipmate()
     endif
   endfor
   return 1
+endfunction
+
+" Default 'meets' function for snipMate
+" to determine whether to attempt completion
+function s:MeetsForSnipmate(context, ...)
+  if g:acp_snipmate_length < 0
+    return 0
+  endif
+  let matches = matchlist(a:context, '\(^\|\s\|\<\)\(\u\{' .
+        \                            g:acp_snipmate_length . ',}\)$')
+  return !empty(matches) && !empty(s:GetMatchingSnipItems(matches[2]))
 endfunction
 
 " Default 'meets' function for anything that is a keyword
