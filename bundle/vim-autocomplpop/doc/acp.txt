@@ -304,17 +304,38 @@ OPTIONS                                                          *acp-options*
         is a |Dictionary| itself which contains following keys:
 
         "command":                                    *g:acp_behavior-command*
-        Command to be fed to open popup menu for completion. It can be
-        "<C-x><C-u>" for user completion or "<C-x><C-o>" for omni-completion
+        Command to be fed to trigger popup menu for completion. It can be
+        "<C-x><C-u>" for user completion or "<C-x><C-o>" for omni-completion.
 
         "completefunc":                          *g:acp_behavior-completefunc*
         A complete function. Normally triggered by pressing "<C-x><C-u>" or
-        "<C-x><C-o>" in the |Insert| mode.
+        "<C-x><C-o>" in the |Insert| mode. (See also: |completion-functions|)
 
         "meets":                                        *g:acp_behavior-meets*
-        Name of a function which determines whether to trigger the completion
-        (defined by "completefunc"). The completion will be
-        attempted if it returns a non-zero.
+        Name of a function that determines whether to attempt a completion
+        defined by the "completefunc" key. A completion will be attempted only
+        if it returns a non-zero.
+
+        The function will be called in two different ways:
+        - First the function is called to determine whether to attempt a
+          completion.
+        - After a successful completion attempt, if the "repeat" key is
+          non-zero, the function is called to determine whether to attempt a
+          repeat.
+
+        On the first invocation, a single argument will be given as:
+          a:context   the text that needs to be matched with based on the
+                      global length options
+
+        On the second invocation the arguments are:
+          a:context   the text that needs to be matched with
+          a:1         0 by default
+
+        The existence of a:1 is currently only used to indicate that the
+        function is called for a repeat attempt. It is optional however
+        whether the function honors the existence and/or actual value of a:1.
+        If a:1 is ignored on a repeat attempt, the function will behavior the
+        same way as on the first invocation.
 
         "closefunc":                                *g:acp_behavior-closefunc*
         Name of a function which is called when the popup menu for this
@@ -322,7 +343,9 @@ OPTIONS                                                          *acp-options*
         this function returns a zero.
 
         "repeat":                                      *g:acp_behavior-repeat*
-        If non-zero, the last completion behavior will be forcefully repeated.
+        If non-zero, the "meets" function will be called to determine whether
+        the last completion behavior should be repeated instead of a new
+        completion attempt.
 
 ==============================================================================
 SPECIAL THANKS                                                    *acp-thanks*
@@ -348,6 +371,8 @@ CHANGELOG                                                      *acp-changelog*
     |Insert| mode will trigger auto-popup menu.
   - Fix a bug that subsequent attempt is skipped after previous completion
     when the "meets" function length is 0.
+  - Fix a bug that auto-popup menu will be triggered indecisively when the
+    "repeat" key is non-zero.
 
     Other changes:
   - Remove Japanese documentation.
