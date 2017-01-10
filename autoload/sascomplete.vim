@@ -11,7 +11,7 @@ let s:sas_proc_names = ["aceclus", "adaptivereg", "anova", "append", "authlib", 
 function! sascomplete#Complete(findstart, base)
   if a:findstart
     let current_text = strpart(getline('.'), 0, col('.') - 1)
-    if matchstrpos(current_text, '\<proc \k*$')[1] >= 0
+    if matchstrpos(current_text, '\<proc\s\+\k*$')[1] >= 0
       return matchstrpos(current_text, '\k*$')[1]
     else
       return -3
