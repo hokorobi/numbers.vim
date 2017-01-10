@@ -259,11 +259,6 @@ function s:GetCurrentText()
   return strpart(getline('.'), 0, col('.') - 1)
 endfunction
 
-" Retrieve contents at current line after cursor
-function s:GetPostText()
-  return strpart(getline('.'), col('.') - 1)
-endfunction
-
 " Retrieve current word at cursor
 " At a non-keyword character, return empty string
 function s:GetCurrentWord()
