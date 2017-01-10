@@ -338,9 +338,11 @@ OPTIONS                                                          *acp-options*
         same way as on the first invocation.
 
         "closefunc":                                *g:acp_behavior-closefunc*
-        Name of a function which is called when the popup menu for this
-        completion is closed. The following completions will be suppressed if
-        this function returns a zero.
+        Name of an optional close function for extra jobs that needs to be
+        done after a completion is finished (e.g.: triggering a snippet). The
+        function is called when a popup menu for completion is closed. The
+        proceeding attempt for completion will be suppressed if the function
+        returns a non-zero.
 
         "repeat":                                      *g:acp_behavior-repeat*
         If non-zero, the "meets" function will be called to determine whether
@@ -584,4 +586,4 @@ Bugs/Issues/Suggestions/Improvements ~
 Please submit to http://bitbucket.org/ns9tks/vim-autocomplpop/issues/ .
 
 ==============================================================================
- vim:tw=78:ts=8:ft=help:norl:
+ vim:tw=78:fo+=t:ts=8:ft=help:norl:

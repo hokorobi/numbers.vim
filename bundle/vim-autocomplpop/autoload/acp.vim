@@ -93,10 +93,10 @@ function s:CloseFuncForSnipmate()
   for trigger in keys(GetSnipsInCurrentScope())
     if word ==# trigger
       call feedkeys("\<C-r>=TriggerSnippet()\<CR>", "n")
-      return 0
+      return 1
     endif
   endfor
-  return 1
+  return 0
 endfunction
 
 " Default 'meets' function for snipMate
@@ -267,6 +267,11 @@ endfunction
 " Make current behavior set s:current_behavs
 " Return 1 if a new behavior set is created, 0 if otherwise
 function s:MakeCurrentBehaviorSet()
+  if exists('s:current_behavs[s:behav_idx].closefunc')
+        \ && call(s:current_behavs[s:behav_idx].closefunc, [])
+    call s:ClearCurrentBehaviorSet()
+    return 0
+  endif
   if exists('s:current_behavs[s:behav_idx].repeat')
         \ && s:current_behavs[s:behav_idx].repeat
         \ && call(s:current_behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
@@ -282,22 +287,20 @@ function s:MakeCurrentBehaviorSet()
   let s:behav_idx = 0
   let text = s:GetCurrentText()
   call filter(s:current_behavs, 'call(v:val.meets, [text])')
-  " Improve the response by not to attempt another completion
-  " after a word found with no completion candidate at the last attempt
+  " Improve responsiveness by not to attempt another completion
+  " after the last attempt found no completion candidate
   if exists('s:last_uncompletable') &&
         \ stridx(s:GetCurrentWord(), s:last_uncompletable.word) == 0 &&
         \ map(copy(s:current_behavs), 'v:val.command') ==# s:last_uncompletable.commands
     call s:ClearCurrentBehaviorSet()
     return 0
-  else
-    if empty(s:current_behavs)
-      unlet! s:last_uncompletable
-      call s:ClearCurrentBehaviorSet()
-      return 0
-    else
-      return 1
-    endif
   endif
+  if empty(s:current_behavs)
+    unlet! s:last_uncompletable
+    call s:ClearCurrentBehaviorSet()
+    return 0
+  endif
+  return 1
 endfunction
 
 " Clear current behavior set s:current_behavs
@@ -308,13 +311,7 @@ endfunction
 " Feed keys to popup menu
 function s:FeedPopup()
   if s:lock_count > 0 || &paste
-    return ''
-  elseif exists('s:current_behavs[s:behav_idx].closefunc')
-    if !call(s:current_behavs[s:behav_idx].closefunc, [])
-      " Fallback to s:FinishPopup if not successful
-      call s:FinishPopup(1)
-    endif
-    return ''
+    return
   elseif s:MakeCurrentBehaviorSet()
     call s:SetTempOption(s:L_0, '&complete', g:acp_set_complete)
     call s:SetTempOption(s:L_0, '&completeopt',
@@ -329,11 +326,13 @@ function s:FeedPopup()
     call s:SetTempOption(s:L_0, '&lazyredraw', 1)
     call s:SetTempOption(s:L_0, '&spell', 0)
     call s:SetTempOption(s:L_1, '&textwidth', 0)
-    call feedkeys(printf("%s\<C-r>=%sOnPopup()\<CR>", s:current_behavs[0].command, s:PREFIX_SID), 'n')
-    return ''
+    call feedkeys(printf("%s\<C-r>=%sOnPopup()\<CR>",
+          \ s:current_behavs[0].command,
+          \ s:PREFIX_SID), 'n')
+    return
   else
     call s:FinishPopup(1)
-    return ''
+    return
   endif
 endfunction
 
@@ -364,7 +363,9 @@ function s:OnPopup()
           \ (exists('s:current_behavs[s:behav_idx].completefunc') ?
           \ s:current_behavs[s:behav_idx].completefunc :
           \ eval('&completefunc')))
-    return printf("\<C-e>%s\<C-r>=%sOnPopup()\<CR>", s:current_behavs[s:behav_idx].command, s:PREFIX_SID)
+    return printf("\<C-e>%s\<C-r>=%sOnPopup()\<CR>",
+          \ s:current_behavs[s:behav_idx].command,
+          \ s:PREFIX_SID)
   else
     " After all attempts have failed
     let s:last_uncompletable = {
