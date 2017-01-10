@@ -148,15 +148,11 @@ endfunction
 " Default 'meets' function for Ruby
 " to determine whether to attempt completion
 function s:MeetsForRubyOmni(context, ...)
-  if has('ruby') && g:acp_ruby_omni_method_length >= 0 &&
-        \ a:context =~ '[^. \t]\(\.\|::\)\k\{' . g:acp_ruby_omni_method_length . ',}$'
-    return 1
-  endif
-  if has('ruby') && g:acp_ruby_omni_symbol_length >= 0 &&
-        \ a:context =~ '\(^\|[^:]\):\k\{' . g:acp_ruby_omni_symbol_length . ',}$'
-    return 1
-  endif
-  return 0
+  return has('ruby') &&
+        \ (g:acp_ruby_omni_method_length >= 0 &&
+        \ a:context =~ '\k\(\.\|::\)\k\{' . g:acp_ruby_omni_method_length . ',}$') ||
+        \ (g:acp_ruby_omni_symbol_length >= 0 &&
+        \ a:context =~ '\(^\|[^:]\):\k\{' . g:acp_ruby_omni_symbol_length . ',}$')
 endfunction
 
 " Default 'meets' function for Python
@@ -179,28 +175,23 @@ endfunction
 " to determine whether to attempt completion
 function s:MeetsForXmlOmni(context, ...)
   return g:acp_xml_omni_length >= 0 &&
-        \ a:context =~ '<\(\|\/\|\k\+ \)\k\{' . g:acp_xml_omni_length . ',}$'
+        \ a:context =~ '<\(\/\=\|[^>]\+ \)\k\{' . g:acp_xml_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Html
 " to determine whether to attempt completion
 function s:MeetsForHtmlOmni(context, ...)
   return g:acp_html_omni_length >= 0 &&
-        \ a:context =~ '<\(\|\/\|\k\+ \)\k\{' . g:acp_html_omni_length . ',}$'
+        \ a:context =~ '<\(\/\=\|[^>]\+ \)\k\{' . g:acp_html_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Css
 " to determine whether to attempt completion
 function s:MeetsForCssOmni(context, ...)
-  if g:acp_css_omni_property_length >= 0 &&
-        \ a:context =~ '\(^\s\|[;{]\)\s*\k\{' . g:acp_css_omni_property_length . ',}$'
-    return 1
-  endif
-  if g:acp_css_omni_value_length >= 0 &&
-        \ a:context =~ '[:@!]\s*\k\{' . g:acp_css_omni_value_length . ',}$'
-    return 1
-  endif
-  return 0
+  return (g:acp_css_omni_property_length >= 0 &&
+        \ a:context =~ '\(^\|[;{]\)\s*\k\{' . g:acp_css_omni_property_length . ',}$') ||
+        \ (g:acp_css_omni_value_length >= 0 &&
+        \ a:context =~ '[:@!]\s*\k\{' . g:acp_css_omni_value_length . ',}$')
 endfunction
 
 " Default 'meets' function for JavaScript
@@ -221,7 +212,7 @@ endfunction
 " to determine whether to attempt completion
 function s:MeetsForSASOmni(context, ...)
   return g:acp_sas_omni_length >= 0 &&
-        \ a:context =~ '\<proc \k\{' . g:acp_sas_omni_length . ',}$'
+        \ a:context =~ '\<proc\s\+\k\{' . g:acp_sas_omni_length . ',}$'
 endfunction
 
 " Set variable with temporary value
