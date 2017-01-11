@@ -1,5 +1,5 @@
 " Enable spell check
-setlocal spell spelllang=en_us
+setlocal textwidth=78 formatoptions+=t spell spelllang=en_us
 
 " Set comment toggle
 nnoremap <buffer> <silent> <F5> :call KenyToggleComment('<!-- ', ' -->')<CR>
