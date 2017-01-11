@@ -1,29 +1,38 @@
 # Vim Auto Complete Popup
 
-Auto trigger complete popup menu.
+Plugin for automatically prompting completion popup menu.
+
+## Introduction
+
+This plugin is a fork of Takeshi Nishida's AutoComplPop. The plugin enables
+VIM to automatically prompt popup menu for completion when inserting
+characters in the text. It supports prompting completion for keywords and
+omni-completion for various programming languages.
+
+### Supported programming languages
+
+* HTML, XHTML, XML
+* CSS
+* JavaScript, Coffee, LiveScript
+* PHP
+* Perl
+* Python
+* Ruby
+* SAS
 
 ## Changes
 
-* Revert the reliability to L9 library
-* Add default behavior for JavaScript, Coffee, LiveScript
-* Supports [garbas/vim-snipmate][] - TODO
-
-[garbas/vim-snipmate]:https://github.com/garbas/vim-snipmate
-
-## Old About
-
-Author:  Takeshi NISHIDA <ns9tks@DELETE-ME.gmail.com>  
-Licence: MIT Licence  
-URL:     http://www.vim.org/scripts/script.php?script_id=1879  
-         http://bitbucket.org/ns9tks/vim-autocomplpop/  
-
-Bugs/Issues/Suggestions/Improvements ~
-
-Please submit to http://bitbucket.org/ns9tks/vim-autocomplpop/issues/ .
+* Add default behaviors for JavaScript, Coffee, LiveScript, PHP, and SAS.
+* Add a new option `acp_select_first_item` to control whether to select the
+  first item on the popup menu.
+* Fix various bugs in the original plugin.
+* Revert the reliability to L9 library.
 
 ## License
 
-Copyright (c) 2007-2009 Takeshi NISHIDA, 2012-2013 Wei-Ko Kao, 2016 Zhen-Huan Hu
+This plugin is released under the MIT license:
+
+Copyright 2006-2009 Takeshi NISHIDA, 2016-2017 Zhenhuan Hu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,13 +41,13 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
