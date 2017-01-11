@@ -317,9 +317,11 @@ function s:FeedPopup()
   elseif s:MakeCurrentBehaviorSet()
     call s:SetTempOption(s:L_0, '&complete', g:acp_set_complete)
     call s:SetTempOption(s:L_0, '&completeopt',
-          \ (g:acp_set_completeopt_preview ?
-          \ 'menuone,preview' :
-          \ 'menuone'))
+          \ 'menuone,noinsert' .
+          \ (g:acp_set_completeopt_preview ? ',preview' : '') .
+          \ (g:acp_set_completeopt_noselect ? ',noselect' : '')
+          \ )
+    echom &completeopt
     call s:SetTempOption(s:L_0, '&completefunc',
           \ (exists('s:current_behavs[0].completefunc') ?
           \ s:current_behavs[0].completefunc :
@@ -342,20 +344,7 @@ endfunction
 " Keep it as a local function to avoid users accidentally calling it directly
 function s:OnPopup()
   if pumvisible()
-    " When a popup menu appears
-    if g:acp_select_first_item
-      " To restore the original text and select the first match
-      return (s:current_behavs[s:behav_idx].command =~#
-            \ "\<C-p>" ?
-            \ "\<C-n>\<Up>" :
-            \ "\<C-p>\<Down>")
-    else
-      " To restore the original text
-      return (s:current_behavs[s:behav_idx].command =~#
-            \ "\<C-p>" ?
-            \ "\<C-n>" :
-            \ "\<C-p>")
-    endif
+    return ''
   elseif s:behav_idx < len(s:current_behavs) - 1
     " When popup menu impossible for the current completion behavior,
     " attempt the next behavior if available
