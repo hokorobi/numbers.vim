@@ -339,7 +339,7 @@ function s:OnPopup()
   if pumvisible() || empty(s:current_behavs)
     return ''
   endif
-  if s:behav_idx <= len(s:current_behavs) - 1
+  if s:behav_idx < len(s:current_behavs) - 1
     " When popup menu impossible for the current completion behavior,
     " attempt the next behavior if available
     let s:behav_idx += 1
