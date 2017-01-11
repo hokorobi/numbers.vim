@@ -18,6 +18,11 @@ snippet tedconsent
 snippet crfconsent
 	if yeartx <= 2007 and sgirbres = 0 then delete; 
 	else if yeartx > 2007 and (sgirbres <= 0 or sgirbres = 3) then delete;
+snippet pkeep
+	call streaminit(86409);
+	pkeepfloor = rand("Uniform");
+	if assignby = 4 and yeartx <= 2002
+	and pkeepfloor >= pkeep then delete;	
 snippet mds
 	* 50: MDS, unclassified | 51: RA | 52: RAEB | 54: CMML | 55: RARS
 	* 61: RAEB-1 | 62: RAEB-2 | 64: RCMD | 65: RCMD/RS | 66: 5q- syndrome
