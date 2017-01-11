@@ -336,7 +336,7 @@ endfunction
 " Generate contents for s:FeedPopup()
 " Keep it as a local function to avoid users accidentally calling it directly
 function s:OnPopup()
-  if pumvisible()
+  if pumvisible() || empty(s:current_behavs)
     return ''
   endif
   if s:behav_idx <= len(s:current_behavs) - 1
