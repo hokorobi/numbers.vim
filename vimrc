@@ -106,7 +106,6 @@ vnoremap <leader><Space> zf
 vnoremap <BS> d
 
 inoremap <leader><Tab> <Esc>`^
-inoremap <Esc> <Esc>`^
 
 xnoremap ( c(<C-r>")
 xnoremap [ c[<C-r>"]
