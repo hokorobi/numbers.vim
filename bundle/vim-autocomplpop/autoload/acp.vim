@@ -284,7 +284,6 @@ function s:MakeCurrentBehaviorSet()
     call s:ClearCurrentBehaviorSet()
     return 0
   endif
-  let s:behav_idx = 0
   let text = s:GetCurrentText()
   call filter(s:current_behavs, 'call(v:val.meets, [text])')
   " Improve responsiveness by not to attempt another completion
@@ -317,22 +316,16 @@ function s:FeedPopup()
   elseif s:MakeCurrentBehaviorSet()
     call s:SetTempOption(s:L_0, '&complete', g:acp_set_complete)
     call s:SetTempOption(s:L_0, '&completeopt',
-          \ 'menuone,noinsert' .
-          \ (g:acp_set_completeopt_preview ? ',preview' : '') .
-          \ (g:acp_set_completeopt_noselect ? ',noselect' : '')
+          \ (g:acp_set_completeopt_preview  ? 'preview,'  : '') .
+          \ (g:acp_set_completeopt_noselect ? 'noselect,' : '') .
+          \ 'menuone,noinsert'
           \ )
-    echom &completeopt
-    call s:SetTempOption(s:L_0, '&completefunc',
-          \ (exists('s:current_behavs[0].completefunc') ?
-          \ s:current_behavs[0].completefunc :
-          \ eval('&completefunc')))
     call s:SetTempOption(s:L_0, '&ignorecase', g:acp_set_ignorecase)
     call s:SetTempOption(s:L_0, '&lazyredraw', 1)
     call s:SetTempOption(s:L_0, '&spell', 0)
     call s:SetTempOption(s:L_1, '&textwidth', 0)
-    call feedkeys(printf("%s\<C-r>=%sOnPopup()\<CR>",
-          \ s:current_behavs[0].command,
-          \ s:PREFIX_SID), 'n')
+    let s:behav_idx = -1
+    call feedkeys(printf("\<C-r>=%sOnPopup()\<CR>", s:PREFIX_SID), 'n')
     return
   else
     call s:FinishPopup(1)
@@ -345,27 +338,27 @@ endfunction
 function s:OnPopup()
   if pumvisible()
     return ''
-  elseif s:behav_idx < len(s:current_behavs) - 1
+  endif
+  if s:behav_idx <= len(s:current_behavs) - 1
     " When popup menu impossible for the current completion behavior,
     " attempt the next behavior if available
     let s:behav_idx += 1
     " Need to update &completefunc each time before a new behavior is tried
     call s:SetTempOption(s:L_0, '&completefunc',
-          \ (exists('s:current_behavs[s:behav_idx].completefunc') ?
+          \ exists('s:current_behavs[s:behav_idx].completefunc') ?
           \ s:current_behavs[s:behav_idx].completefunc :
-          \ eval('&completefunc')))
-    return printf("\<C-e>%s\<C-r>=%sOnPopup()\<CR>",
+          \ eval('&completefunc'))
+    return printf("%s\<C-r>=%sOnPopup()\<CR>",
           \ s:current_behavs[s:behav_idx].command,
           \ s:PREFIX_SID)
-  else
-    " After all attempts have failed
-    let s:last_uncompletable = {
-          \ 'word': s:GetCurrentWord(),
-          \ 'commands': map(copy(s:current_behavs), 'v:val.command')[1:],
-          \ }
-    call s:FinishPopup(0)
-    return "\<C-e>"
   endif
+  " After all attempts have failed
+  let s:last_uncompletable = {
+        \ 'word': s:GetCurrentWord(),
+        \ 'commands': map(copy(s:current_behavs), 'v:val.command')[1:],
+        \ }
+  call s:FinishPopup(0)
+  return ''
 endfunction
 
 " Finishing function
