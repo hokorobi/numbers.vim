@@ -93,6 +93,7 @@ nnoremap <leader>, ,
 nnoremap <leader>es :vsplit $MYVIMRC<CR>
 nnoremap <leader>ss :source $MYVIMRC<CR>
 nnoremap <leader>ww :w<CR>
+nnoremap <leader>wq :wq<CR>
 nnoremap <leader>qq :q<CR>
 nnoremap <leader>cd :cd %:p:h<CR>
 nnoremap <leader>fi mzgg=G`z
@@ -103,6 +104,8 @@ nnoremap <leader>wr /warning<CR>
 nnoremap <leader><Space> za
 vnoremap <leader><Space> zf
 vnoremap <BS> d
+
+inoremap <leader><Tab> <Esc>`^
 
 xnoremap ( c(<C-r>")
 xnoremap [ c[<C-r>"]
