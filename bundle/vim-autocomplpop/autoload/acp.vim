@@ -16,6 +16,7 @@ let g:loaded_autoload_acp = 1
 
 " Enable auto-popup
 function acp#Enable()
+  inoremap <Plug>AcpFeedPopup <C-r>=<SID>FeedPopup()<CR>
   augroup AcpGlobalAutoCommand
     autocmd!
     autocmd InsertEnter  * call s:ResetLastCursorPosition()
@@ -27,6 +28,7 @@ endfunction
 
 " Disable auto-popup
 function acp#Disable()
+  iunmap <Plug>AcpFeedPopup
   augroup AcpGlobalAutoCommand
     autocmd!
   augroup END
@@ -356,9 +358,8 @@ function s:FeedPopup()
           \ exists('s:current_behavs[s:behav_idx].completefunc') ?
           \ s:current_behavs[s:behav_idx].completefunc :
           \ eval('&completefunc'))
-    call feedkeys(printf("%s\<C-r>=%sFeedPopup()\<CR>",
-          \ s:current_behavs[s:behav_idx].command,
-          \ s:PREFIX_SID), 'n')
+    call feedkeys(s:current_behavs[s:behav_idx].command, 'n')
+    call feedkeys("\<Plug>AcpFeedPopup")
     return ''
   endif
   " After all attempts have failed
@@ -381,17 +382,11 @@ function s:FinishPopup(level)
   endif
 endfunction
 
-function s:GetSidPrefix()
-  return matchstr(expand('<sfile>'), '<SNR>\d\+_')
-endfunction
-
 " }}}1
 "=============================================================================
 " INITIALIZATION {{{1
 
 "-----------------------------------------------------------------------------
-let s:PREFIX_SID = s:GetSidPrefix()
-delfunction s:GetSidPrefix
 let s:L_0 = 0
 let s:L_1 = 1
 "-----------------------------------------------------------------------------
