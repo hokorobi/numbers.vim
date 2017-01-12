@@ -19,7 +19,7 @@ function acp#Enable()
   augroup AcpGlobalAutoCommand
     autocmd!
     autocmd InsertEnter  * call s:ResetLastCursorPosition()
-    autocmd TextChangedI * call s:FeedPopup()
+    autocmd TextChangedI * call s:InitPopup()
     autocmd CompleteDone * call s:ResetLastCursorPosition()
     autocmd InsertLeave  * call s:FinishPopup(1)
   augroup END
@@ -316,8 +316,8 @@ function s:ClearCurrentBehaviorSet()
   let s:current_behavs = []
 endfunction
 
-" Feed keys to popup menu
-function s:FeedPopup()
+" Initialize
+function s:InitPopup()
   if s:lock_count > 0 || &paste
     return
   elseif s:MakeCurrentBehaviorSet()
@@ -332,7 +332,7 @@ function s:FeedPopup()
     call s:SetTempOption(s:L_0, '&spell', 0)
     call s:SetTempOption(s:L_1, '&textwidth', 0)
     let s:behav_idx = -1
-    call feedkeys(printf("\<C-r>=%sOnPopup()\<CR>", s:PREFIX_SID), 'n')
+    call s:FeedPopup()
     return
   else
     call s:FinishPopup(1)
@@ -340,24 +340,26 @@ function s:FeedPopup()
   endif
 endfunction
 
-" Generate contents for s:FeedPopup()
+" Feed keys to trigger popup menu
 " Keep it as a local function to avoid users accidentally calling it directly
-function s:OnPopup()
-  if pumvisible() || empty(s:current_behavs)
+function s:FeedPopup()
+  if empty(s:current_behavs)
+    return ''
+  endif
+  if pumvisible()
     return ''
   endif
   if s:behav_idx < len(s:current_behavs) - 1
-    " When popup menu impossible for the current completion behavior,
-    " attempt the next behavior if available
     let s:behav_idx += 1
     " Need to update &completefunc each time before a new behavior is tried
     call s:SetTempOption(s:L_0, '&completefunc',
           \ exists('s:current_behavs[s:behav_idx].completefunc') ?
           \ s:current_behavs[s:behav_idx].completefunc :
           \ eval('&completefunc'))
-    return printf("%s\<C-r>=%sOnPopup()\<CR>",
+    call feedkeys(printf("%s\<C-r>=%sFeedPopup()\<CR>",
           \ s:current_behavs[s:behav_idx].command,
-          \ s:PREFIX_SID)
+          \ s:PREFIX_SID), 'n')
+    return ''
   endif
   " After all attempts have failed
   let s:last_uncompletable = {
@@ -368,7 +370,7 @@ function s:OnPopup()
   return ''
 endfunction
 
-" Finishing function
+" Finish up
 function s:FinishPopup(level) 
   if a:level >= 0
     call s:ClearCurrentBehaviorSet()
