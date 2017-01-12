@@ -18,11 +18,13 @@ omni-completion for various programming languages.
 * Perl
 * Python
 * Ruby
+* VimScript
 * SAS
 
 ## Changes
 
-* Add default behaviors for JavaScript, Coffee, LiveScript, PHP, and SAS.
+* Add default behaviors for JavaScript, Coffee, LiveScript, PHP, VimScript
+  and SAS.
 * Add a new option `acp_set_completeopt_noselect` to control whether to
   select the first item in the popup menu.
 * Fix various bugs in the original plugin.

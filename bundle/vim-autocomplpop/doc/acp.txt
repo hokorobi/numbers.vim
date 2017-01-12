@@ -27,6 +27,7 @@ Supported programming languages:
   - Perl
   - Python
   - Ruby
+  - VimScript
   - SAS
 
 ==============================================================================
@@ -48,6 +49,7 @@ text before the cursor. The supported behaviors are as follows:
         Keyword   *           three keyword characters
         Filename  *           a filename character + a path separator 
                               + 0 or more filename characters
+        Command   vim         two keyword characters
         Omni      ruby        ".", "::" or non-word characters + ":"
                               (|+ruby| required.)
         Omni      python      "." (|+python| required.)
@@ -197,15 +199,23 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_file_length = 0
 <
-        The length of filename characters before the cursor, which is needed
-        to trigger filename completion. If the value is negative, the
+        The length of filename characters before the cursor that is needed to
+        trigger filename completion. If the value is negative, the
         completion will not be attempted.
+
+                                                      *g:acp_vimscript_length*
+>
+  let g:acp_vimscript_length = 2
+<
+        The length of keyword characters before the cursor that is needed to
+        trigger VimScript completion. If the value is negative, the completion
+        will not be attempted.
 
                                                *g:acp_ruby_omni_method_length*
 >
   let g:acp_ruby_omni_method_length = 0
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger Ruby omni-completion for Ruby methods. If the value is
         negative, the completion will not be attempted.
 
@@ -213,7 +223,7 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_ruby_omni_symbol_length = 1
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger Ruby omni-completion for Ruby symbols. If the value is
         negative, the completion will not be attempted.
 
@@ -221,7 +231,7 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_python_omni_length = 0
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger Python omni-completion. If the value is negative, the
         completion will not be attempted.
 
@@ -229,7 +239,7 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_perl_omni_length = -1
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger Perl omni-completion. If the value is negative, the completion
         will not be attempted.
 
@@ -239,7 +249,7 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_xml_omni_length = 0
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger XML omni-completion. If the value is negative, the completion
         will not be attempted.
 
@@ -247,7 +257,7 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_html_omni_length = 0
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger HTML omni-completion. If the value is negative, the completion
         will not be attempted.
 
@@ -255,7 +265,7 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_css_omni_property_length = 1
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger CSS omni-completion for CSS properties. If the value is
         negative, the completion will not be attempted.
 
@@ -263,7 +273,7 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_css_omni_value_length = 0
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger CSS omni-completion for CSS values. If the value is negative,
         the completion will not be attempted.
 
@@ -271,7 +281,7 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_javascript_omni_length = 0
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger JavaScript omni-completion. If the value is negative, the
         completion will not be attempted.
 
@@ -279,7 +289,7 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_php_omni_length = 0
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger PHP omni-completion. If the value is negative, the completion
         will not be attempted.
 
@@ -287,7 +297,7 @@ OPTIONS                                                          *acp-options*
 >
   let g:acp_sas_omni_length = 0
 <
-        The length of keyword characters before the cursor, which is needed to
+        The length of keyword characters before the cursor that is needed to
         trigger SAS omni-completion. If the value is negative, the completion
         will not be attempted.
 
@@ -352,18 +362,21 @@ OPTIONS                                                          *acp-options*
 CHANGELOG                                                      *acp-changelog*
 
 3.0-fork
-  - Add default behaviors for JavaScript, Coffee, LiveScript, PHP, and SAS.
+  - Add default behaviors for JavaScript, Coffee, LiveScript, PHP, VimScript
+    and SAS.
   - Add a new option |acp_set_completeopt_noselect| to control whether to
     select the first item in the popup menu.
   - Use |TextChangedI| event to trigger auto-popup (This also makes the entire
     key-mapping mechanism obsolete, therefore remove the corresponding code).
+  - Revert a behavior that switching from |Normal| mode to |Insert| mode will 
+    instantanously attempt a completion
   - Remove the reliability to L9 library.
   - Rename methods and variables based on VIM naming conventions.
   - Change all built-in "meets" functions to local scope.
 
     The following bugs have been fixed:
-  - Fix a bug that moving cursor after changing back from |Normal| mode to
-    |Insert| mode will trigger auto-popup menu.
+  - Fix a bug that moving cursor after switching back from |Normal| mode to
+    |Insert| mode will always trigger auto-popup menu.
   - Fix a bug that subsequent attempt is skipped after previous completion
     when the "meets" function length is 0.
   - Fix a bug that auto-popup menu will be triggered indecisively when the

@@ -28,6 +28,7 @@ endfunction
 function s:MakeDefaultBehavior()
   let behavs = {
         \   '*'           : [],
+        \   'vim'         : [],
         \   'ruby'        : [],
         \   'python'      : [],
         \   'perl'        : [],
@@ -79,6 +80,12 @@ function s:MakeDefaultBehavior()
           \   'repeat'  : 1,
           \ })
   endfor
+  "---------------------------------------------------------------------------
+  call add(behavs.vim, {
+        \   'command' : "\<C-x>\<C-v>",
+        \   'meets'   : 's:MeetsForVimScript',
+        \   'repeat'  : 0,
+        \ })
   "---------------------------------------------------------------------------
   call add(behavs.ruby, {
         \   'command' : "\<C-x>\<C-o>",
@@ -172,6 +179,7 @@ call s:DefineVariableDefault('g:acp_keyword_command', "\<C-n>")
 call s:DefineVariableDefault('g:acp_keyword_length', 3)
 call s:DefineVariableDefault('g:acp_keyword_ignored', [])
 call s:DefineVariableDefault('g:acp_file_length', 0)
+call s:DefineVariableDefault('g:acp_vimscript_length', 2)
 call s:DefineVariableDefault('g:acp_ruby_omni_method_length', 0)
 call s:DefineVariableDefault('g:acp_ruby_omni_symbol_length', 1)
 call s:DefineVariableDefault('g:acp_python_omni_length', 0)
