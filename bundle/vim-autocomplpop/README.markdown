@@ -23,8 +23,8 @@ omni-completion for various programming languages.
 ## Changes
 
 * Add default behaviors for JavaScript, Coffee, LiveScript, PHP, and SAS.
-* Add a new option `acp_select_first_item` to control whether to select the
-  first item on the popup menu.
+* Add a new option `acp_set_completeopt_noselect` to control whether to
+  select the first item in the popup menu.
 * Fix various bugs in the original plugin.
 * Revert the reliability to L9 library.
 

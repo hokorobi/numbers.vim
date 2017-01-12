@@ -127,12 +127,6 @@ OPTIONS                                                          *acp-options*
 <
         If non-zero, auto-popup is enabled at startup.
 
-                                                     *g:acp_select_first_item*
->
-  let g:acp_select_first_item = 1
-<
-        If non-zero, the first item will be selected in the auto-popup menu.
-
                                                         *g:acp_set_ignorecase*
 >
   let g:acp_set_ignorecase = 1
@@ -150,6 +144,12 @@ OPTIONS                                                          *acp-options*
   let g:acp_set_completeopt_preview = 0
 <
         If non-zero, "preview" is added to 'completeopt' when auto-popup.
+
+                                              *g:acp_set_completeopt_noselect*
+>
+  let g:acp_set_completeopt_noselect = 0
+<
+        If non-zero, the first item will not be selected in the popup menu.
 
                                              *g:acp_user_defined_completefunc*
 >
@@ -353,8 +353,8 @@ CHANGELOG                                                      *acp-changelog*
 
 3.0-fork
   - Add default behaviors for JavaScript, Coffee, LiveScript, PHP, and SAS.
-  - Add a new option |acp_select_first_item| to control whether to select the
-    first item on the popup menu.
+  - Add a new option |acp_set_completeopt_noselect| to control whether to
+    select the first item in the popup menu.
   - Use |TextChangedI| event to trigger auto-popup (This also makes the entire
     key-mapping mechanism obsolete, therefore remove the corresponding code).
   - Remove the reliability to L9 library.
