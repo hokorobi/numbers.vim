@@ -267,7 +267,7 @@ function s:ResetLastCursorPosition()
   let s:pos_last = getpos('.')
 endfunction
 
-" Check if the cursor is moved
+" Check if the cursor was moved
 function s:IsCursorMoved()
   if exists('s:pos_last')
     let pos_prev = s:pos_last
@@ -282,7 +282,7 @@ function s:ClearCurrentBehaviorSet()
   let s:current_behavs = []
 endfunction
 
-" Make current behavior set s:current_behavs
+" Make a new behavior set s:current_behavs
 " Return 1 if a new behavior set is created, 0 if otherwise
 function s:MakeCurrentBehaviorSet()
   if s:IsCursorMoved()
@@ -337,7 +337,6 @@ function s:InitPopup()
 endfunction
 
 " Feed keys to trigger popup menu
-" Keep it as a local function to avoid users accidentally calling it directly
 function s:FeedPopup()
   if !exists('s:current_behavs[s:behav_idx]')
     return ''
@@ -347,7 +346,7 @@ function s:FeedPopup()
   endif
   if s:behav_idx < len(s:current_behavs) - 1
     let s:behav_idx += 1
-    " Need to update &completefunc each time before a new behavior is tried
+    " Need to update &completefunc each time
     call s:SetTempOption(s:L_0, '&completefunc',
           \ exists('s:current_behavs[s:behav_idx].completefunc') ?
           \ s:current_behavs[s:behav_idx].completefunc :
@@ -367,6 +366,10 @@ endfunction
 
 " Complete done
 function s:CompleteDone()
+  " This function is called in two scenarios
+  " If completion was successful, it is executed
+  " before the next s:InitPopup() call; if completion
+  " failed, it is executed after the next s:InitPopup()
   if !empty(v:completed_item)
     if exists('s:current_behavs[s:behav_idx].repeat')
           \ && s:current_behavs[s:behav_idx].repeat
