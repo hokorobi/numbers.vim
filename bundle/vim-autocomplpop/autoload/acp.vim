@@ -36,15 +36,17 @@ endfunction
 
 " Suspend auto-popup
 function acp#Lock()
-  let s:lock_count += 1
+  let s:lock_count = exists(s:lock_count) ?
+        \ s:lock_count + 1 : 1
 endfunction
 
 " Release auto-popup from suspension
 function acp#Unlock()
-  let s:lock_count -= 1
-  if s:lock_count < 0
-    let s:lock_count = 0
-    throw "AutoComplPop: Not locked"
+  let s:lock_count = exists(s:lock_count) ?
+        \ s:lock_count - 1 :
+        \ throw "AutoComplPop: Not locked"
+  if s:lock_count < 1
+    unlet s:lock_count
   endif
 endfunction
 
@@ -320,9 +322,10 @@ endfunction
 
 " Initialize
 function s:InitPopup()
-  if s:lock_count > 0 || &paste
+  if (exists(s:lock_count) && s:lock_count > 0) || &paste
     return
-  elseif s:MakeCurrentBehaviorSet()
+  endif
+  if s:MakeCurrentBehaviorSet()
     call s:SetTempOption(s:L_0, '&complete', g:acp_set_complete)
     call s:SetTempOption(s:L_0, '&completeopt',
           \ (g:acp_set_completeopt_preview  ? 'preview,'  : '') .
@@ -390,7 +393,6 @@ endfunction
 let s:L_0 = 0
 let s:L_1 = 1
 "-----------------------------------------------------------------------------
-let s:lock_count = 0
 let s:current_behavs = []
 let s:behav_idx = 0
 let s:orig_map = {}
