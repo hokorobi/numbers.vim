@@ -356,8 +356,8 @@ function s:FeedPopup()
   if pumvisible()
     return ''
   endif
-  let s:behav_idx += 1
-  if s:behav_idx < len(s:current_behavs)
+  if s:behav_idx < len(s:current_behavs) - 1
+    let s:behav_idx += 1
     " Need to update &completefunc each time before a new behavior is tried
     call s:SetTempOption(s:L_0, '&completefunc',
           \ exists('s:current_behavs[s:behav_idx].completefunc') ?
