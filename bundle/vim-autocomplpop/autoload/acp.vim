@@ -380,7 +380,7 @@ function s:CompleteDone()
       return
     endif
     if exists('s:current_behavs[s:behav_idx].closefunc')
-      call(s:current_behavs[s:behav_idx].closefunc, [])
+      call call(s:current_behavs[s:behav_idx].closefunc, [])
     endif
     call s:FinishPopup(1)
     call s:ResetLastCursorPosition()
