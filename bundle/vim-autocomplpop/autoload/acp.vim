@@ -55,8 +55,9 @@ endfunction
 
 " LOCAL FUNCTIONS: {{{1
 
+" Create snipMate item list for the complete function
 function s:MakeSnipmateItem(key, snip)
-  if type(a:snip) == type([])
+  if type(a:snip) == v:t_list
     let descriptions = map(copy(a:snip), 'v:val[0]')
     let formatted_snip = '[MULTI] ' . join(descriptions, ', ')
   else
@@ -81,12 +82,15 @@ endfunction
 " Default completion function for snipMate
 function s:CompleteFuncForSnipmate(findstart, base)
   if a:findstart
-    let s:snip_completion_pos = len(matchstr(s:GetCurrentText(), '.*\U'))
-    return s:snip_completion_pos
+    if matchstrpos(s:GetCurrentText(), '\S+$')[1] >= 0
+      return matchstrpos(s:GetCurrentText(), '\S+$')[1]
+    else
+      return -3
+    endif
   endif
   let base_len = len(a:base)
   let items = filter(GetSnipsInCurrentScope(),
-        \            'strpart(v:key, 0, base_len) ==? a:base')
+        \ 'strpart(v:key, 0, base_len) ==? a:base')
   return map(sort(items(items)), 's:MakeSnipmateItem(v:val[0], v:val[1])')
 endfunction
 
@@ -108,8 +112,7 @@ function s:MeetsForSnipmate(context, ...)
   if g:acp_snipmate_length < 0
     return 0
   endif
-  let matches = matchlist(a:context, '\(^\|\s\|\<\)\(\u\{' .
-        \                            g:acp_snipmate_length . ',}\)$')
+  let matches = matchlist(a:context, '\S\{' . g:acp_snipmate_length . ',}$')
   return !empty(matches) && !empty(s:GetMatchingSnipItems(matches[2]))
 endfunction
 
