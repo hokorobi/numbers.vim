@@ -312,6 +312,7 @@ function s:MakeCurrentBehaviorSet()
     call s:ClearCurrentBehaviorSet()
     return 0
   endif
+  let s:behav_idx = -1
   return 1
 endfunction
 
@@ -336,7 +337,6 @@ function s:InitPopup()
     call s:SetTempOption(s:L_0, '&lazyredraw', 1)
     call s:SetTempOption(s:L_0, '&spell', 0)
     call s:SetTempOption(s:L_1, '&textwidth', 0)
-    let s:behav_idx = -1
     call s:FeedPopup()
     return
   else
