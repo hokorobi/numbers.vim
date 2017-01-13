@@ -1,8 +1,7 @@
-"=============================================================================
-" Copyright (c) 2007-2009 Takeshi NISHIDA
-" Copyright (c) 2016-2017 Zhen-Huan Hu
-"
-"=============================================================================
+" Vim AutoComplPop
+" Copyright 2007-2009 Takeshi NISHIDA
+"           2016-2017 Zhen-Huan Hu
+
 " LOAD GUARD {{{1
 
 if exists('g:loaded_autoload_acp') || v:version < 800
@@ -11,7 +10,6 @@ endif
 let g:loaded_autoload_acp = 1
 
 " }}}1
-"=============================================================================
 " GLOBAL FUNCTIONS: {{{1
 
 " Enable auto-popup
@@ -53,10 +51,9 @@ function acp#Unlock()
 endfunction
 
 " }}}1
-"=============================================================================
+
 " LOCAL FUNCTIONS: {{{1
 
-"
 function s:MakeSnipmateItem(key, snip)
   if type(a:snip) == type([])
     let descriptions = map(copy(a:snip), 'v:val[0]')
@@ -70,7 +67,6 @@ function s:MakeSnipmateItem(key, snip)
         \ }
 endfunction
 
-"
 function s:GetMatchingSnipItems(base)
   let key = a:base . "\n"
   if !exists('s:snip_items[key]')
@@ -399,7 +395,7 @@ function s:FinishPopup(level)
 endfunction
 
 " }}}1
-"=============================================================================
+
 " INITIALIZATION {{{1
 
 let s:L_0 = 0
@@ -411,5 +407,5 @@ let s:orig_options = {}
 let s:snip_items = {}
 
 " }}}1
-"=============================================================================
+
 " vim: set fdm=marker:
