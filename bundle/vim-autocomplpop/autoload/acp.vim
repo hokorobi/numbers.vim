@@ -51,6 +51,21 @@ function acp#Unlock()
   endif
 endfunction
 
+" Default completion function for snipMate
+function acp#CompleteFuncForSnipmate(findstart, base)
+  if a:findstart
+    if matchstrpos(s:GetCurrentText(), '\S+$')[1] >= 0
+      return matchstrpos(s:GetCurrentText(), '\S+$')[1]
+    else
+      return -3
+    endif
+  endif
+  let base_len = len(a:base)
+  let items = filter(GetSnipsInCurrentScope(),
+        \ 'strpart(v:key, 0, base_len) ==? a:base')
+  return map(sort(items(items)), 's:MakeSnipmateItem(v:val[0], v:val[1])')
+endfunction
+
 " }}}1
 
 " LOCAL FUNCTIONS: {{{1
@@ -77,21 +92,6 @@ function s:GetMatchingSnipItems(base)
     call map(s:snip_items[key], 's:MakeSnipmateItem(v:val[0], v:val[1])')
   endif
   return s:snip_items[key]
-endfunction
-
-" Default completion function for snipMate
-function s:CompleteFuncForSnipmate(findstart, base)
-  if a:findstart
-    if matchstrpos(s:GetCurrentText(), '\S+$')[1] >= 0
-      return matchstrpos(s:GetCurrentText(), '\S+$')[1]
-    else
-      return -3
-    endif
-  endif
-  let base_len = len(a:base)
-  let items = filter(GetSnipsInCurrentScope(),
-        \ 'strpart(v:key, 0, base_len) ==? a:base')
-  return map(sort(items(items)), 's:MakeSnipmateItem(v:val[0], v:val[1])')
 endfunction
 
 " Default close function for snipMate
