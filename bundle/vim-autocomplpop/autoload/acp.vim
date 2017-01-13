@@ -37,17 +37,17 @@ endfunction
 
 " Suspend auto-popup
 function acp#Lock()
-  let s:lock_count = exists('s:lock_count') ?
-        \ s:lock_count + 1 : 1
+  let b:lock_count = exists('b:lock_count') ?
+        \ b:lock_count + 1 : 1
 endfunction
 
 " Release auto-popup from suspension
 function acp#Unlock()
-  let s:lock_count = exists('s:lock_count') ?
-        \ s:lock_count - 1 :
+  let b:lock_count = exists('b:lock_count') ?
+        \ b:lock_count - 1 :
         \ throw "AutoComplPop: Not locked"
-  if s:lock_count < 1
-    unlet s:lock_count
+  if b:lock_count < 1
+    unlet b:lock_count
   endif
 endfunction
 
@@ -311,7 +311,7 @@ endfunction
 
 " Initialize
 function s:InitPopup()
-  if (exists('s:lock_count') && s:lock_count > 0) || &paste
+  if (exists('b:lock_count') && b:lock_count > 0) || &paste
     return
   endif
   if s:MakeCurrentBehaviorSet()
