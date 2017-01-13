@@ -16,7 +16,6 @@ let g:loaded_autoload_acp = 1
 
 " Enable auto-popup
 function acp#Enable()
-  inoremap <Plug>AcpFeedPopup <C-r>=<SID>FeedPopup()<CR>
   augroup AcpGlobalAutoCommand
     autocmd!
     autocmd InsertEnter  * call s:ResetLastCursorPosition()
@@ -24,14 +23,17 @@ function acp#Enable()
     autocmd CompleteDone * call s:ResetLastCursorPosition()
     autocmd InsertLeave  * call s:FinishPopup(1)
   augroup END
+
+  inoremap <silent> <Plug>AcpFeedPopup <C-r>=<SID>FeedPopup()<CR>
 endfunction
 
 " Disable auto-popup
 function acp#Disable()
-  iunmap <Plug>AcpFeedPopup
   augroup AcpGlobalAutoCommand
     autocmd!
   augroup END
+
+  iunmap <Plug>AcpFeedPopup
 endfunction
 
 " Suspend auto-popup
@@ -228,25 +230,25 @@ endfunction
 
 " Set variable with temporary value
 function s:SetTempOption(group, name, value)
-  if !exists('s:orig_map[a:group]')
-    let s:orig_map[a:group] = {}
+  if !exists('s:orig_options[a:group]')
+    let s:orig_options[a:group] = {}
   endif
-  if !exists('s:orig_map[a:group][a:name]')
-    let s:orig_map[a:group][a:name] = eval(a:name)
+  if !exists('s:orig_options[a:group][a:name]')
+    let s:orig_options[a:group][a:name] = eval(a:name)
   endif
   execute 'let' a:name '= a:value'
 endfunction
 
 " Restore original value to variable and clean up
 function s:RestoreTempOptions(group)
-  if !exists('s:orig_map[a:group]')
+  if !exists('s:orig_options[a:group]')
     return
   endif
-  for [name, value] in items(s:orig_map[a:group])
+  for [name, value] in items(s:orig_options[a:group])
     execute 'let' name '= value'
     unlet value " to avoid E706
   endfor
-  unlet s:orig_map[a:group]
+  unlet s:orig_options[a:group]
 endfunction
 
 " Retrieve contents at current line before cursor
@@ -348,14 +350,14 @@ endfunction
 " Feed keys to trigger popup menu
 " Keep it as a local function to avoid users accidentally calling it directly
 function s:FeedPopup()
-  if empty(s:current_behavs)
+  if !exists('s:current_behavs[s:behav_idx]')
     return ''
   endif
   if pumvisible()
     return ''
   endif
-  if s:behav_idx < len(s:current_behavs) - 1
-    let s:behav_idx += 1
+  let s:behav_idx += 1
+  if s:behav_idx < len(s:current_behavs)
     " Need to update &completefunc each time before a new behavior is tried
     call s:SetTempOption(s:L_0, '&completefunc',
           \ exists('s:current_behavs[s:behav_idx].completefunc') ?
@@ -389,13 +391,12 @@ endfunction
 "=============================================================================
 " INITIALIZATION {{{1
 
-"-----------------------------------------------------------------------------
 let s:L_0 = 0
 let s:L_1 = 1
-"-----------------------------------------------------------------------------
-let s:current_behavs = []
+
 let s:behav_idx = 0
-let s:orig_map = {}
+let s:current_behavs = []
+let s:orig_options = {}
 let s:snip_items = {}
 
 " }}}1
