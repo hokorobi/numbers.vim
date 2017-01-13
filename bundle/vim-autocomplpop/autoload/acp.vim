@@ -20,7 +20,7 @@ function acp#Enable()
     autocmd!
     autocmd InsertEnter  * call s:ResetLastCursorPosition()
     autocmd TextChangedI * call s:InitPopup()
-    autocmd CompleteDone * call s:ResetLastCursorPosition()
+    autocmd CompleteDone * call s:CompleteDone()
     autocmd InsertLeave  * call s:FinishPopup(1)
   augroup END
 
@@ -267,34 +267,29 @@ function s:ResetLastCursorPosition()
   let s:pos_last = getpos('.')
 endfunction
 
-" Check if the cursor only moved a single position
-function s:CursorMovedSinglePosition()
+" Check if the cursor is moved
+function s:IsCursorMoved()
   if exists('s:pos_last')
     let pos_prev = s:pos_last
   endif
   call s:ResetLastCursorPosition()
   return pos_prev[1] ==# s:pos_last[1] &&
-        \ abs(pos_prev[2] - s:pos_last[2]) == 1
+        \ abs(pos_prev[2] - s:pos_last[2]) >= 1
+endfunction
+
+" Clear current behavior set s:current_behavs
+function s:ClearCurrentBehaviorSet()
+  let s:current_behavs = []
 endfunction
 
 " Make current behavior set s:current_behavs
 " Return 1 if a new behavior set is created, 0 if otherwise
 function s:MakeCurrentBehaviorSet()
-  if exists('s:current_behavs[s:behav_idx].closefunc')
-        \ && call(s:current_behavs[s:behav_idx].closefunc, [])
-    call s:ClearCurrentBehaviorSet()
-    return 0
-  endif
-  if exists('s:current_behavs[s:behav_idx].repeat')
-        \ && s:current_behavs[s:behav_idx].repeat
-        \ && call(s:current_behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
-    let s:current_behavs = [ s:current_behavs[s:behav_idx] ]
-  elseif s:CursorMovedSinglePosition()
+  if s:IsCursorMoved()
     let s:current_behavs = copy(exists('g:acp_behavior[&filetype]')
           \ ? g:acp_behavior[&filetype]
           \ : g:acp_behavior['*'])
   else
-    call s:ClearCurrentBehaviorSet()
     return 0
   endif
   let text = s:GetCurrentText()
@@ -311,16 +306,10 @@ function s:MakeCurrentBehaviorSet()
     endif
   endif
   if empty(s:current_behavs) 
-    call s:ClearCurrentBehaviorSet()
     return 0
   endif
   let s:behav_idx = -1
   return 1
-endfunction
-
-" Clear current behavior set s:current_behavs
-function s:ClearCurrentBehaviorSet()
-  let s:current_behavs = []
 endfunction
 
 " Initialize
@@ -376,8 +365,27 @@ function s:FeedPopup()
   return ''
 endfunction
 
+" Complete done
+function s:CompleteDone()
+  if !empty(v:completed_item)
+    if exists('s:current_behavs[s:behav_idx].repeat')
+          \ && s:current_behavs[s:behav_idx].repeat
+          \ && call(s:current_behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
+      let s:current_behavs = [ s:current_behavs[s:behav_idx] ]
+      let s:behav_idx = -1
+      call s:FeedPopup()
+      return
+    endif
+    if exists('s:current_behavs[s:behav_idx].closefunc')
+      call(s:current_behavs[s:behav_idx].closefunc, [])
+    endif
+    call s:FinishPopup(1)
+    call s:ResetLastCursorPosition()
+  endif
+endfunction
+
 " Finish up
-function s:FinishPopup(level) 
+function s:FinishPopup(level)
   if a:level >= 0
     call s:ClearCurrentBehaviorSet()
     call s:RestoreTempOptions(s:L_0)
