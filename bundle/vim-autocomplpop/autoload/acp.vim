@@ -10,6 +10,7 @@ endif
 let g:loaded_autoload_acp = 1
 
 " }}}1
+
 " GLOBAL FUNCTIONS: {{{1
 
 " Enable auto-popup

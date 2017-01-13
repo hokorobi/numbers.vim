@@ -14,7 +14,7 @@ let g:loaded_acp = 1
 
 " }}}1
 
-" FUNCTION: {{{1
+" FUNCTIONS: {{{1
 
 function s:DefineVariableDefault(name, default)
   if !exists(a:name)
