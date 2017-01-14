@@ -54,15 +54,12 @@ endfunction
 " Default completion function for snipMate
 function acp#CompleteFuncForSnipmate(findstart, base)
   if a:findstart
-    if matchstrpos(s:GetCurrentText(), '\S\+$')[1] >= 0
-      return matchstrpos(s:GetCurrentText(), '\S\+$')[1]
-    else
-      return -3
-    endif
+    let pos = matchstrpos(s:GetCurrentText(), '\S\+$')[1]
+    return pos >= 0 ? pos : -3
   endif
-  let base_len = len(a:base)
+  let base = type(a:base) == v:t_number ? string(a:base) : a:base
   let items = filter(GetSnipsInCurrentScope(),
-        \ 'strpart(v:key, 0, base_len) ==? a:base')
+        \ 'strpart(v:key, 0, len(base)) ==? base')
   return map(sort(items(items)), 's:MakeSnipmateItem(v:val[0], v:val[1])')
 endfunction
 
