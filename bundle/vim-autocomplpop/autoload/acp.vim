@@ -54,8 +54,8 @@ endfunction
 " Default completion function for snipMate
 function acp#CompleteFuncForSnipmate(findstart, base)
   if a:findstart
-    if matchstrpos(s:GetCurrentText(), '\S+$')[1] >= 0
-      return matchstrpos(s:GetCurrentText(), '\S+$')[1]
+    if matchstrpos(s:GetCurrentText(), '\S\+$')[1] >= 0
+      return matchstrpos(s:GetCurrentText(), '\S\+$')[1]
     else
       return -3
     endif
@@ -96,10 +96,10 @@ endfunction
 
 " Default close function for snipMate
 function s:CloseFuncForSnipmate()
-  let word = s:GetCurrentText()[s:snip_completion_pos :]
+  let word = matchstr(s:GetCurrentText(), '\S\+$')
   for trigger in keys(GetSnipsInCurrentScope())
     if word ==# trigger
-      call feedkeys("\<C-r>=TriggerSnippet()\<CR>", "n")
+      call feedkeys("\<C-r>=TriggerSnippet()\<CR>", 'n')
       return 1
     endif
   endfor
@@ -351,7 +351,12 @@ function s:FeedPopup()
           \ exists('s:current_behavs[s:behav_idx].completefunc') ?
           \ s:current_behavs[s:behav_idx].completefunc :
           \ eval('&completefunc'))
-    call feedkeys(s:current_behavs[s:behav_idx].command, 'n')
+    " If it is not the first round,
+    " the last key command must be cancelled via <C-e>
+    " before feeding the next key command
+    call feedkeys((s:behav_idx == 0 ?
+          \ s:current_behavs[s:behav_idx].command :
+          \ "\<C-e>" . s:current_behavs[s:behav_idx].command), 'n')
     call feedkeys("\<Plug>AcpFeedPopup")
     return ''
   endif
@@ -360,6 +365,7 @@ function s:FeedPopup()
         \ 'word': s:GetCurrentWord(),
         \ 'commands': map(copy(s:current_behavs), 'v:val.command')[1:],
         \ }
+  call feedkeys("\<C-e>", 'n')
   call s:FinishPopup(0)
   return ''
 endfunction
