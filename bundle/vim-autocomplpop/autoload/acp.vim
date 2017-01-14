@@ -69,14 +69,12 @@ endfunction
 
 " Create snipMate item list for the complete function
 function s:MakeSnipmateItems(key, snip)
-  if type(a:snip) == v:t_list
-    let fsnip = strpart('[MULTI] ' . join(map(copy(a:snip), 'v:val[0]'), ', '), 0, 80)
-  else
-    let fsnip = strpart(substitute(a:snip, '\(\n\|\s\)\+', ' ', 'g'), 0, 80)
-  endif
   return {
         \ 'word': a:key,
-        \ 'menu': fsnip,
+        \ 'menu': strpart((type(a:snip) == v:t_list ?
+        \         '[' . len(a:snip) . '] ' . join(map(copy(a:snip), 'v:val[0]'), ', ') :
+        \         substitute(a:snip, '\(\n\|\s\)\+', ' ', 'g')
+        \         ), 0, 80),
         \ }
 endfunction
 
