@@ -73,25 +73,14 @@ endfunction
 " Create snipMate item list for the complete function
 function s:MakeSnipmateItem(key, snip)
   if type(a:snip) == v:t_list
-    let descriptions = map(copy(a:snip), 'v:val[0]')
-    let formatted_snip = '[MULTI] ' . join(descriptions, ', ')
+    let fsnip = strpart('[MULTI] ' . join(map(copy(a:snip), 'v:val[0]'), ', '), 0, 80)
   else
-    let formatted_snip = substitute(a:snip, '\(\n\|\s\)\+', ' ', 'g')
+    let fsnip = strpart(substitute(a:snip, '\(\n\|\s\)\+', ' ', 'g'), 0, 80)
   endif
   return {
         \ 'word': a:key,
-        \ 'menu': strpart(formatted_snip, 0, 80),
+        \ 'menu': fsnip,
         \ }
-endfunction
-
-function s:GetMatchingSnipItems(base)
-  let key = a:base . "\n"
-  if !exists('s:snip_items[key]')
-    let s:snip_items[key] = items(GetSnipsInCurrentScope())
-    call filter(s:snip_items[key], 'strpart(v:val[0], 0, len(a:base)) ==? a:base')
-    call map(s:snip_items[key], 's:MakeSnipmateItem(v:val[0], v:val[1])')
-  endif
-  return s:snip_items[key]
 endfunction
 
 " Default close function for snipMate
@@ -112,8 +101,17 @@ function s:MeetsForSnipmate(context, ...)
   if g:acp_snipmate_length < 0
     return 0
   endif
-  let matches = matchlist(a:context, '\S\{' . g:acp_snipmate_length . ',}$')
-  return !empty(matches) && !empty(s:GetMatchingSnipItems(matches[2]))
+  let match = matchstr(a:context, '\S\{' . g:acp_snipmate_length . ',}$')
+  if len(match) == 0
+    return 0
+  endif
+  let key = match
+  if !exists('s:snip_items[key]')
+    let s:snip_items[key] = items(GetSnipsInCurrentScope())
+    call filter(s:snip_items[key], 'strpart(v:val[0], 0, len(match)) ==? match')
+    call map(s:snip_items[key], 's:MakeSnipmateItem(v:val[0], v:val[1])')
+  endif
+  return !empty('s:snip_items[key]')
 endfunction
 
 " Default 'meets' function for anything that is a keyword
