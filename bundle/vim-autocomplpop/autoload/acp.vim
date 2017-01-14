@@ -60,7 +60,7 @@ function acp#CompleteFuncForSnipmate(findstart, base)
   let base = type(a:base) == v:t_number ? string(a:base) : a:base
   let items = filter(GetSnipsInCurrentScope(),
         \ 'strpart(v:key, 0, len(base)) ==? base')
-  return map(sort(items(items)), 's:MakeSnipmateItem(v:val[0], v:val[1])')
+  return map(sort(items(items)), 's:MakeSnipmateItems(v:val[0], v:val[1])')
 endfunction
 
 " }}}1
@@ -68,7 +68,7 @@ endfunction
 " LOCAL FUNCTIONS: {{{1
 
 " Create snipMate item list for the complete function
-function s:MakeSnipmateItem(key, snip)
+function s:MakeSnipmateItems(key, snip)
   if type(a:snip) == v:t_list
     let fsnip = strpart('[MULTI] ' . join(map(copy(a:snip), 'v:val[0]'), ', '), 0, 80)
   else
@@ -106,7 +106,7 @@ function s:MeetsForSnipmate(context, ...)
   if !exists('s:snip_items[key]')
     let s:snip_items[key] = items(GetSnipsInCurrentScope())
     call filter(s:snip_items[key], 'strpart(v:val[0], 0, len(match)) ==? match')
-    call map(s:snip_items[key], 's:MakeSnipmateItem(v:val[0], v:val[1])')
+    call map(s:snip_items[key], 's:MakeSnipmateItems(v:val[0], v:val[1])')
   endif
   return !empty('s:snip_items[key]')
 endfunction
