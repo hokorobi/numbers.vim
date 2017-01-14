@@ -37,15 +37,13 @@ endfunction
 
 " Suspend auto-popup
 function acp#Lock()
-  let b:lock_count = exists('b:lock_count') ?
-        \ b:lock_count + 1 : 1
+  let b:lock_count = exists('b:lock_count') ? b:lock_count + 1 : 1
 endfunction
 
 " Release auto-popup from suspension
 function acp#Unlock()
-  let b:lock_count = exists('b:lock_count') ?
-        \ b:lock_count - 1 :
-        \ throw "AutoComplPop: Not locked"
+  let b:lock_count = exists('b:lock_count') ? b:lock_count - 1 :
+        \ throw "AutoComplPop: Not locked!"
   if b:lock_count < 1
     unlet b:lock_count
   endif
@@ -80,9 +78,9 @@ endfunction
 
 " Default close function for snipMate
 function s:CloseFuncForSnipmate()
-  let word = matchstr(s:GetCurrentText(), '\S\+$')
+  let match = matchstr(s:GetCurrentText(), '\S\+$')
   for trigger in keys(GetSnipsInCurrentScope())
-    if word ==# trigger
+    if match ==# trigger
       call feedkeys("\<C-r>=TriggerSnippet()\<CR>", 'n')
       return 1
     endif
@@ -115,14 +113,14 @@ function s:MeetsForKeyword(context, ...)
   if g:acp_keyword_length < 0
     return 0
   endif
-  let matches = matchlist(a:context, '\k\{' . g:acp_keyword_length . ',}$')
-  if empty(matches)
+  let match = matchstr(a:context, '\k\{' . g:acp_keyword_length . ',}$')
+  if len(match) == 0
     return 0
   endif
-  for ignore in g:acp_keyword_ignored
-    if stridx(ignore, matches[1]) == 0
-      " Do not attempt completion
-      " if the start of a match occurs in 'ignore'
+  for ignored in g:acp_keyword_ignored
+    " Do not attempt a completion
+    " if the start of a match occurs in 'ignored'
+    if stridx(ignored, match) == 0
       return 0
     endif
   endfor
@@ -135,10 +133,10 @@ function s:MeetsForFile(context, ...)
   if g:acp_file_length < 0
     return 0
   endif
-  let separator = (has('win32') || has('win64')) ? '[/\\]' : '\/'
+  let sep = (has('win32') || has('win64')) ? '[/\\]' : '\/'
   if a:0 > 0 ?
-        \ a:context !~ '\f' . separator . '\f\{' . a:1 . '}$' :
-        \ a:context !~ '\f' . separator . '\f\{' . g:acp_file_length . ',}$'
+        \ a:context !~ '\f' . sep . '\f\{' . a:1 . '}$' :
+        \ a:context !~ '\f' . sep . '\f\{' . g:acp_file_length . ',}$'
     return 0
   endif
   return a:context !~ '[*/\\][/\\]\f*$\|[^[:print:]]\f*$'
