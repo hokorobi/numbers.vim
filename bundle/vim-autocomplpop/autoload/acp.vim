@@ -354,7 +354,7 @@ function s:FeedPopup()
   " After all attempts have failed
   let s:last_uncompletable = {
         \ 'word': s:GetCurrentWord(),
-        \ 'commands': map(copy(s:current_behavs), 'v:val.command')[1:],
+        \ 'commands': map(copy(s:current_behavs), 'v:val.command'),
         \ }
   call feedkeys("\<C-e>", 'n')
   call s:FinishPopup(0)
