@@ -80,8 +80,11 @@ if version >= 500
 endif
 
 " Indentation, wrap, and white spaces
-set autoindent softtabstop=2 shiftwidth=2 expandtab
-set wrap | let &showbreak = "\u2192"
+set autoindent softtabstop=2 shiftwidth=2 expandtab wrap
+let &showbreak = "\u2192"
+if version > 704
+  set breakindent breakindentopt+=sbr
+endif
 " set list | let &listchars = "eol:\u00AC"
 
 " Searching behaviors
