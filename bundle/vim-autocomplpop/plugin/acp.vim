@@ -2,7 +2,7 @@
 " Copyright 2007-2009 Takeshi NISHIDA
 "           2016-2017 Zhen-Huan Hu
 
-" LOAD GUARD {{{1
+" LOAD GUARD: {{{1
 
 if exists('g:loaded_acp')
   finish
@@ -13,6 +13,10 @@ endif
 let g:loaded_acp = 1
 
 " }}}1
+
+" Save cpoptions.
+let s:cpo_save = &cpo
+set cpo&vim
 
 " FUNCTIONS: {{{1
 
@@ -138,7 +142,7 @@ endfunction
 
 " }}}1
 
-" INITIALIZATION {{{1
+" INITIALIZATION: {{{1
 
 call s:DefineVariableDefault('g:acp_enable_at_startup', 1)
 call s:DefineVariableDefault('g:acp_set_ignorecase', 1)
@@ -184,5 +188,9 @@ if g:acp_enable_at_startup
 endif
 
 " }}}1
+
+" Restore cpotions.
+let &cpo = s:cpo_save
+unlet s:cpo_save
 
 " vim: set fdm=marker:

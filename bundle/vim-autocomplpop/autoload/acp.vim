@@ -2,7 +2,7 @@
 " Copyright 2007-2009 Takeshi NISHIDA
 "           2016-2017 Zhen-Huan Hu
 
-" LOAD GUARD {{{1
+" LOAD GUARD: {{{1
 
 if exists('g:loaded_autoload_acp') || v:version < 800
   finish
@@ -10,6 +10,10 @@ endif
 let g:loaded_autoload_acp = 1
 
 " }}}1
+
+" Save cpoptions.
+let s:cpo_save = &cpo
+set cpo&vim
 
 " GLOBAL FUNCTIONS: {{{1
 
@@ -397,7 +401,7 @@ endfunction
 
 " }}}1
 
-" INITIALIZATION {{{1
+" INITIALIZATION: {{{1
 
 let s:L_0 = 0
 let s:L_1 = 1
@@ -408,5 +412,9 @@ let s:orig_options = {}
 let s:snip_items = {}
 
 " }}}1
+
+" Restore cpotions.
+let &cpo = s:cpo_save
+unlet s:cpo_save
 
 " vim: set fdm=marker:
