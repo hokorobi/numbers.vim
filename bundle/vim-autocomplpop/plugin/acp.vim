@@ -163,6 +163,7 @@ endfunction
 " INITIALIZATION: {{{1
 
 call s:DefineVariableDefault('g:acp_enable_at_startup', 1)
+call s:DefineVariableDefault('g:acp_debug_log', 0)
 call s:DefineVariableDefault('g:acp_set_ignorecase', 1)
 call s:DefineVariableDefault('g:acp_set_complete', '.,w,b')
 call s:DefineVariableDefault('g:acp_set_completeopt_preview', 0)

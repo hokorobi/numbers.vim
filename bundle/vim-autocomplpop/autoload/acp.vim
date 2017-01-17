@@ -24,7 +24,7 @@ function acp#Enable()
     autocmd InsertEnter  * call s:ResetLastCursorPosition()
     autocmd TextChangedI * call s:InitPopup()
     autocmd CompleteDone * call s:CompleteDone()
-    autocmd InsertLeave  * call s:FinishPopup(1)
+    autocmd InsertLeave  * call s:FinishPopup(2)
   augroup END
 
   inoremap <silent> <Plug>AcpFeedPopup <C-r>=<SID>FeedPopup()<CR>
@@ -301,7 +301,6 @@ function s:MakeCurrentBehaviorSet()
   if exists('s:last_uncompletable')
     if stridx(s:GetCurrentWord(), s:last_uncompletable.word) == 0 &&
           \ map(copy(s:current_behavs), 'v:val.command') ==# s:last_uncompletable.commands
-      call s:ClearCurrentBehaviorSet()
       return 0
     else
       unlet! s:last_uncompletable
@@ -310,6 +309,7 @@ function s:MakeCurrentBehaviorSet()
   if empty(s:current_behavs) 
     return 0
   endif
+  call s:DebugLog("Make current behavior set.")
   let s:behav_idx = -1
   return 1
 endfunction
@@ -319,21 +319,23 @@ function s:InitPopup()
   if (exists('b:lock_count') && b:lock_count > 0) || &paste
     return
   endif
+  call s:DebugLog("Initial popup.")
   if s:MakeCurrentBehaviorSet()
-    call s:SetTempOption(s:L_0, '&complete', g:acp_set_complete)
-    call s:SetTempOption(s:L_0, '&completeopt',
+    call s:SetTempOption(1, '&complete', g:acp_set_complete)
+    call s:SetTempOption(1, '&completeopt',
           \ (g:acp_set_completeopt_preview  ? 'preview,'  : '') .
           \ (g:acp_set_completeopt_noselect ? 'noselect,' : '') .
           \ 'menuone,noinsert'
           \ )
-    call s:SetTempOption(s:L_0, '&ignorecase', g:acp_set_ignorecase)
-    call s:SetTempOption(s:L_0, '&lazyredraw', 1)
-    call s:SetTempOption(s:L_0, '&spell', 1)
-    call s:SetTempOption(s:L_1, '&textwidth', 0)
+    call s:SetTempOption(1, '&ignorecase', g:acp_set_ignorecase)
+    call s:SetTempOption(1, '&lazyredraw', 1)
+    call s:SetTempOption(1, '&spell', 1)
+    call s:SetTempOption(2, '&textwidth', 0)
     call s:FeedPopup()
     return
   else
-    call s:FinishPopup(1)
+    call s:FinishPopup(2)
+    call s:ClearCurrentBehaviorSet()
     return
   endif
 endfunction
@@ -349,13 +351,17 @@ function s:FeedPopup()
   if s:behav_idx < len(s:current_behavs) - 1
     let s:behav_idx += 1
     " Need to update &completefunc each time
-    call s:SetTempOption(s:L_0, '&completefunc',
+    call s:RestoreTempOptions(0)
+    call s:SetTempOption(0, '&completefunc',
           \ exists('s:current_behavs[s:behav_idx].completefunc') ?
           \ s:current_behavs[s:behav_idx].completefunc :
           \ eval('&completefunc'))
     " If it is not the first round,
     " the last key command must be cancelled via <C-e>
     " before feeding the next key command
+    call s:DebugLog("Feed keys: " . (s:behav_idx == 0 ?
+          \ s:current_behavs[s:behav_idx].command :
+          \ "\<C-e>" . s:current_behavs[s:behav_idx].command))
     call feedkeys((s:behav_idx == 0 ?
           \ s:current_behavs[s:behav_idx].command :
           \ "\<C-e>" . s:current_behavs[s:behav_idx].command), 'n')
@@ -363,12 +369,14 @@ function s:FeedPopup()
     return ''
   endif
   " After all attempts have failed
+  call s:DebugLog("All attempts failed.")
   let s:last_uncompletable = {
         \ 'word': s:GetCurrentWord(),
         \ 'commands': map(copy(s:current_behavs), 'v:val.command'),
         \ }
   call feedkeys("\<C-e>", 'n')
-  call s:FinishPopup(0)
+  call s:FinishPopup(1)
+  call s:ClearCurrentBehaviorSet()
   return ''
 endfunction
 
@@ -379,6 +387,7 @@ function s:CompleteDone()
   " before the next s:InitPopup() call; if completion
   " failed, it is executed after the next s:InitPopup()
   if !empty(v:completed_item)
+    call s:DebugLog("Completion done.")
     if exists('s:current_behavs[s:behav_idx].repeat')
           \ && s:current_behavs[s:behav_idx].repeat
           \ && call(s:current_behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
@@ -390,28 +399,30 @@ function s:CompleteDone()
     if exists('s:current_behavs[s:behav_idx].closefunc')
       call call(s:current_behavs[s:behav_idx].closefunc, [])
     endif
-    call s:FinishPopup(1)
+    call s:FinishPopup(2)
+    call s:ClearCurrentBehaviorSet()
     call s:ResetLastCursorPosition()
   endif
+  call s:DebugLog("Completion failed.")
 endfunction
 
 " Finish up
 function s:FinishPopup(level)
-  if a:level >= 0
-    call s:ClearCurrentBehaviorSet()
-    call s:RestoreTempOptions(s:L_0)
-  endif
-  if a:level >= 1
-    call s:RestoreTempOptions(s:L_1)
+  for level_group in range(0, a:level)
+    call s:RestoreTempOptions(level_group)
+  endfor
+endfunction
+
+" Debug log
+function s:DebugLog(text)
+  if g:acp_debug_log = 1
+    echom "[" . s:GetCurrentText() . "] " . a:text
   endif
 endfunction
 
 " }}}1
 
 " INITIALIZATION: {{{1
-
-let s:L_0 = 0
-let s:L_1 = 1
 
 let s:behav_idx = 0
 let s:current_behavs = []
