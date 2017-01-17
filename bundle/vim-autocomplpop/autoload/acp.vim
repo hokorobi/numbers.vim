@@ -146,6 +146,13 @@ function s:MeetsForFile(context, ...)
   return a:context !~ '[*/\\][/\\]\f*$\|[^[:print:]]\f*$'
 endfunction
 
+" Default 'meets' function for texts
+" to determine whether to attempt a spelling completion
+function s:MeetsForText(context, ...)
+  return g:acp_text_length >= 0 &&
+        \ a:context =~ '\w\{' . g:acp_text_length . ',}$'
+endfunction
+
 " Default 'meets' function for VimScript
 " to determine whether to attempt a completion
 function s:MeetsForVimScript(context, ...)
@@ -321,7 +328,7 @@ function s:InitPopup()
           \ )
     call s:SetTempOption(s:L_0, '&ignorecase', g:acp_set_ignorecase)
     call s:SetTempOption(s:L_0, '&lazyredraw', 1)
-    call s:SetTempOption(s:L_0, '&spell', 0)
+    call s:SetTempOption(s:L_0, '&spell', 1)
     call s:SetTempOption(s:L_1, '&textwidth', 0)
     call s:FeedPopup()
     return

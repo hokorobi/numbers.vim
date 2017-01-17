@@ -7,7 +7,8 @@ Plugin for automatically prompting completion popup menu.
 This plugin is a fork of Takeshi Nishida's AutoComplPop. The plugin enables
 VIM to automatically prompt popup menu for completion when inserting
 characters in the text. It supports prompting completion for keywords and
-omni-completion for various programming languages.
+omni-completion for various programming languages, as well as spelling
+completion for text files.
 
 ### Supported programming languages
 
@@ -21,10 +22,14 @@ omni-completion for various programming languages.
 * VimScript
 * SAS
 
+### Spelling completion for:
+* Markdown
+
 ## Changes
 
 * Add default behaviors for JavaScript, Coffee, LiveScript, PHP, VimScript
   and SAS.
+* Add spelling completion for Markdown, as well as plain text files.
 * Add a new option `acp_set_completeopt_noselect` to control whether to
   select the first item in the popup menu.
 * Fix various bugs in the original plugin.

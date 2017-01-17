@@ -17,7 +17,8 @@ INTRODUCTION                                                *acp-introduction*
 This plugin is a fork of Takeshi Nishida's AutoComplPop. The plugin enables
 VIM to automatically prompt popup menu for completion when inserting
 characters in the text. It supports prompting completion for keywords and
-omni-completion for various programming languages.
+omni-completion for various programming languages, as well as spelling
+completion for text files.
 
 Supported programming languages:
   - HTML, XHTML, XML
@@ -29,6 +30,9 @@ Supported programming languages:
   - Ruby
   - VimScript
   - SAS
+
+Spelling completion for:
+  - Markdown
 
 ==============================================================================
 INSTALLATION                                                *acp-installation*
@@ -45,21 +49,25 @@ Once installed, auto-popup is enabled at startup by default.
 The completion behavior used depends on the file type and is triggered by the
 text before the cursor. The supported behaviors are as follows:
 
-        kind      filetype    text before the cursor ~
-        Keyword   *           three keyword characters
-        Filename  *           a filename character + a path separator 
-                              + 0 or more filename characters
-        Command   vim         two keyword characters
-        Omni      ruby        ".", "::" or non-word characters + ":"
-                              (|+ruby| required.)
-        Omni      python      "." (|+python| required.)
-        Omni      perl        "->" (|+perl| required.)
-        Omni      xml         "<", "</" or ("<" + non-">" characters + " ")
-        Omni      html/xhtml  "<", "</" or ("<" + non-">" characters + " ")
-        Omni      css         ":", ";", "{", "^", "@", or "!" (+- 1 space)
-        Omni      javascript  "."
-        Omni      php         "->", "::"
-        Omni      sas         "proc "
+        kind      filetype      text before the cursor ~
+        Snippet   *             one non-space character
+        Keyword   *             three keyword characters
+        Filename  *             a filename character + a path separator 
+                                + 0 or more filename characters
+        Spelling  txt/markdown  four word characters
+        Command   vim           two keyword characters
+        Omni      ruby          ".", "::" or non-word characters + ":"
+                                (|+ruby| required.)
+        Omni      python        "." (|+python| required.)
+        Omni      perl          "->" (|+perl| required.)
+        Omni      xml           "<", "</" or
+                                "<" + non-">" characters + " "
+        Omni      html/xhtml    "<", "</" or
+                                "<" + non-">" characters + " "
+        Omni      css           ":", ";", "{", "^", "@", or "!"
+        Omni      javascript    "."
+        Omni      php           "->", "::"
+        Omni      sas           "proc" + whitespaces
 
 The plugin also allows users to make user-defined completion and snipMate's
 trigger completion (See: |acp-snipmate|) auto-popup if the options are set.
@@ -201,6 +209,14 @@ OPTIONS                                                          *acp-options*
 <
         The length of filename characters before the cursor that is needed to
         trigger filename completion. If the value is negative, the
+        completion will not be attempted.
+
+                                                           *g:acp_text_length*
+>
+  let g:acp_text_length = 4
+<
+        The minimum length of text characters before the cursor that is needed
+        to attempt spelling completion. If the value is negative, the
         completion will not be attempted.
 
                                                       *g:acp_vimscript_length*
@@ -364,6 +380,7 @@ CHANGELOG                                                      *acp-changelog*
 3.0-fork
   - Add default behaviors for JavaScript, Coffee, LiveScript, PHP, VimScript
     and SAS.
+  - Add spelling completion for Markdown, as well as plain text files.
   - Add a new option |acp_set_completeopt_noselect| to control whether to
     select the first item in the popup menu.
   - Use |TextChangedI| event to trigger auto-popup (This also makes the entire

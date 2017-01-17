@@ -29,6 +29,9 @@ endfunction
 function s:MakeDefaultBehavior()
   let behavs = {
         \ '*'           : [],
+        \ 'txt'         : [],
+        \ 'help'        : [],
+        \ 'markdown'    : [],
         \ 'vim'         : [],
         \ 'ruby'        : [],
         \ 'python'      : [],
@@ -72,6 +75,21 @@ function s:MakeDefaultBehavior()
           \ 'repeat'  : 1,
           \ })
   endfor
+  call add(behavs.txt, {
+        \ 'command' : "\<C-x>\<C-k>",
+        \ 'meets'   : 's:MeetsForText',
+        \ 'repeat'  : 0,
+        \ })
+  call add(behavs.help, {
+        \ 'command' : "\<C-x>\<C-k>",
+        \ 'meets'   : 's:MeetsForText',
+        \ 'repeat'  : 0,
+        \ })
+  call add(behavs.markdown, {
+        \ 'command' : "\<C-x>\<C-k>",
+        \ 'meets'   : 's:MeetsForText',
+        \ 'repeat'  : 0,
+        \ })
   call add(behavs.vim, {
         \ 'command' : "\<C-x>\<C-v>",
         \ 'meets'   : 's:MeetsForVimScript',
@@ -146,7 +164,7 @@ endfunction
 
 call s:DefineVariableDefault('g:acp_enable_at_startup', 1)
 call s:DefineVariableDefault('g:acp_set_ignorecase', 1)
-call s:DefineVariableDefault('g:acp_set_complete', '.,w,b,k')
+call s:DefineVariableDefault('g:acp_set_complete', '.,w,b')
 call s:DefineVariableDefault('g:acp_set_completeopt_preview', 0)
 call s:DefineVariableDefault('g:acp_set_completeopt_noselect', 0)
 call s:DefineVariableDefault('g:acp_user_defined_completefunc', '')
@@ -156,6 +174,7 @@ call s:DefineVariableDefault('g:acp_keyword_command', "\<C-n>")
 call s:DefineVariableDefault('g:acp_keyword_length', 3)
 call s:DefineVariableDefault('g:acp_keyword_ignored', [])
 call s:DefineVariableDefault('g:acp_file_length', 0)
+call s:DefineVariableDefault('g:acp_text_length', 4)
 call s:DefineVariableDefault('g:acp_vimscript_length', 2)
 call s:DefineVariableDefault('g:acp_ruby_omni_method_length', 0)
 call s:DefineVariableDefault('g:acp_ruby_omni_symbol_length', 1)
