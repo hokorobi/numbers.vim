@@ -107,6 +107,9 @@ endfunction
 
 " Set a temperary value to a variable
 function s:SetTempOption(group, name, value)
+  if !exists('s:orig_options')
+    let s:orig_options = {}
+  endif
   if !exists('s:orig_options[a:group]')
     let s:orig_options[a:group] = {}
   endif
@@ -118,6 +121,9 @@ endfunction
 
 " Restore original values to a variable group
 function s:RestoreTempOptions(group)
+  if !exists('s:orig_options')
+    return
+  endif
   if !exists('s:orig_options[a:group]')
     return
   endif
@@ -269,7 +275,6 @@ endfunction
 
 let s:behav_idx = 0
 let s:current_behavs = []
-let s:orig_options = {}
 
 " }}}1
 
