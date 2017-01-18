@@ -415,8 +415,8 @@ endfunction
 function s:CompleteDone()
   " This function is called in two scenarios
   " If completion was successful, it is executed
-  " before the next s:InitPopup() call; if completion
-  " failed, it is executed after the next s:InitPopup()
+  " before the next InsertCharPre event; if completion
+  " was aborted, it is executed after the next InsertCharPre event
   if !empty(v:completed_item)
     call s:LogDebugInfo("Completion done.")
     unlet! s:last_word_status
