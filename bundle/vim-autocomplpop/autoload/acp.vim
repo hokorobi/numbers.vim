@@ -370,7 +370,7 @@ function s:FeedPopup()
     " Before feeding the first key command, <C-n><C-e> needs
     " to be fed first to ensure starting the first round under Insert mode.
     " After the first round, the last key command must be cancelled via <C-e>
-    call s:LogDebugInfo("Feed keys [" . s:behav_idx . "]: " . (s:behav_idx == 0 ?
+    call s:LogDebugInfo("Feed keys: " . (s:behav_idx == 0 ?
           \ s:current_behavs[s:behav_idx].command :
           \ "\<C-e>" . s:current_behavs[s:behav_idx].command))
     call feedkeys((s:behav_idx == 0 &&
@@ -426,7 +426,7 @@ function s:FinishPopup(level)
   endfor
 endfunction
 
-" Log debugging information 
+" Log debugging information
 function s:LogDebugInfo(text)
   if g:acp_log_debug_info == 1
     echom "[" . s:GetCurrentText() . "] " . a:text

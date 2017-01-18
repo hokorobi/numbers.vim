@@ -177,7 +177,7 @@ OPTIONS                                                          *acp-options*
 
                                                        *g:acp_snipmate_length*
 >
-  let g:acp_snipmate_length = -1
+  let g:acp_snipmate_length = 1
 <
         The minimum length of snipMate pattern before the cursor that is
         needed to attempt snipMate-trigger completion.
