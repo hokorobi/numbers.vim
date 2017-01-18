@@ -298,12 +298,12 @@ function s:MakeCurrentBehaviorSet()
   call filter(s:current_behavs, 'call(v:val.meets, [text])')
   " Improve responsiveness by not to attempt another completion
   " after the last attempt failed to find any completion candidate
-  if exists('s:last_uncompletable')
-    if stridx(s:GetCurrentWord(), s:last_uncompletable.word) == 0 &&
-          \ map(copy(s:current_behavs), 'v:val.command') ==# s:last_uncompletable.commands
+  if exists('s:last_word_status') && s:last_word_status.completable == 0
+    if stridx(s:GetCurrentWord(), s:last_word_status.word) == 0 &&
+          \ map(copy(s:current_behavs), 'v:val.command') ==# s:last_word_status.commands
       return 0
     else
-      unlet! s:last_uncompletable
+      unlet! s:last_word_status
     endif
   endif
   if empty(s:current_behavs)
@@ -341,13 +341,22 @@ function s:InitPopup()
   endif
 endfunction
 
+" Save the status of the last word
+function s:SaveLastWordStatus(completable)
+  let s:last_word_status = {
+      \ 'word': s:GetCurrentWord(),
+      \ 'commands': map(copy(s:current_behavs), 'v:val.command'),
+      \ 'completable': a:completable
+      \ }
+endfunction
+
 " Feed keys to trigger popup menu
 function s:FeedPopup()
   if !exists('s:current_behavs[s:behav_idx]')
     return ''
   endif
   if pumvisible()
-    let s:last_completable = 1
+    call s:SaveLastWordStatus(1)
     return ''
   endif
   if s:behav_idx < len(s:current_behavs) - 1
@@ -364,7 +373,10 @@ function s:FeedPopup()
     call s:LogDebugInfo("Feed keys [" . s:behav_idx . "]: " . (s:behav_idx == 0 ?
           \ s:current_behavs[s:behav_idx].command :
           \ "\<C-e>" . s:current_behavs[s:behav_idx].command))
-    call feedkeys((s:behav_idx == 0 && exists('s:last_completable') ? "\<C-n>\<C-e>" : ''), 'n')
+    call feedkeys((s:behav_idx == 0 &&
+          \ exists('s:last_word_status') &&
+          \ s:last_word_status.completable == 1 ?
+          \ "\<C-n>\<C-e>" : ''), 'n')
     call feedkeys((s:behav_idx == 0 ?
           \ s:current_behavs[s:behav_idx].command :
           \ "\<C-e>" . s:current_behavs[s:behav_idx].command), 'n')
@@ -373,11 +385,8 @@ function s:FeedPopup()
   endif
   " After all attempts have failed
   call s:LogDebugInfo("All attempts failed.")
-  let s:last_uncompletable = {
-        \ 'word': s:GetCurrentWord(),
-        \ 'commands': map(copy(s:current_behavs), 'v:val.command'),
-        \ }
   call feedkeys("\<C-e>", 'n')
+  call s:SaveLastWordStatus(0)
   call s:FinishPopup(1)
   call s:ClearCurrentBehaviorSet()
   return ''
@@ -391,9 +400,7 @@ function s:CompleteDone()
   " failed, it is executed after the next s:InitPopup()
   if !empty(v:completed_item)
     call s:LogDebugInfo("Completion done.")
-    if exists('s:last_completable')
-      unlet s:last_completable
-    endif
+    unlet! s:last_word_status
     if exists('s:current_behavs[s:behav_idx].repeat')
           \ && s:current_behavs[s:behav_idx].repeat
           \ && call(s:current_behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
