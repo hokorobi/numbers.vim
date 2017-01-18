@@ -306,10 +306,11 @@ function s:MakeCurrentBehaviorSet()
       unlet! s:last_uncompletable
     endif
   endif
-  if empty(s:current_behavs) 
+  if empty(s:current_behavs)
     return 0
   endif
-  call s:DebugLog("Make current behavior set.")
+  call s:LogDebugInfo("Make behavior set: [" .
+        \ join(map(copy(s:current_behavs), 'v:val.command')) . "].")
   let s:behav_idx = -1
   return 1
 endfunction
@@ -319,7 +320,7 @@ function s:InitPopup()
   if (exists('b:lock_count') && b:lock_count > 0) || &paste
     return
   endif
-  call s:DebugLog("Initial popup.")
+  call s:LogDebugInfo("Initialize popup.")
   if s:MakeCurrentBehaviorSet()
     call s:SetTempOption(1, '&complete', g:acp_set_complete)
     call s:SetTempOption(1, '&completeopt',
@@ -346,6 +347,7 @@ function s:FeedPopup()
     return ''
   endif
   if pumvisible()
+    let s:last_completable = 1
     return ''
   endif
   if s:behav_idx < len(s:current_behavs) - 1
@@ -356,12 +358,13 @@ function s:FeedPopup()
           \ exists('s:current_behavs[s:behav_idx].completefunc') ?
           \ s:current_behavs[s:behav_idx].completefunc :
           \ eval('&completefunc'))
-    " If it is not the first round,
-    " the last key command must be cancelled via <C-e>
-    " before feeding the next key command
-    call s:DebugLog("Feed keys: " . (s:behav_idx == 0 ?
+    " Before feeding the first key command, <C-n><C-e> needs
+    " to be fed first to ensure starting the first round under Insert mode.
+    " After the first round, the last key command must be cancelled via <C-e>
+    call s:LogDebugInfo("Feed keys [" . s:behav_idx . "]: " . (s:behav_idx == 0 ?
           \ s:current_behavs[s:behav_idx].command :
           \ "\<C-e>" . s:current_behavs[s:behav_idx].command))
+    call feedkeys((s:behav_idx == 0 && exists('s:last_completable') ? "\<C-n>\<C-e>" : ''), 'n')
     call feedkeys((s:behav_idx == 0 ?
           \ s:current_behavs[s:behav_idx].command :
           \ "\<C-e>" . s:current_behavs[s:behav_idx].command), 'n')
@@ -369,7 +372,7 @@ function s:FeedPopup()
     return ''
   endif
   " After all attempts have failed
-  call s:DebugLog("All attempts failed.")
+  call s:LogDebugInfo("All attempts failed.")
   let s:last_uncompletable = {
         \ 'word': s:GetCurrentWord(),
         \ 'commands': map(copy(s:current_behavs), 'v:val.command'),
@@ -387,7 +390,10 @@ function s:CompleteDone()
   " before the next s:InitPopup() call; if completion
   " failed, it is executed after the next s:InitPopup()
   if !empty(v:completed_item)
-    call s:DebugLog("Completion done.")
+    call s:LogDebugInfo("Completion done.")
+    if exists('s:last_completable')
+      unlet s:last_completable
+    endif
     if exists('s:current_behavs[s:behav_idx].repeat')
           \ && s:current_behavs[s:behav_idx].repeat
           \ && call(s:current_behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
@@ -403,7 +409,7 @@ function s:CompleteDone()
     call s:ClearCurrentBehaviorSet()
     call s:ResetLastCursorPosition()
   endif
-  call s:DebugLog("Completion failed.")
+  call s:LogDebugInfo("Completion failed.")
 endfunction
 
 " Finish up
@@ -414,8 +420,8 @@ function s:FinishPopup(level)
 endfunction
 
 " Debug log
-function s:DebugLog(text)
-  if g:acp_debug_log = 1
+function s:LogDebugInfo(text)
+  if g:acp_log_debug_info == 1
     echom "[" . s:GetCurrentText() . "] " . a:text
   endif
 endfunction
