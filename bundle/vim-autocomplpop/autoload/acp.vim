@@ -344,10 +344,10 @@ endfunction
 " Save the status of the last word
 function s:SaveLastWordStatus(completable)
   let s:last_word_status = {
-      \ 'word': s:GetCurrentWord(),
-      \ 'commands': map(copy(s:current_behavs), 'v:val.command'),
-      \ 'completable': a:completable
-      \ }
+        \ 'word': s:GetCurrentWord(),
+        \ 'commands': map(copy(s:current_behavs), 'v:val.command'),
+        \ 'completable': a:completable
+        \ }
 endfunction
 
 " Feed keys to trigger popup menu
