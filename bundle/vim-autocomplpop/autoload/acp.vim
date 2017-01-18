@@ -54,6 +54,169 @@ function acp#Unlock()
   endif
 endfunction
 
+" Default completion function for snipMate
+function acp#CompleteFuncForSnipmate(findstart, base)
+  if a:findstart
+    let pos = matchstrpos(s:GetCurrentText(), '\S\+$')[1]
+    return pos >= 0 ? pos : -3
+  endif
+  let base = type(a:base) == v:t_number ? string(a:base) : a:base
+  let items = filter(GetSnipsInCurrentScope(),
+        \ 'strpart(v:key, 0, len(base)) ==? base')
+  return map(sort(items(items)), 's:MakeSnipmateItems(v:val[0], v:val[1])')
+endfunction
+
+" }}}1
+
+" BEHAVIOR FUNCTIONS: {{{1
+
+" Create snipMate item list for the complete function
+function s:MakeSnipmateItems(key, snip)
+  return {
+        \ 'word': a:key,
+        \ 'menu': strpart((type(a:snip) == v:t_list ?
+        \         '[' . len(a:snip) . '] ' . join(map(copy(a:snip), 'v:val[0]'), ', ') :
+        \         substitute(a:snip, '\(\n\|\s\)\+', ' ', 'g')
+        \         ), 0, 80),
+        \ }
+endfunction
+
+" Default close function for snipMate
+function s:CloseFuncForSnipmate()
+  let match = matchstr(s:GetCurrentText(), '\S\+$')
+  for trigger in keys(GetSnipsInCurrentScope())
+    if match ==# trigger
+      call feedkeys("\<C-r>=TriggerSnippet()\<CR>", 'n')
+      return 1
+    endif
+  endfor
+  return 0
+endfunction
+
+" Default 'meets' function for snipMate
+function s:MeetsForSnipmate(context, ...)
+  if g:acp_snipmate_length < 0
+    return 0
+  endif
+  let match = matchstr(a:context, '\S\{' . g:acp_snipmate_length . ',}$')
+  if len(match) == 0
+    return 0
+  endif
+  let key = match
+  if !exists('s:snip_items[key]')
+    let s:snip_items[key] = items(GetSnipsInCurrentScope())
+    call filter(s:snip_items[key], 'strpart(v:val[0], 0, len(match)) ==? match')
+    call map(s:snip_items[key], 's:MakeSnipmateItems(v:val[0], v:val[1])')
+  endif
+  return !empty('s:snip_items[key]')
+endfunction
+
+" Default 'meets' function for keywords
+function s:MeetsForKeyword(context, ...)
+  if g:acp_keyword_length < 0
+    return 0
+  endif
+  let match = matchstr(a:context, '\k\{' . g:acp_keyword_length . ',}$')
+  if len(match) == 0
+    return 0
+  endif
+  for ignored in g:acp_keyword_ignored
+    " Do not attempt a completion
+    " if the start of a match occurs in 'ignored'
+    if stridx(ignored, match) == 0
+      return 0
+    endif
+  endfor
+  return 1
+endfunction
+
+" Default 'meets' function for file names
+function s:MeetsForFile(context, ...)
+  if g:acp_file_length < 0
+    return 0
+  endif
+  let sep = (has('win32') || has('win64')) ? '[/\\]' : '\/'
+  if a:0 > 0 ?
+        \ a:context !~ '\f' . sep . '\f\{' . a:1 . '}$' :
+        \ a:context !~ '\f' . sep . '\f\{' . g:acp_file_length . ',}$'
+    return 0
+  endif
+  return a:context !~ '[*/\\][/\\]\f*$\|[^[:print:]]\f*$'
+endfunction
+
+" Default 'meets' function for spelling completion
+function s:MeetsForText(context, ...)
+  return g:acp_text_length >= 0 &&
+        \ a:context =~ '\w\{' . g:acp_text_length . ',}$'
+endfunction
+
+" Default 'meets' function for VimScript
+function s:MeetsForVimScript(context, ...)
+  return g:acp_vimscript_length >= 0 &&
+        \ a:context =~ '\k\{' . g:acp_vimscript_length . ',}$'
+endfunction
+
+" Default 'meets' function for Ruby
+function s:MeetsForRubyOmni(context, ...)
+  return has('ruby') &&
+        \ (g:acp_ruby_omni_method_length >= 0 &&
+        \ a:context =~ '\k\(\.\|::\)\k\{' . g:acp_ruby_omni_method_length . ',}$') ||
+        \ (g:acp_ruby_omni_symbol_length >= 0 &&
+        \ a:context =~ '\(^\|[^:]\):\k\{' . g:acp_ruby_omni_symbol_length . ',}$')
+endfunction
+
+" Default 'meets' function for Python
+function s:MeetsForPythonOmni(context, ...)
+  return has('python') && g:acp_python_omni_length >= 0 &&
+        \ a:0 > 0 ?
+        \ a:context =~ '\k\.\k\{' . a:1 . '}$' :
+        \ a:context =~ '\k\.\k\{' . g:acp_python_omni_length . ',}$'
+endfunction
+
+" Default 'meets' function for Perl
+function s:MeetsForPerlOmni(context, ...)
+  return has('perl') && g:acp_perl_omni_length >= 0 &&
+        \ a:context =~ '\w->\k\{' . g:acp_perl_omni_length . ',}$'
+endfunction
+
+" Default 'meets' function for Xml
+function s:MeetsForXmlOmni(context, ...)
+  return g:acp_xml_omni_length >= 0 &&
+        \ a:context =~ '<\(\/\=\|[^>]\+ \)\k\{' . g:acp_xml_omni_length . ',}$'
+endfunction
+
+" Default 'meets' function for Html
+function s:MeetsForHtmlOmni(context, ...)
+  return g:acp_html_omni_length >= 0 &&
+        \ a:context =~ '<\(\/\=\|[^>]\+ \)\k\{' . g:acp_html_omni_length . ',}$'
+endfunction
+
+" Default 'meets' function for Css
+function s:MeetsForCssOmni(context, ...)
+  return (g:acp_css_omni_property_length >= 0 &&
+        \ a:context =~ '\(^\|[;{]\)\s*\k\{' . g:acp_css_omni_property_length . ',}$') ||
+        \ (g:acp_css_omni_value_length >= 0 &&
+        \ a:context =~ '[:@!]\s*\k\{' . g:acp_css_omni_value_length . ',}$')
+endfunction
+
+" Default 'meets' function for JavaScript
+function s:MeetsForJavaScriptOmni(context, ...)
+  return g:acp_javascript_omni_length >= 0 &&
+        \ a:context =~ '\k\.\k\{' . g:acp_javascript_omni_length . ',}$'
+endfunction
+
+" Default 'meets' function for Php
+function s:MeetsForPhpOmni(context, ...)
+  return g:acp_php_omni_length >= 0 &&
+        \ a:context =~ '\w\(->\|::\)\k\{' . g:acp_php_omni_length . ',}$'
+endfunction
+
+" Default 'meets' function for SAS
+function s:MeetsForSASOmni(context, ...)
+  return g:acp_sas_omni_length >= 0 &&
+        \ a:context =~ '\<proc\s\+\k\{' . g:acp_sas_omni_length . ',}$'
+endfunction
+
 " }}}1
 
 " INTERNAL FUNCTIONS: {{{1
@@ -282,6 +445,7 @@ endfunction
 let s:behav_idx = 0
 let s:current_behavs = []
 let s:orig_options = {}
+let s:snip_items = {}
 
 " }}}1
 

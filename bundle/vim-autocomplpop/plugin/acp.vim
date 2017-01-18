@@ -59,90 +59,100 @@ function s:MakeDefaultBehavior()
     endif
     call add(behavs[key], {
           \ 'command'      : "\<C-x>\<C-u>",
-          \ 'completefunc' : 'acp#snipmate#Complete',
-          \ 'meets'        : 'acp#snipmate#Meets',
-          \ 'closefunc'    : 'acp#snipmate#Close',
+          \ 'completefunc' : 'acp#CompleteFuncForSnipmate',
+          \ 'meets'        : 's:MeetsForSnipmate',
+          \ 'closefunc'    : 's:CloseFuncForSnipmate',
           \ 'repeat'       : 0,
           \ })
     call add(behavs[key], {
           \ 'command' : g:acp_keyword_command,
-          \ 'meets'   : 'acp#keyword#Meets',
+          \ 'meets'   : 's:MeetsForKeyword',
           \ 'repeat'  : 0,
           \ })
     call add(behavs[key], {
           \ 'command' : "\<C-x>\<C-f>",
-          \ 'meets'   : 'acp#file#Meets',
-          \ 'repeat'  : 1,
-          \ })
-    call add(behavs[key], {
-          \ 'command' : "\<C-x>\<C-k>",
-          \ 'meets'   : 'acp#spell#Meets',
+          \ 'meets'   : 's:MeetsForFile',
           \ 'repeat'  : 1,
           \ })
   endfor
+  call add(behavs.txt, {
+        \ 'command' : "\<C-x>\<C-k>",
+        \ 'meets'   : 's:MeetsForText',
+        \ 'repeat'  : 0,
+        \ })
+  call add(behavs.help, {
+        \ 'command' : "\<C-x>\<C-k>",
+        \ 'meets'   : 's:MeetsForText',
+        \ 'repeat'  : 0,
+        \ })
+  call add(behavs.markdown, {
+        \ 'command' : "\<C-x>\<C-k>",
+        \ 'meets'   : 's:MeetsForText',
+        \ 'repeat'  : 0,
+        \ })
   call add(behavs.vim, {
         \ 'command' : "\<C-x>\<C-v>",
-        \ 'meets'   : 'acp#vim#Meets',
+        \ 'meets'   : 's:MeetsForVimScript',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.ruby, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#ruby#Meets',
+        \ 'meets'   : 's:MeetsForRubyOmni',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.python, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#python#Meets',
+        \ 'meets'   : 's:MeetsForPythonOmni',
         \ 'repeat'  : 1,
         \ })
   call add(behavs.perl, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#perl#Meets',
+        \ 'meets'   : 's:MeetsForPerlOmni',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.xml, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#xml#Meets',
+        \ 'meets'   : 's:MeetsForXmlOmni',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.html, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#html#Meets',
+        \ 'meets'   : 's:MeetsForHtmlOmni',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.xhtml, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#html#Meets',
+        \ 'meets'   : 's:MeetsForHtmlOmni',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.css, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#css#Meets',
+        \ 'meets'   : 's:MeetsForCssOmni',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.javascript, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#javascript#Meets',
+        \ 'meets'   : 's:MeetsForJavaScriptOmni',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.coffee, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#javascript#Meets',
+        \ 'meets'   : 's:MeetsForJavaScriptOmni',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.ls, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#javascript#Meets',
+        \ 'meets'   : 's:MeetsForJavaScriptOmni',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.php, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#php#Meets',
+        \ 'meets'   : 's:MeetsForPhpOmni',
         \ 'repeat'  : 0,
         \ })
   call add(behavs.sas, {
         \ 'command' : "\<C-x>\<C-o>",
-        \ 'meets'   : 'acp#sas#Meets',
+        \ 'meets'   : 's:MeetsForSASOmni',
         \ 'repeat'  : 0,
         \ })
   return behavs
@@ -165,7 +175,7 @@ call s:DefineVariableDefault('g:acp_keyword_command', "\<C-n>")
 call s:DefineVariableDefault('g:acp_keyword_length', 3)
 call s:DefineVariableDefault('g:acp_keyword_ignored', [])
 call s:DefineVariableDefault('g:acp_file_length', 0)
-call s:DefineVariableDefault('g:acp_spell_length', 4)
+call s:DefineVariableDefault('g:acp_text_length', 4)
 call s:DefineVariableDefault('g:acp_vimscript_length', 2)
 call s:DefineVariableDefault('g:acp_ruby_omni_method_length', 0)
 call s:DefineVariableDefault('g:acp_ruby_omni_symbol_length', 1)
