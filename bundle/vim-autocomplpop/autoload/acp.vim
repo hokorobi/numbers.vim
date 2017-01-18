@@ -22,7 +22,6 @@ function acp#Enable()
   augroup AcpGlobalAutoCommand
     autocmd!
     autocmd InsertEnter   * call s:ResetLastCursorPosition()
-    autocmd InsertCharPre * call s:PrePopup()
     autocmd TextChangedI  * call s:InitPopup()
     autocmd CompleteDone  * call s:CompleteDone()
     autocmd InsertLeave   * call s:RestoreOptionGroupsUpto(2)
@@ -170,21 +169,6 @@ endfunction
 
 " EVENT FUNCTIONS: {{{1
 
-" Insert <C-n><C-e> before initializing the next popup menu
-" This is needed because an aborted completion would not trigger
-" a CompleteDone event until a <C-n><C-e>
-function s:PrePopup()
-  call s:LogDebugInfo("Pre-popup")
-  " Before initializing the next popup menu, <C-n><C-e> needs
-  " to be fed first to ensure starting the first round under Insert mode.
-  if exists('s:last_word_status') &&
-        \ s:last_word_status.completable == 1
-    call s:LogDebugInfo("Feed keys: \<C-n>\<C-e>")
-    call feedkeys("\<C-n>\<C-e>", 'n')
-    unlet! s:last_word_status
-  endif
-endfunction
-
 " Initialize popup menu
 " Make behavior set and set options
 function s:InitPopup()
@@ -229,19 +213,28 @@ function s:FeedPopup()
           \ exists('s:current_behavs[s:behav_idx].completefunc') ?
           \ s:current_behavs[s:behav_idx].completefunc :
           \ eval('&completefunc'))
+    " Before initializing the next popup menu, <C-n><C-e> needs
+    " to be fed first to ensure starting the first round under Insert mode
+    " This is needed because a CompleteDone event will not be triggered
+    " until a <C-n><C-e> is pressed
+    if exists('s:last_word_status') &&
+          \ s:last_word_status.completable == 1
+      call feedkeys("\<C-n>\<C-e>", 'n')
+      call s:LogDebugInfo("Feed keys: \<C-n>\<C-e>")
+      unlet! s:last_word_status
+    endif
     " After the first round, the last key command must be cancelled via <C-e>
-    call s:LogDebugInfo("Feed keys: " . (s:behav_idx == 0 ?
-          \ s:current_behavs[s:behav_idx].command :
-          \ "\<C-e>" . s:current_behavs[s:behav_idx].command))
     call feedkeys((s:behav_idx == 0 ?
           \ s:current_behavs[s:behav_idx].command :
           \ "\<C-e>" . s:current_behavs[s:behav_idx].command), 'n')
     call feedkeys("\<Plug>AcpFeedPopup")
+    call s:LogDebugInfo("Feed keys: " . (s:behav_idx == 0 ?
+          \ s:current_behavs[s:behav_idx].command :
+          \ "\<C-e>" . s:current_behavs[s:behav_idx].command))
     return ''
   endif
   " After all attempts have failed
   call s:LogDebugInfo("All attempts failed.")
-  call feedkeys("\<C-e>", 'n')
   call s:SaveLastWordStatus(0)
   call s:RestoreOptionGroupsUpto(1)
   call s:ClearCurrentBehaviorSet()
@@ -255,8 +248,8 @@ function s:CompleteDone()
   " before the next InsertCharPre event; if completion
   " was aborted, it is executed after the next InsertCharPre event
   if !empty(v:completed_item)
-    call s:LogDebugInfo("Completion done.")
     unlet! s:last_word_status
+    call s:LogDebugInfo("Completion done.")    
     if exists('s:current_behavs[s:behav_idx].repeat')
           \ && s:current_behavs[s:behav_idx].repeat
           \ && call(s:current_behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
