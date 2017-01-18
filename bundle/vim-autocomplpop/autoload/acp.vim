@@ -21,13 +21,11 @@ set cpo&vim
 function acp#Enable()
   augroup AcpGlobalAutoCommand
     autocmd!
-    autocmd InsertEnter   * call s:ResetLastCursorPosition()
-    autocmd TextChangedI  * call s:InitPopup()
-    autocmd CompleteDone  * call s:CompleteDone()
-    autocmd InsertLeave   * call s:RestoreOptionGroupsUpto(2)
+    autocmd InsertEnter  * call s:ResetLastCursorPosition()
+    autocmd TextChangedI * call s:InitPopup()
+    autocmd CompleteDone * call s:CompleteDone()
+    autocmd InsertLeave  * call s:RestoreOptionGroupsUpto(2)
   augroup END
-
-  inoremap <silent> <Plug>AcpFeedPopup <C-r>=<SID>FeedPopup()<CR>
 endfunction
 
 " Disable AutoComplPop
@@ -35,8 +33,6 @@ function acp#Disable()
   augroup AcpGlobalAutoCommand
     autocmd!
   augroup END
-
-  iunmap <Plug>AcpFeedPopup
 endfunction
 
 " Suspend AutoComplPop
@@ -51,6 +47,51 @@ function acp#Unlock()
   if b:lock_count < 1
     unlet b:lock_count
   endif
+endfunction
+
+" Feed keys to trigger popup menu
+function acp#FeedKeys()
+  if empty('s:current_behavs')
+    return ''
+  endif
+  if pumvisible()
+    call s:SaveLastWordStatus(1)
+    return ''
+  endif
+  if s:behav_idx < len(s:current_behavs) - 1
+    let s:behav_idx += 1
+    " Need to update &completefunc each time
+    call s:RestoreTempOptions(0)
+    call s:SetTempOption(0, '&completefunc',
+          \ exists('s:current_behavs[s:behav_idx].completefunc') ?
+          \ s:current_behavs[s:behav_idx].completefunc :
+          \ eval('&completefunc'))
+    " Before initializing the next popup menu, <C-n><C-e> needs
+    " to be fed first to ensure starting the first round under Insert mode
+    " This is needed because a CompleteDone event will not be triggered
+    " until a <C-n><C-e> is pressed
+    if exists('s:last_word_status') &&
+          \ s:last_word_status.completable == 1
+      call feedkeys("\<C-n>\<C-e>", 'n')
+      call s:LogDebugInfo("Feed keys: \<C-n>\<C-e>")
+      unlet! s:last_word_status
+    endif
+    " After the first round, the last key command must be cancelled via <C-e>
+    call feedkeys((s:behav_idx == 0 ?
+          \ s:current_behavs[s:behav_idx].command :
+          \ "\<C-e>" . s:current_behavs[s:behav_idx].command), 'n')
+    call feedkeys("\<C-r>=acp#FeedKeys()\<CR>", 'n')
+    call s:LogDebugInfo("Feed keys: " . (s:behav_idx == 0 ?
+          \ s:current_behavs[s:behav_idx].command :
+          \ "\<C-e>" . s:current_behavs[s:behav_idx].command))
+    return ''
+  endif
+  " After all attempts have failed
+  call s:LogDebugInfo("All attempts failed.")
+  call s:SaveLastWordStatus(0)
+  call s:RestoreOptionGroupsUpto(1)
+  call s:ClearCurrentBehaviorSet()
+  return ''
 endfunction
 
 " }}}1
@@ -186,58 +227,13 @@ function s:InitPopup()
     call s:SetTempOption(1, '&ignorecase', g:acp_set_ignorecase)
     call s:SetTempOption(1, '&lazyredraw', 1)
     call s:SetTempOption(2, '&textwidth', 0)
-    call s:FeedPopup()
+    call acp#FeedKeys()
     return
   else
     call s:RestoreOptionGroupsUpto(2)
     call s:ClearCurrentBehaviorSet()
     return
   endif
-endfunction
-
-" Feed keys to trigger popup menu
-function s:FeedPopup()
-  if empty('s:current_behavs')
-    return ''
-  endif
-  if pumvisible()
-    call s:SaveLastWordStatus(1)
-    return ''
-  endif
-  if s:behav_idx < len(s:current_behavs) - 1
-    let s:behav_idx += 1
-    " Need to update &completefunc each time
-    call s:RestoreTempOptions(0)
-    call s:SetTempOption(0, '&completefunc',
-          \ exists('s:current_behavs[s:behav_idx].completefunc') ?
-          \ s:current_behavs[s:behav_idx].completefunc :
-          \ eval('&completefunc'))
-    " Before initializing the next popup menu, <C-n><C-e> needs
-    " to be fed first to ensure starting the first round under Insert mode
-    " This is needed because a CompleteDone event will not be triggered
-    " until a <C-n><C-e> is pressed
-    if exists('s:last_word_status') &&
-          \ s:last_word_status.completable == 1
-      call feedkeys("\<C-n>\<C-e>", 'n')
-      call s:LogDebugInfo("Feed keys: \<C-n>\<C-e>")
-      unlet! s:last_word_status
-    endif
-    " After the first round, the last key command must be cancelled via <C-e>
-    call feedkeys((s:behav_idx == 0 ?
-          \ s:current_behavs[s:behav_idx].command :
-          \ "\<C-e>" . s:current_behavs[s:behav_idx].command), 'n')
-    call feedkeys("\<Plug>AcpFeedPopup")
-    call s:LogDebugInfo("Feed keys: " . (s:behav_idx == 0 ?
-          \ s:current_behavs[s:behav_idx].command :
-          \ "\<C-e>" . s:current_behavs[s:behav_idx].command))
-    return ''
-  endif
-  " After all attempts have failed
-  call s:LogDebugInfo("All attempts failed.")
-  call s:SaveLastWordStatus(0)
-  call s:RestoreOptionGroupsUpto(1)
-  call s:ClearCurrentBehaviorSet()
-  return ''
 endfunction
 
 " Complete done
@@ -254,7 +250,7 @@ function s:CompleteDone()
           \ && call(s:current_behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
       let s:current_behavs = [ s:current_behavs[s:behav_idx] ]
       let s:behav_idx = -1
-      call s:FeedPopup()
+      call acp#FeedKeys()
       return
     endif
     if exists('s:current_behavs[s:behav_idx].closefunc')
