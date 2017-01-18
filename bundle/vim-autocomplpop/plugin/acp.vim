@@ -49,7 +49,7 @@ function s:MakeDefaultBehavior()
 
   for key in keys(behavs)
     if !empty(g:acp_user_defined_completefunc) &&
-        \ !empty(g:acp_user_defined_meets)
+          \ !empty(g:acp_user_defined_meets)
       call add(behavs[key], {
             \ 'command'      : "\<C-x>\<C-u>",
             \ 'completefunc' : g:acp_user_defined_completefunc,
