@@ -17,7 +17,7 @@ set cpo&vim
 
 " GLOBAL FUNCTIONS: {{{1
 
-" Enable auto-popup
+" Enable AutoComplPop
 function acp#Enable()
   augroup AcpGlobalAutoCommand
     autocmd!
@@ -30,7 +30,7 @@ function acp#Enable()
   inoremap <silent> <Plug>AcpFeedPopup <C-r>=<SID>FeedPopup()<CR>
 endfunction
 
-" Disable auto-popup
+" Disable AutoComplPop
 function acp#Disable()
   augroup AcpGlobalAutoCommand
     autocmd!
@@ -39,12 +39,12 @@ function acp#Disable()
   iunmap <Plug>AcpFeedPopup
 endfunction
 
-" Suspend auto-popup
+" Suspend AutoComplPop
 function acp#Lock()
   let b:lock_count = exists('b:lock_count') ? b:lock_count + 1 : 1
 endfunction
 
-" Release auto-popup from suspension
+" Release AutoComplPop from suspension
 function acp#Unlock()
   let b:lock_count = exists('b:lock_count') ? b:lock_count - 1 :
         \ throw "AutoComplPop: Not locked!"
