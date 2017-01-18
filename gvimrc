@@ -46,7 +46,7 @@ an Edit.Convert.-KSEP1-                                     <Nop>
 vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Left    <<CR>
 vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Right   ><CR>
 an Edit.Convert.-KSEP2-                                     <Nop>
-vnoreme <silent> Edit.Convert.Split\ Line                   :call KenySplitLineNicely()<CR>
+vnoreme <silent> Edit.Convert.Split\ Line                   :call keny#SplitLineNicely()<CR>
 vnoreme <silent> Edit.Convert.Join\ Lines                   J<CR>
 an Edit.Convert.-KSEP3-                                     <Nop>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-8       :setlocal fenc=utf-8<CR>
