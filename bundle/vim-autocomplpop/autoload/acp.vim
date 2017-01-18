@@ -21,10 +21,11 @@ set cpo&vim
 function acp#Enable()
   augroup AcpGlobalAutoCommand
     autocmd!
-    autocmd InsertEnter  * call s:ResetLastCursorPosition()
-    autocmd TextChangedI * call s:InitPopup()
-    autocmd CompleteDone * call s:CompleteDone()
-    autocmd InsertLeave  * call s:FinishPopup(2)
+    autocmd InsertEnter   * call s:ResetLastCursorPosition()
+    autocmd InsertCharPre * call s:PrePopup()
+    autocmd TextChangedI  * call s:InitPopup()
+    autocmd CompleteDone  * call s:CompleteDone()
+    autocmd InsertLeave   * call s:RestoreOptionGroupsUpto(2)
   augroup END
 
   inoremap <silent> <Plug>AcpFeedPopup <C-r>=<SID>FeedPopup()<CR>
@@ -67,7 +68,7 @@ endfunction
 
 " }}}1
 
-" LOCAL FUNCTIONS: {{{1
+" BEHAVIOR FUNCTIONS: {{{1
 
 " Create snipMate item list for the complete function
 function s:MakeSnipmateItems(key, snip)
@@ -93,7 +94,6 @@ function s:CloseFuncForSnipmate()
 endfunction
 
 " Default 'meets' function for snipMate
-" to determine whether to attempt a completion
 function s:MeetsForSnipmate(context, ...)
   if g:acp_snipmate_length < 0
     return 0
@@ -111,8 +111,7 @@ function s:MeetsForSnipmate(context, ...)
   return !empty('s:snip_items[key]')
 endfunction
 
-" Default 'meets' function for anything that is a keyword
-" to determine whether to attempt a completion
+" Default 'meets' function for keywords
 function s:MeetsForKeyword(context, ...)
   if g:acp_keyword_length < 0
     return 0
@@ -132,7 +131,6 @@ function s:MeetsForKeyword(context, ...)
 endfunction
 
 " Default 'meets' function for file names
-" to determine whether to attempt a completion
 function s:MeetsForFile(context, ...)
   if g:acp_file_length < 0
     return 0
@@ -146,22 +144,19 @@ function s:MeetsForFile(context, ...)
   return a:context !~ '[*/\\][/\\]\f*$\|[^[:print:]]\f*$'
 endfunction
 
-" Default 'meets' function for texts
-" to determine whether to attempt a spelling completion
+" Default 'meets' function for spelling completion
 function s:MeetsForText(context, ...)
   return g:acp_text_length >= 0 &&
         \ a:context =~ '\w\{' . g:acp_text_length . ',}$'
 endfunction
 
 " Default 'meets' function for VimScript
-" to determine whether to attempt a completion
 function s:MeetsForVimScript(context, ...)
   return g:acp_vimscript_length >= 0 &&
         \ a:context =~ '\k\{' . g:acp_vimscript_length . ',}$'
 endfunction
 
 " Default 'meets' function for Ruby
-" to determine whether to attempt a completion
 function s:MeetsForRubyOmni(context, ...)
   return has('ruby') &&
         \ (g:acp_ruby_omni_method_length >= 0 &&
@@ -171,7 +166,6 @@ function s:MeetsForRubyOmni(context, ...)
 endfunction
 
 " Default 'meets' function for Python
-" to determine whether to attempt a completion
 function s:MeetsForPythonOmni(context, ...)
   return has('python') && g:acp_python_omni_length >= 0 &&
         \ a:0 > 0 ?
@@ -180,28 +174,24 @@ function s:MeetsForPythonOmni(context, ...)
 endfunction
 
 " Default 'meets' function for Perl
-" to determine whether to attempt a completion
 function s:MeetsForPerlOmni(context, ...)
   return has('perl') && g:acp_perl_omni_length >= 0 &&
         \ a:context =~ '\w->\k\{' . g:acp_perl_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Xml
-" to determine whether to attempt a completion
 function s:MeetsForXmlOmni(context, ...)
   return g:acp_xml_omni_length >= 0 &&
         \ a:context =~ '<\(\/\=\|[^>]\+ \)\k\{' . g:acp_xml_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Html
-" to determine whether to attempt a completion
 function s:MeetsForHtmlOmni(context, ...)
   return g:acp_html_omni_length >= 0 &&
         \ a:context =~ '<\(\/\=\|[^>]\+ \)\k\{' . g:acp_html_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Css
-" to determine whether to attempt a completion
 function s:MeetsForCssOmni(context, ...)
   return (g:acp_css_omni_property_length >= 0 &&
         \ a:context =~ '\(^\|[;{]\)\s*\k\{' . g:acp_css_omni_property_length . ',}$') ||
@@ -210,27 +200,35 @@ function s:MeetsForCssOmni(context, ...)
 endfunction
 
 " Default 'meets' function for JavaScript
-" to determine whether to attempt a completion
 function s:MeetsForJavaScriptOmni(context, ...)
   return g:acp_javascript_omni_length >= 0 &&
         \ a:context =~ '\k\.\k\{' . g:acp_javascript_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for Php
-" to determine whether to attempt a completion
 function s:MeetsForPhpOmni(context, ...)
   return g:acp_php_omni_length >= 0 &&
         \ a:context =~ '\w\(->\|::\)\k\{' . g:acp_php_omni_length . ',}$'
 endfunction
 
 " Default 'meets' function for SAS
-" to determine whether to attempt a completion
 function s:MeetsForSASOmni(context, ...)
   return g:acp_sas_omni_length >= 0 &&
         \ a:context =~ '\<proc\s\+\k\{' . g:acp_sas_omni_length . ',}$'
 endfunction
 
-" Set variable with temporary value
+" }}}1
+
+" INTERNAL FUNCTIONS: {{{1
+
+" Log debugging information
+function s:LogDebugInfo(text)
+  if g:acp_log_debug_info == 1
+    echom "[" . s:GetCurrentText() . "] " . a:text
+  endif
+endfunction
+
+" Set a temperary value to a variable
 function s:SetTempOption(group, name, value)
   if !exists('s:orig_options[a:group]')
     let s:orig_options[a:group] = {}
@@ -241,16 +239,23 @@ function s:SetTempOption(group, name, value)
   execute 'let' a:name '= a:value'
 endfunction
 
-" Restore original value to variable and clean up
+" Restore original values to a variable group
 function s:RestoreTempOptions(group)
   if !exists('s:orig_options[a:group]')
     return
   endif
   for [name, value] in items(s:orig_options[a:group])
     execute 'let' name '= value'
-    unlet value " to avoid E706
+    unlet value " To avoid E706
   endfor
   unlet s:orig_options[a:group]
+endfunction
+
+" Restore multiple variable groups
+function s:RestoreOptionGroupsUpto(level)
+  for group in range(0, a:level)
+    call s:RestoreTempOptions(group)
+  endfor
 endfunction
 
 " Retrieve contents at current line before cursor
@@ -277,11 +282,6 @@ function s:IsCursorMoved()
   call s:ResetLastCursorPosition()
   return pos_prev[1] ==# s:pos_last[1] &&
         \ abs(pos_prev[2] - s:pos_last[2]) >= 1
-endfunction
-
-" Clear current behavior set s:current_behavs
-function s:ClearCurrentBehaviorSet()
-  let s:current_behavs = []
 endfunction
 
 " Make a new behavior set s:current_behavs
@@ -315,12 +315,46 @@ function s:MakeCurrentBehaviorSet()
   return 1
 endfunction
 
-" Initialize
+" Clear current behavior set s:current_behavs
+function s:ClearCurrentBehaviorSet()
+  let s:current_behavs = []
+endfunction
+
+" Save the status of the last word
+function s:SaveLastWordStatus(completable)
+  let s:last_word_status = {
+        \ 'word': s:GetCurrentWord(),
+        \ 'commands': map(copy(s:current_behavs), 'v:val.command'),
+        \ 'completable': a:completable
+        \ }
+endfunction
+
+" }}}1
+
+" EVENT FUNCTIONS: {{{1
+
+" Insert <C-n><C-e> before initializing the next popup menu
+" This is needed because an aborted completion would not trigger
+" a CompleteDone event until a <C-n><C-e>
+function s:PrePopup()
+  call s:LogDebugInfo("Pre-popup")
+  " Before initializing the next popup menu, <C-n><C-e> needs
+  " to be fed first to ensure starting the first round under Insert mode.
+  if exists('s:last_word_status') &&
+        \ s:last_word_status.completable == 1
+    call s:LogDebugInfo("Feed keys: \<C-n>\<C-e>")
+    call feedkeys("\<C-n>\<C-e>", 'n')
+    unlet! s:last_word_status
+  endif
+endfunction
+
+" Initialize popup menu
+" Make behavior set and set options
 function s:InitPopup()
   if (exists('b:lock_count') && b:lock_count > 0) || &paste
     return
   endif
-  call s:LogDebugInfo("Initialize popup.")
+  call s:LogDebugInfo("Initialize popup menu.")
   if s:MakeCurrentBehaviorSet()
     call s:SetTempOption(1, '&complete', g:acp_set_complete)
     call s:SetTempOption(1, '&completeopt',
@@ -335,24 +369,15 @@ function s:InitPopup()
     call s:FeedPopup()
     return
   else
-    call s:FinishPopup(2)
+    call s:RestoreOptionGroupsUpto(2)
     call s:ClearCurrentBehaviorSet()
     return
   endif
 endfunction
 
-" Save the status of the last word
-function s:SaveLastWordStatus(completable)
-  let s:last_word_status = {
-        \ 'word': s:GetCurrentWord(),
-        \ 'commands': map(copy(s:current_behavs), 'v:val.command'),
-        \ 'completable': a:completable
-        \ }
-endfunction
-
 " Feed keys to trigger popup menu
 function s:FeedPopup()
-  if !exists('s:current_behavs[s:behav_idx]')
+  if empty('s:current_behavs')
     return ''
   endif
   if pumvisible()
@@ -367,16 +392,10 @@ function s:FeedPopup()
           \ exists('s:current_behavs[s:behav_idx].completefunc') ?
           \ s:current_behavs[s:behav_idx].completefunc :
           \ eval('&completefunc'))
-    " Before feeding the first key command, <C-n><C-e> needs
-    " to be fed first to ensure starting the first round under Insert mode.
     " After the first round, the last key command must be cancelled via <C-e>
     call s:LogDebugInfo("Feed keys: " . (s:behav_idx == 0 ?
           \ s:current_behavs[s:behav_idx].command :
           \ "\<C-e>" . s:current_behavs[s:behav_idx].command))
-    call feedkeys((s:behav_idx == 0 &&
-          \ exists('s:last_word_status') &&
-          \ s:last_word_status.completable == 1 ?
-          \ "\<C-n>\<C-e>" : ''), 'n')
     call feedkeys((s:behav_idx == 0 ?
           \ s:current_behavs[s:behav_idx].command :
           \ "\<C-e>" . s:current_behavs[s:behav_idx].command), 'n')
@@ -387,7 +406,7 @@ function s:FeedPopup()
   call s:LogDebugInfo("All attempts failed.")
   call feedkeys("\<C-e>", 'n')
   call s:SaveLastWordStatus(0)
-  call s:FinishPopup(1)
+  call s:RestoreOptionGroupsUpto(1)
   call s:ClearCurrentBehaviorSet()
   return ''
 endfunction
@@ -412,25 +431,11 @@ function s:CompleteDone()
     if exists('s:current_behavs[s:behav_idx].closefunc')
       call call(s:current_behavs[s:behav_idx].closefunc, [])
     endif
-    call s:FinishPopup(2)
+    call s:RestoreOptionGroupsUpto(2)
     call s:ClearCurrentBehaviorSet()
     call s:ResetLastCursorPosition()
   endif
-  call s:LogDebugInfo("Completion failed.")
-endfunction
-
-" Finish up
-function s:FinishPopup(level)
-  for level_group in range(0, a:level)
-    call s:RestoreTempOptions(level_group)
-  endfor
-endfunction
-
-" Log debugging information
-function s:LogDebugInfo(text)
-  if g:acp_log_debug_info == 1
-    echom "[" . s:GetCurrentText() . "] " . a:text
-  endif
+  call s:LogDebugInfo("Completion aborted.")
 endfunction
 
 " }}}1
