@@ -17,8 +17,8 @@ INTRODUCTION                                                *acp-introduction*
 This plugin is a fork of Takeshi Nishida's AutoComplPop. The plugin enables
 VIM to automatically prompt popup menu for completion when inserting
 characters in the text. It supports prompting completion for keywords and
-omni-completion for various programming languages, as well as spelling
-completion for text files.
+omni-completion for various programming languages, as well as spell completion
+for text files.
 
 Supported programming languages:
   - HTML, XHTML, XML
@@ -49,9 +49,9 @@ text before the cursor. The supported behaviors are as follows:
         kind      filetype      text before the cursor ~
         Snippet   *             one non-space character
         Keyword   *             three keyword characters
-        Filename  *             a filename character + a path separator 
+        Filename  *             a filename character + a path separator
                                 + 0 or more filename characters
-        Spelling  *             four word characters
+        Spell     *             four word characters
                                 (|'spell'| option required)
         Command   vim           two keyword characters
         Omni      ruby          ".", "::" or non-word characters + ":"
@@ -214,8 +214,8 @@ OPTIONS                                                          *acp-options*
   let g:acp_spell_length = 4
 <
         The minimum length of text characters before the cursor that is needed
-        to attempt spelling completion. If the value is negative, the
-        completion will not be attempted.
+        to attempt spell completion. If the value is negative, the completion
+        will not be attempted.
 
                                                       *g:acp_vimscript_length*
 >
@@ -376,14 +376,14 @@ OPTIONS                                                          *acp-options*
 CHANGELOG                                                      *acp-changelog*
 
 3.0-fork
-  - Add spelling completion.
+  - Add spell completion.
   - Add default behaviors for JavaScript, Coffee, LiveScript, PHP, VimScript
     and SAS.
   - Add a new option |acp_set_completeopt_noselect| to control whether to
     select the first item in the popup menu.
   - Use |TextChangedI| event to trigger auto-popup (This also makes the entire
     key-mapping mechanism obsolete, therefore remove the corresponding code).
-  - Revert a behavior that switching from |Normal| mode to |Insert| mode will 
+  - Revert a behavior that switching from |Normal| mode to |Insert| mode will
     instantanously attempt a completion
   - Remove the reliability to L9 library.
   - Rename methods and variables based on VIM naming conventions.
@@ -461,7 +461,7 @@ CHANGELOG                                                      *acp-changelog*
   - Fixed a bug that setting 'spell' on a new buffer made typing go crazy.
 
 2.7
-  - Changed naming conventions for filenames, functions, commands, and option 
+  - Changed naming conventions for filenames, functions, commands, and option
     and thus renamed them.
   - Added g:acp_behaviorKeywordCommand option. If you prefer the previous
     behavior for keyword completion, set this option "\<C-n>".
@@ -470,18 +470,18 @@ CHANGELOG                                                      *acp-changelog*
   The following were done by Ingo Karkat:
 
   - ENH: Added support for setting a user-provided 'completefunc' during the
-    completion, configurable via g:acp_behavior. 
+    completion, configurable via g:acp_behavior.
   - BUG: When the configured completion is <C-p> or <C-x><C-p>, the command to
-    restore the original text (in on_popup_post()) must be reverted, too. 
+    restore the original text (in on_popup_post()) must be reverted, too.
   - BUG: When using a custom completion function (<C-x><C-u>) that also uses
     an s:...() function name, the s:GetSidPrefix() function dynamically
     determines the wrong SID. Now calling s:DetermineSidPrefix() once during
-    sourcing and caching the value in s:SID. 
+    sourcing and caching the value in s:SID.
   - BUG: Should not use custom defined <C-X><C-...> completion mappings. Now
     consistently using unmapped completion commands everywhere. (Beforehand,
     s:PopupFeeder.feed() used mappings via feedkeys(..., 'm'), but
     s:PopupFeeder.on_popup_post() did not due to its invocation via
-    :map-expr.) 
+    :map-expr.)
 
 2.6:
   - Improved the behavior of omni completion for HTML/XHTML.
