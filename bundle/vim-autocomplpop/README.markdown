@@ -22,14 +22,11 @@ completion for text files.
 * VimScript
 * SAS
 
-### Spelling completion for:
-* Markdown
-
 ## Changes
 
+* Add spelling completion.
 * Add default behaviors for JavaScript, Coffee, LiveScript, PHP, VimScript
   and SAS.
-* Add spelling completion for Markdown, as well as plain text files.
 * Add a new option `acp_set_completeopt_noselect` to control whether to
   select the first item in the popup menu.
 * Fix various bugs in the original plugin.
