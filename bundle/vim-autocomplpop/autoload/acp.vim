@@ -426,7 +426,7 @@ function s:FinishPopup(level)
   endfor
 endfunction
 
-" Debug log
+" Log debugging information 
 function s:LogDebugInfo(text)
   if g:acp_log_debug_info == 1
     echom "[" . s:GetCurrentText() . "] " . a:text
