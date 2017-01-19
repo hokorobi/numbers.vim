@@ -4,10 +4,7 @@
 
 " LOAD GUARD: {{{1
 
-if exists('g:loaded_acp')
-  finish
-elseif v:version < 800
-  echoerr 'AutoComplPop does not support this version of vim (' . v:version . ').'
+if exists('g:loaded_acp') || v:version < 800 || !has('insert_expand')
   finish
 endif
 let g:loaded_acp = 1

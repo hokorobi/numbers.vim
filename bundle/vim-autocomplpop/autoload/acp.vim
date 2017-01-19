@@ -3,8 +3,7 @@
 "           2016-2017 Zhen-Huan Hu
 
 " LOAD GUARD: {{{1
-
-if exists('g:loaded_autoload_acp') || v:version < 800
+if exists('g:loaded_autoload_acp') || v:version < 800 || !has('insert_expand')
   finish
 endif
 let g:loaded_autoload_acp = 1
