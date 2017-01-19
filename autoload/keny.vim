@@ -1,16 +1,15 @@
-" Self-defined functions
+if exists('g:loaded_keny')
+  finish
+endif
+let g:loaded_keny = 1
+
+let s:save_cpo = &cpo
+set cpo&vim
+
 function! keny#ToggleComments(leader, ...)
-  let l:save_cpo   = &cpo
-  let l:save_paste = &paste
-  set cpo&vim
-  set paste
   if getline('.') !=# ''
     let l:leader = escape(a:leader, '\/*')
-    if a:0 > 0
-      let l:tail = escape(a:1, '\/*')
-    else
-      let l:tail = ''
-    end
+    let l:tail   = a:0 > 0 ? escape(a:1, '\/*') : ''
     " Add or remove commenting syntax depending on
     " whether there is commenting syntax at the beginning of a line
     if getline('.') =~ '^' . l:leader . '\(.*\)' . l:tail . '$'
@@ -21,8 +20,7 @@ function! keny#ToggleComments(leader, ...)
   endif
   " Move cursor to the beginning of the next line
   silent exec 'normal! +'
-  let &cpo   = l:save_cpo
-  let &paste = l:save_paste
+  return ''
 endfunction
 
 function! keny#SplitLineNicely()
@@ -34,3 +32,6 @@ function! keny#SplitLineNicely()
   " Restore previous search register
   let @/ = l:saved_last_search_pattern
 endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
