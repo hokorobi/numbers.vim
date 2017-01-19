@@ -20,12 +20,6 @@ set cpo&vim
 
 " FUNCTIONS: {{{1
 
-function s:DefineVariableDefault(name, default)
-  if !exists(a:name)
-    let {a:name} = a:default
-  endif
-endfunction
-
 function s:MakeDefaultBehavior()
   let behavs = {
         \ '*'           : [],
@@ -152,33 +146,60 @@ endfunction
 
 " INITIALIZATION: {{{1
 
-call s:DefineVariableDefault('g:acp_enable_at_startup', 1)
-call s:DefineVariableDefault('g:acp_log_debug_info', 0)
-call s:DefineVariableDefault('g:acp_set_ignorecase', 1)
-call s:DefineVariableDefault('g:acp_set_complete', '.,w,b')
-call s:DefineVariableDefault('g:acp_set_completeopt_preview', 0)
-call s:DefineVariableDefault('g:acp_set_completeopt_noselect', 0)
-call s:DefineVariableDefault('g:acp_user_defined_completefunc', '')
-call s:DefineVariableDefault('g:acp_user_defined_meets', '')
-call s:DefineVariableDefault('g:acp_snipmate_length', 1)
-call s:DefineVariableDefault('g:acp_keyword_command', "\<C-n>")
-call s:DefineVariableDefault('g:acp_keyword_length', 3)
-call s:DefineVariableDefault('g:acp_keyword_ignored', [])
-call s:DefineVariableDefault('g:acp_file_length', 0)
-call s:DefineVariableDefault('g:acp_spell_length', 4)
-call s:DefineVariableDefault('g:acp_vimscript_length', 2)
-call s:DefineVariableDefault('g:acp_ruby_omni_method_length', 0)
-call s:DefineVariableDefault('g:acp_ruby_omni_symbol_length', 1)
-call s:DefineVariableDefault('g:acp_python_omni_length', 0)
-call s:DefineVariableDefault('g:acp_perl_omni_length', -1)
-call s:DefineVariableDefault('g:acp_xml_omni_length', 0)
-call s:DefineVariableDefault('g:acp_html_omni_length', 0)
-call s:DefineVariableDefault('g:acp_css_omni_property_length', 1)
-call s:DefineVariableDefault('g:acp_css_omni_value_length', 0)
-call s:DefineVariableDefault('g:acp_javascript_omni_length', 0)
-call s:DefineVariableDefault('g:acp_php_omni_length', 0)
-call s:DefineVariableDefault('g:acp_sas_omni_length', 0)
-call s:DefineVariableDefault('g:acp_behavior', {})
+let g:acp_enable_at_startup =
+      \ get(g:, 'acp_enable_at_startup', 1)
+let g:acp_log_debug_info =
+      \ get(g:, 'acp_log_debug_info', 0)
+let g:acp_set_complete =
+      \ get(g:, 'acp_set_complete', '.,w,b')
+let g:acp_set_completeopt_preview =
+      \ get(g:, 'acp_set_completeopt_preview', 0)
+let g:acp_set_completeopt_noselect =
+      \ get(g:, 'acp_set_completeopt_noselect', 0)
+let g:acp_set_ignorecase =
+      \ get(g:, 'acp_set_ignorecase', 1)
+let g:acp_user_defined_completefunc =
+      \ get(g:, 'acp_user_defined_completefunc', '')
+let g:acp_user_defined_meets =
+      \ get(g:, 'acp_user_defined_meets', '')
+let g:acp_snipmate_length =
+      \ get(g:, 'acp_snipmate_length', 1)
+let g:acp_keyword_command =
+      \ get(g:, 'acp_keyword_command', "\<C-n>")
+let g:acp_keyword_ignored =
+      \ get(g:, 'acp_keyword_ignored', [])
+let g:acp_keyword_length =
+      \ get(g:, 'acp_keyword_length', 3)
+let g:acp_file_length =
+      \ get(g:, 'acp_file_length', 0)
+let g:acp_spell_length =
+      \ get(g:, 'acp_spell_length', 4)
+let g:acp_vimscript_length =
+      \ get(g:, 'acp_vimscript_length', 2)
+let g:acp_ruby_omni_method_length =
+      \ get(g:, 'acp_ruby_omni_method_length', 0)
+let g:acp_ruby_omni_symbol_length =
+      \ get(g:, 'acp_ruby_omni_symbol_length', 0)
+let g:acp_python_omni_length =
+      \ get(g:, 'acp_python_omni_length', 0)
+let g:acp_perl_omni_length =
+      \ get(g:, 'acp_perl_omni_length', -1)
+let g:acp_xml_omni_length =
+      \ get(g:, 'acp_xml_omni_length', 0)
+let g:acp_html_omni_length =
+      \ get(g:, 'acp_html_omni_length', 0)
+let g:acp_css_omni_property_length =
+      \ get(g:, 'acp_css_omni_property_length', 0)
+let g:acp_css_omni_value_length =
+      \ get(g:, 'acp_css_omni_value_length', 0)
+let g:acp_javascript_omni_length =
+      \ get(g:, 'acp_javascript_omni_length', 0)
+let g:acp_php_omni_length =
+      \ get(g:, 'acp_php_omni_length', 0)
+let g:acp_sas_omni_length =
+      \ get(g:, 'acp_sas_omni_length', 0)
+let g:acp_behavior =
+      \ get(g:, 'acp_behavior', {})
 
 call extend(g:acp_behavior, s:MakeDefaultBehavior(), 'keep')
 
@@ -186,12 +207,6 @@ command! -bar -narg=0 AcpEnable  call acp#Enable()
 command! -bar -narg=0 AcpDisable call acp#Disable()
 command! -bar -narg=0 AcpLock    call acp#Lock()
 command! -bar -narg=0 AcpUnlock  call acp#Unlock()
-
-" legacy commands
-command! -bar -narg=0 AutoComplPopEnable  AcpEnable
-command! -bar -narg=0 AutoComplPopDisable AcpDisable
-command! -bar -narg=0 AutoComplPopLock    AcpLock
-command! -bar -narg=0 AutoComplPopUnlock  AcpUnlock
 
 if g:acp_enable_at_startup
   AcpEnable
