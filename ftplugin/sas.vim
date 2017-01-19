@@ -1,28 +1,15 @@
-" Local functions
-function! s:RunSAS()
-  w
-  call system("sas -noverbose -sysin '" . expand('%:p') . "'")
-  if v:shell_error ==# 0
-    echo 'All steps terminated normally'
-  elseif v:shell_error ==# 1
-    echohl WarningMsg | echo 'SAS System issued warning(s)' | echohl None
-  elseif v:shell_error ==# 2
-    echohl ErrorMsg | echo 'SAS System issued error(s)' | echohl None
-  elseif v:shell_error ==# 3
-    echo 'User issued the ABORT statement'
-  elseif v:shell_error ==# 4
-    echo 'User issued the ABORT RETURN statement'
-  elseif v:shell_error ==# 5
-    echo 'User issued the ABORT ABEND statement'
-  elseif v:shell_error ==# 6
-    echohl ErrorMsg | echo 'SAS internal error' | echohl None
-  else
-    echo 'Exit status code: ' . v:shell_error
-  endif
-endfunction
+" Only do this when not done yet for this buffer
+if (exists("b:did_ftplugin"))
+  finish
+endif
+let b:did_ftplugin = 1
+
+let s:cpo_save = &cpo
+set cpo&vim
 
 " Local settings
-setlocal autowrite conceallevel=3 omnifunc=sascomplete#Complete
+setlocal softtabstop=2 shiftwidth=2 expandtab conceallevel=3
+setlocal autowrite omnifunc=sascomplete#Complete
 
 " Restore view
 augroup SASView
@@ -55,3 +42,29 @@ inoremap <buffer> <silent> <F8> <C-o>:call <SID>RunSAS()<CR>
 nnoremap <buffer> <silent> <F5> :call keny#ToggleComments('/* ', ' */')<CR>
 vnoremap <buffer> <silent> <F5> :call keny#ToggleComments('/* ', ' */')<CR>
 inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments('/* ', ' */')<CR>
+
+" Local functions
+function! s:RunSAS()
+  w
+  call system("sas -noverbose -sysin '" . expand('%:p') . "'")
+  if v:shell_error ==# 0
+    echo 'All steps terminated normally'
+  elseif v:shell_error ==# 1
+    echohl WarningMsg | echo 'SAS System issued warning(s)' | echohl None
+  elseif v:shell_error ==# 2
+    echohl ErrorMsg | echo 'SAS System issued error(s)' | echohl None
+  elseif v:shell_error ==# 3
+    echo 'User issued the ABORT statement'
+  elseif v:shell_error ==# 4
+    echo 'User issued the ABORT RETURN statement'
+  elseif v:shell_error ==# 5
+    echo 'User issued the ABORT ABEND statement'
+  elseif v:shell_error ==# 6
+    echohl ErrorMsg | echo 'SAS internal error' | echohl None
+  else
+    echo 'Exit status code: ' . v:shell_error
+  endif
+endfunction
+
+let &cpo = s:cpo_save
+unlet s:cpo_save
