@@ -231,6 +231,7 @@ function s:InitPopup()
           \ )
     call s:SetTempOption(1, '&ignorecase', g:acp_set_ignorecase)
     call s:SetTempOption(1, '&lazyredraw', 1)
+    call s:SetTempOption(1, '&belloff', 'all')
     call s:SetTempOption(2, '&textwidth', 0)
     call acp#FeedKeys()
     return
