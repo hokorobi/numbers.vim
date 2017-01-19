@@ -392,8 +392,9 @@ CHANGELOG                                                      *acp-changelog*
     The following bugs have been fixed:
   - Fix a bug that moving cursor after switching back from |Normal| mode to
     |Insert| mode will always trigger auto-popup menu.
-  - Fix a bug that subsequent attempt is skipped after previous completion
-    when the "meets" function length is 0.
+  - Fix a bug that subsequent attempt is skipped after a previous successful
+    completion when the "meets" function length is 0.
+  - Fix a bug that previous abolished completion is not properly cancelled.  
   - Fix a bug that auto-popup menu will be triggered indecisively when the
     "repeat" key is non-zero.
 
