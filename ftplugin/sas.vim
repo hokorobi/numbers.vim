@@ -9,27 +9,34 @@ set cpo&vim
 
 " Local settings
 setlocal softtabstop=2 shiftwidth=2 expandtab conceallevel=3
-setlocal autowrite omnifunc=sascomplete#Complete
+setlocal hidden omnifunc=sascomplete#Complete
+
+" Find autoexec files from $PATH
+for syspath in split(expand('$PATH'), has('win32') ? ';' : ':')
+  if filereadable(syspath . '/autoexec.sas')
+    let &l:path = &path . ',' . syspath
+  endif
+endfor
 
 " Restore view
 augroup SASView
   autocmd!
-  au BufWritePost,BufLeave,WinLeave *.sas mkview 
+  au BufWritePost,BufLeave,WinLeave *.sas mkview
   au BufWinEnter *.sas silent loadview
 augroup END
 
 " Key mappings
-nnoremap <buffer> <silent> <F2> :edit %<.sas<CR>
-vnoremap <buffer> <silent> <F2> :<C-u>edit %<.sas<CR>
-inoremap <buffer> <silent> <F2> <Esc>:edit %<.sas<CR>
+nnoremap <buffer> <silent> <F2> :call <SID>SwitchSASBuffer('sas', 1)<CR>
+vnoremap <buffer> <silent> <F2> :<C-u>call <SID>SwitchSASBuffer('sas', 1)<CR>
+inoremap <buffer> <silent> <F2> <Esc>:call <SID>SwitchSASBuffer('sas', 1)<CR>
 
-nnoremap <buffer> <silent> <F3> :view %<.log<CR>
-vnoremap <buffer> <silent> <F3> :<C-u>view %<.log<CR>
-inoremap <buffer> <silent> <F3> <Esc>:view %<.log<CR>
+nnoremap <buffer> <silent> <F3> :call <SID>SwitchSASBuffer('log', 0)<CR>
+vnoremap <buffer> <silent> <F3> :<C-u>call <SID>SwitchSASBuffer('log', 0)<CR>
+inoremap <buffer> <silent> <F3> <Esc>:call <SID>SwitchSASBuffer('log', 0)<CR>
 
-nnoremap <buffer> <silent> <F4> :view %<.lst<CR>
-vnoremap <buffer> <silent> <F4> :<C-u>view %<.lst<CR>
-inoremap <buffer> <silent> <F4> <Esc>:view %<.lst<CR>
+nnoremap <buffer> <silent> <F4> :call <SID>SwitchSASBuffer('lst', 0)<CR>
+vnoremap <buffer> <silent> <F4> :<C-u>call <SID>SwitchSASBuffer('lst', 0)<CR>
+inoremap <buffer> <silent> <F4> <Esc>:call <SID>SwitchSASBuffer('lst', 0)<CR>
 
 " Set compiler
 setlocal makeprg=sas\ -noverbose\ -sysin\ '%:p'
@@ -44,6 +51,16 @@ vnoremap <buffer> <silent> <F5> :call keny#ToggleComments('/* ', ' */')<CR>
 inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments('/* ', ' */')<CR>
 
 " Local functions
+function! s:SwitchSASBuffer(dest, readwrite)
+  if expand('%:e') ==# a:dest | return | endif
+  let to_buffer = substitute(bufname('%'), expand('%:e') . '$', a:dest, '')
+  if bufnr(to_buffer) >= 0
+    silent execute 'buffer' bufnr(to_buffer)
+  elseif filereadable(expand('%<') . '.' . a:dest)
+    silent execute (a:readwrite ? 'edit' : 'view') fnameescape(expand('%<') . '.' . a:dest)
+  endif
+endfunction
+
 function! s:RunSAS()
   w
   call system("sas -noverbose -sysin '" . expand('%:p') . "'")
