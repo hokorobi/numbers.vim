@@ -51,20 +51,20 @@ endfunction
 
 " Feed keys to trigger popup menu
 function acp#FeedKeys()
-  if empty('s:current_behavs')
+  if empty('s:behavs')
     return ''
   endif
   if pumvisible()
     call s:SaveLastWordStatus(1)
     return ''
   endif
-  if s:behav_idx < len(s:current_behavs) - 1
+  if s:behav_idx < len(s:behavs) - 1
     let s:behav_idx += 1
     " Need to update &completefunc each time
     call s:RestoreTempOptions(0)
     call s:SetTempOption(0, '&completefunc',
-          \ exists('s:current_behavs[s:behav_idx].completefunc') ?
-          \ s:current_behavs[s:behav_idx].completefunc :
+          \ exists('s:behavs[s:behav_idx].completefunc') ?
+          \ s:behavs[s:behav_idx].completefunc :
           \ eval('&completefunc'))
     " Before initializing the next popup menu, <C-n><C-e> needs
     " to be fed first to ensure starting the first round under Insert mode
@@ -78,19 +78,19 @@ function acp#FeedKeys()
     endif
     " After the first round, the last key command must be cancelled via <C-e>
     call feedkeys((s:behav_idx == 0 ?
-          \ s:current_behavs[s:behav_idx].command :
-          \ "\<C-e>" . s:current_behavs[s:behav_idx].command), 'n')
+          \ s:behavs[s:behav_idx].command :
+          \ "\<C-e>" . s:behavs[s:behav_idx].command), 'n')
     call feedkeys("\<C-r>=acp#FeedKeys()\<CR>", 'n')
     call s:LogDebugInfo("Feed keys: " . (s:behav_idx == 0 ?
-          \ s:current_behavs[s:behav_idx].command :
-          \ "\<C-e>" . s:current_behavs[s:behav_idx].command))
+          \ s:behavs[s:behav_idx].command :
+          \ "\<C-e>" . s:behavs[s:behav_idx].command))
     return ''
   endif
   " After all attempts have failed
   call s:LogDebugInfo("All attempts failed.")
   call s:SaveLastWordStatus(0)
   call s:RestoreOptionGroupsUpto(1)
-  call s:ClearCurrentBehaviorSet()
+  call s:ClearBehaviorSet()
   return ''
 endfunction
 
@@ -167,47 +167,46 @@ function s:IsCursorMoved()
         \ abs(pos_prev[2] - s:pos_last[2]) >= 1
 endfunction
 
-" Make a new behavior set s:current_behavs
+" Make a new behavior set s:behavs
 " Return 1 if a new behavior set is created, 0 if otherwise
 function s:MakeCurrentBehaviorSet()
   if s:IsCursorMoved()
-    let s:current_behavs = copy(exists('g:acp_behavior[&filetype]')
-          \ ? g:acp_behavior[&filetype]
-          \ : g:acp_behavior['*'])
+    let s:behavs = copy(exists('g:acp_behavior[&filetype]') ?
+          \ g:acp_behavior[&filetype] : g:acp_behavior['*'])
   else
     return 0
   endif
   let text = s:GetCurrentText()
-  call filter(s:current_behavs, 'call(v:val.meets, [text])')
+  call filter(s:behavs, 'call(v:val.meets, [text])')
   " Improve responsiveness by not to attempt another completion
   " after the last attempt failed to find any completion candidate
   if exists('s:last_word_status') && s:last_word_status.completable == 0
     if stridx(s:GetCurrentWord(), s:last_word_status.word) == 0 &&
-          \ map(copy(s:current_behavs), 'v:val.command') ==# s:last_word_status.commands
+          \ map(copy(s:behavs), 'v:val.command') ==# s:last_word_status.commands
       return 0
     else
       unlet! s:last_word_status
     endif
   endif
-  if empty(s:current_behavs)
+  if empty(s:behavs)
     return 0
   endif
   call s:LogDebugInfo("Make behavior set: [" .
-        \ join(map(copy(s:current_behavs), 'v:val.command')) . "].")
+        \ join(map(copy(s:behavs), 'v:val.command')) . "].")
   let s:behav_idx = -1
   return 1
 endfunction
 
-" Clear current behavior set s:current_behavs
-function s:ClearCurrentBehaviorSet()
-  let s:current_behavs = []
+" Clear current behavior set s:behavs
+function s:ClearBehaviorSet()
+  let s:behavs = []
 endfunction
 
 " Save the status of the last word
 function s:SaveLastWordStatus(completable)
   let s:last_word_status = {
         \ 'word': s:GetCurrentWord(),
-        \ 'commands': map(copy(s:current_behavs), 'v:val.command'),
+        \ 'commands': map(copy(s:behavs), 'v:val.command'),
         \ 'completable': a:completable
         \ }
 endfunction
@@ -237,7 +236,7 @@ function s:InitPopup()
     return
   else
     call s:RestoreOptionGroupsUpto(2)
-    call s:ClearCurrentBehaviorSet()
+    call s:ClearBehaviorSet()
     return
   endif
 endfunction
@@ -251,19 +250,19 @@ function s:CompleteDone()
   if !empty(v:completed_item)
     unlet! s:last_word_status
     call s:LogDebugInfo("Completion done.")    
-    if exists('s:current_behavs[s:behav_idx].repeat')
-          \ && s:current_behavs[s:behav_idx].repeat
-          \ && call(s:current_behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
-      let s:current_behavs = [ s:current_behavs[s:behav_idx] ]
+    if exists('s:behavs[s:behav_idx].repeat')
+          \ && s:behavs[s:behav_idx].repeat
+          \ && call(s:behavs[s:behav_idx].meets, [s:GetCurrentText(), '0'])
+      let s:behavs = [ s:behavs[s:behav_idx] ]
       let s:behav_idx = -1
       call acp#FeedKeys()
       return
     endif
-    if exists('s:current_behavs[s:behav_idx].closefunc')
-      call call(s:current_behavs[s:behav_idx].closefunc, [])
+    if exists('s:behavs[s:behav_idx].closefunc')
+      call call(s:behavs[s:behav_idx].closefunc, [])
     endif
     call s:RestoreOptionGroupsUpto(2)
-    call s:ClearCurrentBehaviorSet()
+    call s:ClearBehaviorSet()
     call s:ResetLastCursorPosition()
   endif
   call s:LogDebugInfo("Completion aborted.")
@@ -274,7 +273,7 @@ endfunction
 " INITIALIZATION: {{{1
 
 let s:behav_idx = 0
-let s:current_behavs = []
+let s:behavs = []
 
 " }}}1
 
