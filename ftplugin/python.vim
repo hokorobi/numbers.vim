@@ -2,7 +2,7 @@
 setlocal softtabstop=4 shiftwidth=4 expandtab
 
 " Set compiler
-setlocal makeprg=python
+setlocal makeprg=python set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
 
 nnoremap <buffer> <silent> <F8> :w !python<CR>
 vnoremap <buffer> <silent> <F8> :w !python<CR>
