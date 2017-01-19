@@ -235,7 +235,7 @@ OPTIONS                                                          *acp-options*
 
                                                *g:acp_ruby_omni_symbol_length*
 >
-  let g:acp_ruby_omni_symbol_length = 1
+  let g:acp_ruby_omni_symbol_length = 0
 <
         The length of keyword characters before the cursor that is needed to
         trigger Ruby omni-completion for Ruby symbols. If the value is
@@ -277,7 +277,7 @@ OPTIONS                                                          *acp-options*
 
                                               *g:acp_css_omni_property_length*
 >
-  let g:acp_css_omni_property_length = 1
+  let g:acp_css_omni_property_length = 0
 <
         The length of keyword characters before the cursor that is needed to
         trigger CSS omni-completion for CSS properties. If the value is
