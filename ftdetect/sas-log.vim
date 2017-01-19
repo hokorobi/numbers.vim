@@ -1,6 +1,6 @@
 function! s:DetectNode()
   if len(findfile(expand('%<') . '.sas', '.')) > 0
-    setfiletype sas-log
+    set filetype=sas-log
   endif
 endfunction
 
