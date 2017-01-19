@@ -3,7 +3,7 @@ function acp#file#Meets(context, ...)
   if g:acp_file_length < 0
     return 0
   endif
-  let sep = (has('win32') || has('win64')) ? '[/\\]' : '\/'
+  let sep = has('win32') ? '[/\\]' : '\/'
   if a:0 > 0 ?
         \ a:context !~ '\f' . sep . '\f\{' . a:1 . '}$' :
         \ a:context !~ '\f' . sep . '\f\{' . g:acp_file_length . ',}$'
