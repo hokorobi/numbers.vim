@@ -1,5 +1,5 @@
 " Local functions
-function! s:KenyRunSAS()
+function! s:RunSAS()
   w
   call system("sas -noverbose -sysin '" . expand('%:p') . "'")
   if v:shell_error ==# 0
@@ -22,9 +22,9 @@ function! s:KenyRunSAS()
 endfunction
 
 " Local settings
-setlocal conceallevel=3 omnifunc=sascomplete#Complete
+setlocal autowrite conceallevel=3 omnifunc=sascomplete#Complete
 
-" Automatic folding when reopening
+" Restore view
 augroup SASView
   autocmd!
   au BufWritePost,BufLeave,WinLeave *.sas mkview 
@@ -45,9 +45,11 @@ vnoremap <buffer> <silent> <F4> :<C-u>view %<.lst<CR>
 inoremap <buffer> <silent> <F4> <Esc>:view %<.lst<CR>
 
 " Set compiler
-nnoremap <buffer> <silent> <F8> :call <SID>KenyRunSAS()<CR>
-vnoremap <buffer> <silent> <F8> :<C-u>call <SID>KenyRunSAS()<CR>
-inoremap <buffer> <silent> <F8> <C-o>:call <SID>KenyRunSAS()<CR>
+setlocal makeprg=sas\ -noverbose\ -sysin\ '%:p'
+
+nnoremap <buffer> <silent> <F8> :call <SID>RunSAS()<CR>
+vnoremap <buffer> <silent> <F8> :<C-u>call <SID>RunSAS()<CR>
+inoremap <buffer> <silent> <F8> <C-o>:call <SID>RunSAS()<CR>
 
 " Set comment toggle
 nnoremap <buffer> <silent> <F5> :call keny#ToggleComments('/* ', ' */')<CR>
