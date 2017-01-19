@@ -77,7 +77,7 @@ function s:MakeDefaultBehavior()
     call add(behavs[key], {
           \ 'command' : "\<C-x>\<C-k>",
           \ 'meets'   : 'acp#spell#Meets',
-          \ 'repeat'  : 1,
+          \ 'repeat'  : 0,
           \ })
   endfor
   call add(behavs.vim, {
