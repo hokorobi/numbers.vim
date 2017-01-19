@@ -66,14 +66,14 @@ function acp#FeedKeys()
           \ exists('s:behavs[s:behav_idx].completefunc') ?
           \ s:behavs[s:behav_idx].completefunc :
           \ eval('&completefunc'))
-    " Before initializing the next popup menu, <C-n><C-e> needs
+    " Before initializing the next popup menu, <C-g><C-g> needs
     " to be fed first to ensure starting the first round under Insert mode
     " This is needed because a CompleteDone event will not be triggered
-    " until a <C-n><C-e> is pressed
+    " until the previous <C-x> mode is cancelled
     if exists('s:last_word_status') &&
           \ s:last_word_status.completable == 1
-      call feedkeys("\<C-n>\<C-e>", 'n')
-      call s:LogDebugInfo("Feed keys: \<C-n>\<C-e>")
+      call feedkeys("\<C-g>\<C-g>", 'n')
+      call s:LogDebugInfo("Feed keys: \<C-g>\<C-g>")
       unlet! s:last_word_status
     endif
     " After the first round, the last key command must be cancelled via <C-e>
