@@ -1,7 +1,7 @@
-fun! s:DetectNode()
-  if getline(1) =~ 'The SAS System'
-    set ft=sas-log
+function! s:DetectNode()
+  if len(findfile(expand('%<') . '.sas', '.')) > 0
+    setfiletype sas-log
   endif
-endfun
+endfunction
 
 au BufNewFile,BufRead *.log call s:DetectNode()
