@@ -1,19 +1,3 @@
-" Local functions
-function! s:KenyFoldPageFeed()
-  setlocal foldmethod=expr
-  setlocal foldexpr=getline(v:lnum)[0]==\"\\<C-l>\"
-  setlocal foldminlines=0
-  setlocal foldtext='---\ New\ Page\ '
-  setlocal foldlevel=0
-  set foldclose=all
-endfunction
-
-" Automatic folding based on page feeds
-augroup SASLogView
-  autocmd!
-  au BufWinEnter *.log call s:KenyFoldPageFeed()
-augroup END
-
 " Key mappings
 nnoremap <buffer> <silent> <F2> :edit! %<.sas<CR>
 vnoremap <buffer> <silent> <F2> :<C-u>edit! %<.sas<CR>
