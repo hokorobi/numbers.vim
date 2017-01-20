@@ -4,9 +4,9 @@
 " set verbose=15 vfile=$HOME/vfile.txt
 
 " General
-filetype plugin indent on
 set nocompatible noswapfile nobackup autoread
 set backspace=indent,eol,start whichwrap+=<,>,[,]
+filetype plugin indent on
 fixdel
 
 " Addtional paths
@@ -70,8 +70,6 @@ nnoremap <leader><Space> za
 vnoremap <leader><Space> zf
 vnoremap <BS> d
 
-inoremap <leader><Tab> <Esc>`^
-
 xnoremap ( c(<C-r>")
 xnoremap [ c[<C-r>"]
 xnoremap { c{<C-r>"}
@@ -115,6 +113,13 @@ if !has('macunix')
   vnoremap <C-s> <C-c>:update<CR>
   inoremap <C-s> <C-o>:update<CR>
 endif
+
+" Configure netrw
+let g:netrw_banner = 0
+let g:netrw_browse_split = 4 " Open in prior window
+let g:netrw_altv = 1         " Open splits to the right
+let g:netrw_liststyle = 3    " Tree view
+let g:netrw_list_hide = netrw_gitignore#Hide() . ',\(^\|\s\s\)\zs\.\S\+'
 
 " Configure vim-airline
 let g:airline#extensions#tabline#enabled = 1
