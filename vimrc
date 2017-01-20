@@ -1,27 +1,27 @@
 " Maintainer: Zhenhuan Hu <zhu@mcw.edu>
-" Version: Aug 05, 2016
+" Version: 2017-01-19
 
 " set verbose=15 vfile=$HOME/vfile.txt
 
 " General
 filetype plugin indent on
-set autoread nocp noswapfile nobackup
-set backspace=2 whichwrap+=<,>,[,]
+set nocompatible noswapfile nobackup autoread
+set backspace=indent,eol,start whichwrap+=<,>,[,]
 fixdel
 
 " Addtional paths
-if has("unix")
+if has('unix')
   set runtimepath+=$HOME/.vim/bundle/*,$HOME/.vim/bundle/*/after
   set viewdir=$HOME/.vim/view viewoptions-=options
-elseif has("win32")
+elseif has('win32')
   set runtimepath+=$HOME/vimfiles/bundle/*,$HOME/vimfiles/bundle/*/after
   set viewdir=$HOME/vimfiles/view viewoptions-=options
 endif
 
 " File format options
 set fileformats=unix,dos
-if has("multi_byte")
-  if &termencoding ==# ""
+if has('multi_byte')
+  if &termencoding ==# ''
     let &termencoding = &encoding
   endif
   set encoding=utf-8 fileencodings=utf-8,gb18030,big5,sjis,latin1
@@ -29,6 +29,16 @@ endif
 
 " Basic interface elements
 set number ruler showcmd showmode wildmenu laststatus=2
+
+" Indentation, wrap, and white spaces
+set autoindent softtabstop=2 shiftwidth=2 expandtab wrap
+let &showbreak = "\u2192"
+if version > 704
+  set breakindent breakindentopt+=sbr
+endif
+
+" Searching behaviors
+set incsearch ignorecase smartcase
 
 " Color
 set background=dark
@@ -41,17 +51,6 @@ if version >= 500
   endif
   syntax sync fromstart
 endif
-
-" Indentation, wrap, and white spaces
-set autoindent softtabstop=2 shiftwidth=2 expandtab wrap
-let &showbreak = "\u2192"
-if version > 704
-  set breakindent breakindentopt+=sbr
-endif
-" set list | let &listchars = "eol:\u00AC"
-
-" Searching behaviors
-set hlsearch incsearch ignorecase smartcase
 
 " Key mappings
 let mapleader = ','
@@ -79,7 +78,7 @@ xnoremap { c{<C-r>"}
 xnoremap ' c'<C-r>"'
 xnoremap " c"<C-r>""
 
-if !has("macunix")
+if !has('macunix')
   nnoremap <C-z> u
   vnoremap <C-z> <Esc>ugv
   inoremap <C-z> <C-o>u
