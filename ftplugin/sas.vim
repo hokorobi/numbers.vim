@@ -10,6 +10,7 @@ set cpo&vim
 " Local settings
 setlocal softtabstop=2 shiftwidth=2 expandtab conceallevel=3
 setlocal hidden omnifunc=sascomplete#Complete
+setlocal makeprg=sas\ -noverbose\ -sysin\ '%:p'
 
 " Find autoexec files from $PATH
 for syspath in split(expand('$PATH'), has('win32') ? ';' : ':')
@@ -38,9 +39,6 @@ nnoremap <buffer> <silent> <F4> :call <SID>SwitchSASBuffer('lst', 0)<CR>
 vnoremap <buffer> <silent> <F4> :<C-u>call <SID>SwitchSASBuffer('lst', 0)<CR>
 inoremap <buffer> <silent> <F4> <Esc>:call <SID>SwitchSASBuffer('lst', 0)<CR>
 
-" Set compiler
-setlocal makeprg=sas\ -noverbose\ -sysin\ '%:p'
-
 nnoremap <buffer> <silent> <F8> :call <SID>RunSAS()<CR>
 vnoremap <buffer> <silent> <F8> :<C-u>call <SID>RunSAS()<CR>
 inoremap <buffer> <silent> <F8> <C-o>:call <SID>RunSAS()<CR>
@@ -63,7 +61,7 @@ endfunction
 
 function! s:RunSAS()
   w
-  call system("sas -noverbose -sysin '" . expand('%:p') . "'")
+  silent make
   if v:shell_error ==# 0
     echo 'All steps terminated normally'
   elseif v:shell_error ==# 1
