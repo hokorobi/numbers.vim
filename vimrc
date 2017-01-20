@@ -76,6 +76,14 @@ xnoremap { c{<C-r>"}
 xnoremap ' c'<C-r>"'
 xnoremap " c"<C-r>""
 
+nnoremap <F9> :silent bp
+vnoremap <F9> :<C-u>silent bp
+inoremap <F9> <Esc>:silent bp
+
+nnoremap <F10> :silent bn
+vnoremap <F10> :<C-u>silent bn
+inoremap <F10> <Esc>:silent bn
+
 if !has('macunix')
   nnoremap <C-z> u
   vnoremap <C-z> <Esc>ugv
