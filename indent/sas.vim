@@ -68,9 +68,9 @@ function! GetSASIndent()
     let prev_line = getline(prev_lnum)
     " Previous non-blank line contains the start of a macro/section/block
     " while not the end of a macro/section/block (at the same line)
-    if (prev_line =~ s:block_str && prev_line !~ s:block_end)
-          \ || (prev_line =~ s:section_str && prev_line !~ s:section_end)
-          \ || (prev_line =~ s:macro_str && prev_line !~ s:macro_end)
+    if (prev_line =~ s:block_str && prev_line !~ s:block_end) ||
+          \ (prev_line =~ s:section_str && prev_line !~ s:section_end) ||
+          \ (prev_line =~ s:macro_str && prev_line !~ s:macro_end)
       let ind = indent(prev_lnum) + &sts
     else
       let ind = indent(prev_lnum)
@@ -84,9 +84,10 @@ function! GetSASIndent()
       " Re-adjust if current line is the start/end of a section
       " since the end of a section could be inexplicit
       let prev_section_str_lnum = s:PrevMatch(v:lnum, s:section_str)
-      let prev_section_end_lnum = max([s:PrevMatch(v:lnum, s:section_end),
-          \s:PrevMatch(v:lnum, s:macro_end),
-          \s:PrevMatch(v:lnum, s:program_end)])
+      let prev_section_end_lnum = max([
+            \ s:PrevMatch(v:lnum, s:section_end),
+            \ s:PrevMatch(v:lnum, s:macro_end),
+            \ s:PrevMatch(v:lnum, s:program_end)])
       if prev_section_end_lnum < prev_section_str_lnum
         let ind = ind - &sts
       endif
