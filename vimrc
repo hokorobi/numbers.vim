@@ -76,6 +76,11 @@ xnoremap { c{<C-r>"}
 xnoremap ' c'<C-r>"'
 xnoremap " c"<C-r>""
 
+nnoremap <S-Up> {
+inoremap <S-Up> <C-o>{
+nnoremap <S-Down> }
+inoremap <S-Down> <C-o>}
+
 nnoremap <F9> :silent bp
 vnoremap <F9> :<C-u>silent bp
 inoremap <F9> <Esc>:silent bp
