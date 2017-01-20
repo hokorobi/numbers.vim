@@ -64,10 +64,25 @@ function! s:RunSAS()
   silent make
   if v:shell_error ==# 0
     echo 'All steps terminated normally'
-  elseif v:shell_error ==# 1
-    echohl WarningMsg | echo 'SAS System issued warning(s)' | echohl None
-  elseif v:shell_error ==# 2
-    echohl ErrorMsg | echo 'SAS System issued error(s)' | echohl None
+  elseif v:shell_error ==# 1 || v:shell_error ==# 2
+    if filereadable(expand('%<') . '.log')
+      let nw = 0 | let ne = 0
+      for logline in readfile(expand('%<') . '.log')
+        if logline =~ '^WARNING' | let nw += 1
+        elseif logline =~ '^ERROR' | let ne += 1 | endif
+      endfor
+      if nw > 0 && ne == 0
+        echoh WarningMsg | echo 'SAS System issued ' . nw . ' warning(s)' | echoh None
+      elseif ne > 0 && nw == 0
+        echoh ErrorMsg | echo 'SAS System issued ' . ne . ' error(s)' | echoh None
+      elseif ne > 0 && nw > 0
+        echoh ErrorMsg | echo 'SAS System issued ' . ne . ' error(s), ' . nw . ' warning(s)' | echoh None
+      endif
+    elseif v:shell_error ==# 1
+      echoh WarningMsg | echo 'SAS System issued warning(s)' | echoh None
+    elseif v:shell_error ==# 2
+      echoh ErrorMsg | echo 'SAS System issued error(s)' | echoh None
+    endif    
   elseif v:shell_error ==# 3
     echo 'User issued the ABORT statement'
   elseif v:shell_error ==# 4
@@ -75,7 +90,7 @@ function! s:RunSAS()
   elseif v:shell_error ==# 5
     echo 'User issued the ABORT ABEND statement'
   elseif v:shell_error ==# 6
-    echohl ErrorMsg | echo 'SAS internal error' | echohl None
+    echoh ErrorMsg | echo 'SAS internal error' | echoh None
   else
     echo 'Exit status code: ' . v:shell_error
   endif
