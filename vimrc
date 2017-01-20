@@ -38,7 +38,7 @@ if version > 704
 endif
 
 " Searching behaviors
-set incsearch ignorecase smartcase
+set hlsearch ignorecase smartcase
 
 " Color
 set background=dark
