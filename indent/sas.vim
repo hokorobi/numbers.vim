@@ -19,9 +19,9 @@ let s:cpo_save = &cpo
 set cpo&vim
 
 " Regex that defines the start of a macro
-let s:macro_str = '^\s*%macro\>'
+let s:macro_str = '%macro\>'
 " Regex that defines the end of a macro
-let s:macro_end = '^\s*%mend;'
+let s:macro_end = '%mend;'
 
 " Regex that defines the start of a data/proc section
 let s:section_str = '\v(^|;)@<=\s*(data|proc)>'
@@ -31,7 +31,7 @@ let s:section_end = '\v(^|;)@<=\s*(run|quit|enddata);'
 " Regex that defines the start of a conditional block
 let s:block_str = '\v<(do( .+<to>.+| <over>.+)?|select( \(.+\))?|(define|layout|method) .+|begingraph);'
 " Regex that defines the end of a conditional block
-let s:block_end = '\v(^|;)@<=\s*\%?(end|endlayout|endgraph);'
+let s:block_end = '\v<(end|endlayout|endgraph);'
 
 " Regex that defines the end of the program
 let s:program_end = '\v(^|;)@<=\s*endsas;'
