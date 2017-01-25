@@ -109,7 +109,7 @@ function s:MakeDefaultBehavior()
   call add(behavs.css, {
         \ 'command' : "\<C-x>\<C-o>",
         \ 'meets'   : 'acp#css#Meets',
-        \ 'repeat'  : 0,
+        \ 'repeat'  : 1,
         \ })
   call add(behavs.javascript, {
         \ 'command' : "\<C-x>\<C-o>",
@@ -148,7 +148,7 @@ let g:acp_enable_at_startup =
 let g:acp_log_debug_info =
       \ get(g:, 'acp_log_debug_info', 0)
 let g:acp_set_complete =
-      \ get(g:, 'acp_set_complete', '.,w,b')
+      \ get(g:, 'acp_set_complete', '.')
 let g:acp_set_completeopt_preview =
       \ get(g:, 'acp_set_completeopt_preview', 0)
 let g:acp_set_completeopt_noselect =
@@ -160,7 +160,7 @@ let g:acp_user_defined_completefunc =
 let g:acp_user_defined_meets =
       \ get(g:, 'acp_user_defined_meets', '')
 let g:acp_snipmate_length =
-      \ get(g:, 'acp_snipmate_length', 1)
+      \ get(g:, 'acp_snipmate_length', 2)
 let g:acp_keyword_command =
       \ get(g:, 'acp_keyword_command', "\<C-n>")
 let g:acp_keyword_ignored =
@@ -186,7 +186,7 @@ let g:acp_xml_omni_length =
 let g:acp_html_omni_length =
       \ get(g:, 'acp_html_omni_length', 0)
 let g:acp_css_omni_property_length =
-      \ get(g:, 'acp_css_omni_property_length', 0)
+      \ get(g:, 'acp_css_omni_property_length', 2)
 let g:acp_css_omni_value_length =
       \ get(g:, 'acp_css_omni_value_length', 0)
 let g:acp_javascript_omni_length =

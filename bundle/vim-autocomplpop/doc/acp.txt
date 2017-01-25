@@ -47,7 +47,7 @@ The completion behavior used depends on the file type and is triggered by the
 text before the cursor. The supported behaviors are as follows:
 
         kind      filetype      text before the cursor ~
-        Snippet   *             one non-space character
+        Snippet   *             two non-space characters
         Keyword   *             three keyword characters
         Filename  *             a filename character + a path separator
                                 + 0 or more filename characters
@@ -62,7 +62,7 @@ text before the cursor. The supported behaviors are as follows:
                                 "<" + non-">" characters + " "
         Omni      html/xhtml    "<", "</" or
                                 "<" + non-">" characters + " "
-        Omni      css           ":", ";", "{", "^", "@", or "!"
+        Omni      css           ":", ";", "{", "@", or "!"
         Omni      javascript    "."
         Omni      php           "->", "::"
         Omni      sas           "proc" + whitespaces
@@ -143,7 +143,7 @@ OPTIONS                                                          *acp-options*
 
                                                           *g:acp_set_complete*
 >
-  let g:acp_set_complete = '.,w,b,k'
+  let g:acp_set_complete = '.'
 <
         Value set to 'complete' temporarily when auto-popup.
 
@@ -175,7 +175,7 @@ OPTIONS                                                          *acp-options*
 
                                                        *g:acp_snipmate_length*
 >
-  let g:acp_snipmate_length = 1
+  let g:acp_snipmate_length = 2
 <
         The minimum length of snipMate pattern before the cursor that is
         needed to attempt snipMate-trigger completion.
@@ -277,7 +277,7 @@ OPTIONS                                                          *acp-options*
 
                                               *g:acp_css_omni_property_length*
 >
-  let g:acp_css_omni_property_length = 0
+  let g:acp_css_omni_property_length = 2
 <
         The length of keyword characters before the cursor that is needed to
         trigger CSS omni-completion for CSS properties. If the value is
