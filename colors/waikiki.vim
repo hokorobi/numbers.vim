@@ -81,26 +81,26 @@ let s:uih = 220 " Hue
 let s:uis = 13  " Saturation
 let s:uil = {'dark': 18, 'light': 66} " Lightness
 
-let s:fg = color#HSLtoHex(s:uih, s:uis, s:uil.light) " #9DA5B4
-let s:bg = color#HSLtoHex(s:uih, s:uis, s:uil.dark ) " #282C34
+let s:fg = color#HSLtoHex(s:uih, s:uis, s:uil.light) " #9da5b4
+let s:bg = color#HSLtoHex(s:uih, s:uis, s:uil.dark ) " #282c34
 
-let s:light = color#Lighten(s:fg, 28) " #D1D5DC
-let s:grey1 = color#Lighten(s:fg, 8 ) " #ABB2BF
-let s:grey2 = s:fg                    " #9DA5B4
-let s:grey3 = color#Darken( s:fg, 48) " #4B5362
-let s:grey4 = color#Lighten(s:bg, 48) " #3C424E
+let s:light = color#Lighten(s:fg, 28) " #d1d5dc
+let s:grey1 = color#Lighten(s:fg, 8 ) " #abb2bf
+let s:grey2 = s:fg                    " #9da5b4
+let s:grey3 = color#Darken( s:fg, 48) " #4b5362
+let s:grey4 = color#Lighten(s:bg, 48) " #3c424e
 let s:dark1 = color#Lighten(s:bg, 28) " #333842
-let s:dark2 = s:bg                    " #282C34
-let s:dark3 = color#Darken( s:bg, 16) " #21252B
-let s:black = color#Darken( s:bg, 40) " #181B20
+let s:dark2 = s:bg                    " #282c34
+let s:dark3 = color#Darken( s:bg, 16) " #21252b
+let s:black = color#Darken( s:bg, 40) " #181b20
 
-let s:pink     = '#F92672'
-let s:orange   = '#FD971F'
-let s:yellow   = '#E6DB74'
-let s:green    = '#A6E22E'
-let s:cyan     = '#66D9EF'
-let s:lavender = '#AE81FF'
-let s:ash      = '#6A717C'
+let s:pink     = '#f92672'
+let s:orange   = '#fd971f'
+let s:yellow   = '#e6db74'
+let s:green    = '#a6e22e'
+let s:cyan     = '#66d9ef'
+let s:lavender = '#ae81ff'
+let s:ash      = '#6a717c'
 
 let s:bgpink   = color#HSLtoHex(color#HexToHSL(s:pink  )[0], s:uis, s:uil.dark)
 let s:bgorange = color#HSLtoHex(color#HexToHSL(s:orange)[0], s:uis, s:uil.dark)
