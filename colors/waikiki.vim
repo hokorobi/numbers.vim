@@ -6,7 +6,7 @@
 "        \/        \/        \/       \/
 "
 " Author: Zhenhuan Hu <zhu@mcw.edu>
-" Date: Nov 07, 2016
+" Date: 2017-02-01
 " License: GPL
 " Note: Based on the Monokai theme for TextMate
 " by Wimer Hazenberg and its darker variant
@@ -31,47 +31,47 @@ endif
 " Functions {{{
 fu! s:SetColor(name, fg, bg, ...)
   execute "hi" a:name
-        \ "guifg=" . a:fg[0]
-        \ "guibg=" . a:bg[0]
+        \ "guifg=" . a:fg
+        \ "guibg=" . a:bg
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
   if &t_Co == 256
     execute "hi" a:name
-          \ "ctermfg=" . a:fg[1]
-          \ "ctermbg=" . a:bg[1]
+          \ "ctermfg=" . color#RGBtoShort(color#HexToRGB(a:fg))
+          \ "ctermbg=" . color#RGBtoShort(color#HexToRGB(a:bg))
           \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
   endif
 endf
 
 fu! s:SetFgColor(name, fg, ...)
   execute "hi" a:name
-        \ "guifg=" . a:fg[0]
+        \ "guifg=" . a:fg
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
   if &t_Co == 256
     execute "hi" a:name
-          \ "ctermfg=" . a:fg[1]
+          \ "ctermfg=" . color#RGBtoShort(color#HexToRGB(a:fg))
           \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
   endif
 endf
 
 fu! s:SetBgColor(name, bg, ...)
   execute "hi" a:name
-        \ "guibg=" . a:bg[0]
+        \ "guibg=" . a:bg
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
   if &t_Co == 256
     execute "hi" a:name
-          \ "ctermbg=" . a:bg[1]
+          \ "ctermbg=" . color#RGBtoShort(color#HexToRGB(a:bg))
           \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
   endif
 endf
 
 fu! s:SetSpColor(name, sp)
   execute "hi" a:name
-        \ "guisp=" . a:sp[0]
+        \ "guisp=" . a:sp
         \ "gui=undercurl"
   if &t_Co == 256
     execute "hi" a:name
           \ "ctermfg=bg"
-          \ "ctermbg=" . a:sp[1]
+          \ "ctermbg=" . color#RGBtoShort(color#HexToRGB(a:sp))
   endif
 endf
 " }}}
@@ -81,31 +81,31 @@ let s:uih = 220 " Hue
 let s:uis = 13  " Saturation
 let s:uil = {'dark': 18, 'light': 66} " Lightness
 
-let s:fg = [color#HSLtoHex(s:uih, s:uis, s:uil.light), 248] " #9DA5B4
-let s:bg = [color#HSLtoHex(s:uih, s:uis, s:uil.dark ), 236] " #282C34
+let s:fg = color#HSLtoHex(s:uih, s:uis, s:uil.light) " #9DA5B4
+let s:bg = color#HSLtoHex(s:uih, s:uis, s:uil.dark ) " #282C34
 
-let s:light = [color#Lighten(s:fg, 28), 252] " #D1D5DC
-let s:grey1 = [color#Lighten(s:fg, 8 ), 249] " #ABB2BF
-let s:grey2 = s:fg                           " #9DA5B4
-let s:grey3 = [ color#Darken(s:fg, 48), 240] " #4B5362
-let s:grey4 = [color#Lighten(s:bg, 48), 238] " #3C424E
-let s:dark1 = [color#Lighten(s:bg, 28), 237] " #333842
-let s:dark2 = s:bg                           " #282C34
-let s:dark3 = [ color#Darken(s:bg, 16), 235] " #21252B
-let s:black = [ color#Darken(s:bg, 40), 234] " #181B20
+let s:light = color#Lighten(s:fg, 28) " #D1D5DC
+let s:grey1 = color#Lighten(s:fg, 8 ) " #ABB2BF
+let s:grey2 = s:fg                    " #9DA5B4
+let s:grey3 = color#Darken( s:fg, 48) " #4B5362
+let s:grey4 = color#Lighten(s:bg, 48) " #3C424E
+let s:dark1 = color#Lighten(s:bg, 28) " #333842
+let s:dark2 = s:bg                    " #282C34
+let s:dark3 = color#Darken( s:bg, 16) " #21252B
+let s:black = color#Darken( s:bg, 40) " #181B20
 
-let s:pink      = ['#F92672', 161]
-let s:orange    = ['#FD971F', 208]
-let s:yellow    = ['#E6DB74', 227]
-let s:green     = ['#A6E22E', 118]
-let s:cyan      = ['#66D9EF', 81 ]
-let s:lavender  = ['#AE81FF', 141]
-let s:ash       = ['#6A717C', 242]
+let s:pink     = '#F92672'
+let s:orange   = '#FD971F'
+let s:yellow   = '#E6DB74'
+let s:green    = '#A6E22E'
+let s:cyan     = '#66D9EF'
+let s:lavender = '#AE81FF'
+let s:ash      = '#6A717C'
 
-let s:bgpink    = [color#HSLtoHex(color#HexToHSL(s:pink  )[0], s:uis, s:uil.dark), 52 ]
-let s:bgorange  = [color#HSLtoHex(color#HexToHSL(s:orange)[0], s:uis, s:uil.dark), 94 ]
-let s:bgyellow  = [color#HSLtoHex(color#HexToHSL(s:yellow)[0], s:uis, s:uil.dark), 100]
-let s:bggreen   = [color#HSLtoHex(color#HexToHSL(s:green )[0], s:uis, s:uil.dark), 22 ]
+let s:bgpink   = color#HSLtoHex(color#HexToHSL(s:pink  )[0], s:uis, s:uil.dark)
+let s:bgorange = color#HSLtoHex(color#HexToHSL(s:orange)[0], s:uis, s:uil.dark)
+let s:bgyellow = color#HSLtoHex(color#HexToHSL(s:yellow)[0], s:uis, s:uil.dark)
+let s:bggreen  = color#HSLtoHex(color#HexToHSL(s:green )[0], s:uis, s:uil.dark)
 
 call s:SetColor("Normal", s:light, s:bg)
 call s:SetColor("Cursor", s:black, s:light)
