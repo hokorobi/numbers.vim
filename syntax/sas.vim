@@ -160,7 +160,7 @@ syn match sasFormatTag "\v\w+\." display contained
 syn region sasFormat matchgroup=sasFormatStatement start="\v%(^|;)@<=\s*%(attrib|format|input|put)>" matchgroup=NONE end="\v;@=" contains=@sasBasicSyntax,sasFormatTag contained
 
 " Macro definition
-syn region sasMacro start="\v\%macro>" end="\v\%mend>" contains=ALL
+syn region sasMacro start="\v\%macro>" end="\v\%mend>" contains=@sasBasicSyntax,sasGlobalStatement,sasDataStepControl,sasDataStepStatement,sasFormat,sasDataStep,sasProc,sasGraphProc,sasAnalyticalProc,sasProcTemplate,sasProcSQL,sasDS2,sasIML
 
 " Define default highlighting
 hi def link sasComment Comment
