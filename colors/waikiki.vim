@@ -36,8 +36,8 @@ fu! s:SetColor(name, fg, bg, ...)
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
   if &t_Co == 256
     execute "hi" a:name
-          \ "ctermfg=" . color#RGBtoShort(color#HexToRGB(a:fg))
-          \ "ctermbg=" . color#RGBtoShort(color#HexToRGB(a:bg))
+          \ "ctermfg=" . color#HexToShort(a:fg)
+          \ "ctermbg=" . color#HexToShort(a:bg)
           \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
   endif
 endf
@@ -48,7 +48,7 @@ fu! s:SetFgColor(name, fg, ...)
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
   if &t_Co == 256
     execute "hi" a:name
-          \ "ctermfg=" . color#RGBtoShort(color#HexToRGB(a:fg))
+          \ "ctermfg=" . color#HexToShort(a:fg)
           \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
   endif
 endf
@@ -59,7 +59,7 @@ fu! s:SetBgColor(name, bg, ...)
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
   if &t_Co == 256
     execute "hi" a:name
-          \ "ctermbg=" . color#RGBtoShort(color#HexToRGB(a:bg))
+          \ "ctermbg=" . color#HexToShort(a:bg)
           \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
   endif
 endf
@@ -71,7 +71,7 @@ fu! s:SetSpColor(name, sp)
   if &t_Co == 256
     execute "hi" a:name
           \ "ctermfg=bg"
-          \ "ctermbg=" . color#RGBtoShort(color#HexToRGB(a:sp))
+          \ "ctermbg=" . color#HexToShort(a:sp)
   endif
 endf
 " }}}
