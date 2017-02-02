@@ -90,6 +90,6 @@ if !get(g:, 'loaded_ctrlp', 0)
   finish
 endif
 let g:airline#themes#wwdc16#palette.ctrlp = airline#extensions#ctrlp#generate_color_map(
-      \ s:ColorExpand('#181b20', s:lavender) + ['bold'],
       \ s:ColorExpand('#d1d5dc', '#4b5362'),
-      \ s:ColorExpand('#d1d5dc', '#21252b'))
+      \ s:ColorExpand('#d1d5dc', '#21252b'),
+      \ s:ColorExpand('#181b20', s:lavender) + ['bold'])
