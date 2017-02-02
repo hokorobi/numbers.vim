@@ -42,7 +42,7 @@ endfu
 
 " @param {String|Number} color
 fu! color#HexToRGB(color)
-  let color = (type(a:color) == v:t_number ? printf('%x', a:color) : a:color)
+  let color = (type(a:color) == 0 ? printf('%x', a:color) : a:color)
   let matches = matchlist(color, s:patterns['hex'])
   if len(matches) < 4
     echohl Error | echom 'Could not parse ' . string(color) | echohl None
