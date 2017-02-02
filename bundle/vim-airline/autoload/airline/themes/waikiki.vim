@@ -1,8 +1,8 @@
 " Internal function
 fu! s:ColorExpand(fg, bg)
-  let fg = (len(a:fg) > 0 ? [a:fg, color#HexToShort(a:fg)] : ['', ''])
-  let bg = (len(a:bg) > 0 ? [a:bg, color#HexToShort(a:bg)] : ['', ''])
-  return [fg[0], bg[0], fg[1], bg[1]]
+  let fg256 = (len(a:fg) > 0 && &t_Co == 256 ? color#HexToShort(a:fg) : '')
+  let bg256 = (len(a:bg) > 0 && &t_Co == 256 ? color#HexToShort(a:bg) : '')
+  return [a:fg, a:bg, fg256, bg256]
 endf
 
 " Palette
