@@ -92,12 +92,12 @@ let s:bg = [color#HSLtoHex(s:uih, s:uis, s:uil.dark ), 236] " #282c34
 let s:light = [color#Lighten(s:fg, 28), 252] " #d1d5dc
 let s:grey1 = [color#Lighten(s:fg, 8 ), 249] " #abb2bf
 let s:grey2 = s:fg                           " #9da5b4
-let s:grey3 = [ color#Darken(s:fg, 48), 240] " #4b5362
+let s:grey3 = [color#Darken( s:fg, 48), 240] " #4b5362
 let s:grey4 = [color#Lighten(s:bg, 48), 238] " #3c424e
 let s:dark1 = [color#Lighten(s:bg, 28), 237] " #333842
 let s:dark2 = s:bg                           " #282c34
-let s:dark3 = [ color#Darken(s:bg, 16), 235] " #21252b
-let s:black = [ color#Darken(s:bg, 40), 234] " #181b20
+let s:dark3 = [color#Darken( s:bg, 16), 235] " #21252b
+let s:black = [color#Darken( s:bg, 40), 234] " #181b20
 
 let s:pink     = '#f92672'
 let s:orange   = '#fd971f'
