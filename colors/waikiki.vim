@@ -8,9 +8,8 @@
 " Author: Zhenhuan Hu <zhu@mcw.edu>
 " Date: 2017-02-01
 " License: GPL
-" Note: Based on the Monokai theme for TextMate
-" by Wimer Hazenberg and its darker variant
-" by Hamish Stuart Macpherson
+" Note: Based on the Monokai theme for TextMate by Wimer Hazenberg
+" and its darker variant by Hamish Stuart Macpherson
 " And OneDark UI theme for Atom
 
 " Initialization {{{
@@ -26,6 +25,8 @@ let g:colors_name="waikiki"
 if !has('gui_running') && &t_Co != 256
   finish
 endif
+
+let s:bgsetting = &background
 " }}}
 
 " Functions {{{
@@ -86,18 +87,33 @@ let s:uih = 220 " Hue
 let s:uis = 13  " Saturation
 let s:uil = {'dark': 18, 'light': 66} " Lightness
 
-let s:fg = color#HSLtoHex(s:uih, s:uis, s:uil.light) " #9da5b4
-let s:bg = color#HSLtoHex(s:uih, s:uis, s:uil.dark ) " #282c34
+let s:lt = color#HSLtoHex(s:uih, s:uis, s:uil.light) " #9da5b4
+let s:dk = color#HSLtoHex(s:uih, s:uis, s:uil.dark ) " #282c34
 
-let s:light = color#Lighten(s:fg, 28) " #d1d5dc
-let s:grey1 = color#Lighten(s:fg, 8 ) " #abb2bf
-let s:grey2 = s:fg                    " #9da5b4
-let s:grey3 = color#Darken( s:fg, 48) " #4b5362
-let s:grey4 = color#Lighten(s:bg, 48) " #3c424e
-let s:dark1 = color#Lighten(s:bg, 28) " #333842
-let s:dark2 = s:bg                    " #282c34
-let s:dark3 = color#Darken( s:bg, 16) " #21252b
-let s:black = color#Darken( s:bg, 40) " #181b20
+" s:ltpalette = ['#d1d5dc', '#abb2bf', '#9da5b4', '#6a768a', '#4b5362']
+let s:ltpalette = [
+      \ color#Lighten(s:lt, 28),
+      \ color#Lighten(s:lt, 8 ),
+      \ s:lt,
+      \ color#Darken( s:lt, 28),
+      \ color#Darken( s:lt, 48),
+      \ ]
+" s:dkpalette = ['#3c424e', '#333842', '#282c34', '#21252b', '#181b20']
+let s:dkpalette = [
+      \ color#Lighten(s:dk, 48),
+      \ color#Lighten(s:dk, 28),
+      \ s:dk,
+      \ color#Darken( s:dk, 16),
+      \ color#Darken( s:dk, 40),
+      \ ]
+
+if s:bgsetting ==# 'dark'
+  let s:fgpalette = s:ltpalette
+  let s:bgpalette = s:dkpalette
+else
+  let s:fgpalette = s:dkpalette
+  let s:bgpalette = s:ltpalette
+end
 
 let s:pink     = '#f92672'
 let s:orange   = '#fd971f'
@@ -112,52 +128,52 @@ let s:bgorange = color#HSLtoHex(color#HexToHSL(s:orange)[0], s:uis, s:uil.dark)
 let s:bgyellow = color#HSLtoHex(color#HexToHSL(s:yellow)[0], s:uis, s:uil.dark)
 let s:bggreen  = color#HSLtoHex(color#HexToHSL(s:green )[0], s:uis, s:uil.dark)
 
-call s:SetColor("Normal", s:light, s:bg)
-call s:SetColor("Cursor", s:black, s:light)
-call s:SetBgColor("CursorLine", s:dark1)
-call s:SetBgColor("CursorColumn", s:dark1)
-call s:SetBgColor("Visual", s:grey4)
-call s:SetBgColor("VisualNOS", s:grey4)
-call s:SetBgColor("ColorColumn", s:dark3)
-call s:SetColor("SignColumn", s:green, s:dark3)
-call s:SetColor("LineNr", s:grey3, s:dark3)
+call s:SetColor("Normal", s:fgpalette[0], s:bgpalette[2])
+call s:SetColor("Cursor", s:bgpalette[4], s:fgpalette[0])
+call s:SetBgColor("CursorLine", s:bgpalette[1])
+call s:SetBgColor("CursorColumn", s:bgpalette[1])
+call s:SetBgColor("Visual", s:bgpalette[0])
+call s:SetBgColor("VisualNOS", s:bgpalette[0])
+call s:SetBgColor("ColorColumn", s:bgpalette[3])
+call s:SetColor("SignColumn", s:green, s:bgpalette[3])
+call s:SetColor("LineNr", s:fgpalette[4], s:bgpalette[3])
 call s:SetFgColor("CursorLineNr", s:orange)
-call s:SetColor("VertSplit", s:grey3, s:dark3)
-call s:SetColor("FoldColumn", s:grey3, s:dark3)
-call s:SetColor("Folded", s:fg, s:black)
-call s:SetColor("Conceal", s:fg, s:black)
-call s:SetColor("MatchParen", s:black, s:orange, "bold")
-call s:SetColor("Pmenu", s:black, s:fg)
-call s:SetColor("PmenuSel", s:black, s:cyan)
-call s:SetBgColor("PmenuSbar", s:dark3)
+call s:SetColor("VertSplit", s:fgpalette[4], s:bgpalette[3])
+call s:SetColor("FoldColumn", s:fgpalette[4], s:bgpalette[3])
+call s:SetColor("Folded", s:fgpalette[2], s:bgpalette[4])
+call s:SetColor("Conceal", s:fgpalette[2], s:bgpalette[4])
+call s:SetColor("MatchParen", s:bgpalette[4], s:orange, "bold")
+call s:SetColor("Pmenu", s:bgpalette[4], s:fgpalette[2])
+call s:SetColor("PmenuSel", s:bgpalette[4], s:cyan)
+call s:SetBgColor("PmenuSbar", s:bgpalette[3])
 call s:SetFgColor("PmenuThumb", s:cyan)
-call s:SetColor("TabLine", s:fg, s:black)
-call s:SetColor("TabLineFill", s:black, s:black)
-call s:SetColor("TabLineSel", s:black, s:fg)
-call s:SetColor("StatusLine", s:black, s:fg)
-call s:SetColor("StatusLineNC", s:fg, s:black)
-call s:SetColor("WildMenu", s:black, s:cyan)
-call s:SetColor("IncSearch", s:black, s:cyan)
-call s:SetColor("Search", s:black, s:orange)
-call s:SetFgColor("NonText", s:grey3)
-call s:SetFgColor("SpecialKey", s:grey3, "italic")
+call s:SetColor("TabLine", s:fgpalette[2], s:bgpalette[4])
+call s:SetColor("TabLineFill", s:bgpalette[4], s:bgpalette[4])
+call s:SetColor("TabLineSel", s:bgpalette[4], s:fgpalette[2])
+call s:SetColor("StatusLine", s:bgpalette[4], s:fgpalette[2])
+call s:SetColor("StatusLineNC", s:fgpalette[2], s:bgpalette[4])
+call s:SetColor("WildMenu", s:bgpalette[4], s:cyan)
+call s:SetColor("IncSearch", s:bgpalette[4], s:cyan)
+call s:SetColor("Search", s:bgpalette[4], s:orange)
+call s:SetFgColor("NonText", s:fgpalette[4])
+call s:SetFgColor("SpecialKey", s:fgpalette[4], "italic")
 call s:SetFgColor("Title", s:green, "underline")
 call s:SetFgColor("Directory", s:green, "bold")
 call s:SetFgColor("Question", s:cyan, "bold")
-call s:SetColor("ErrorMsg", s:pink, s:bg, "bold")
+call s:SetColor("ErrorMsg", s:pink, s:bgpalette[2], "bold")
 call s:SetFgColor("ModeMsg", s:yellow, "bold")
 call s:SetFgColor("MoreMsg", s:yellow, "bold")
-call s:SetColor("WarningMsg", s:orange, s:bg, "bold")
-call s:SetColor("DiffAdd", s:fg, s:bggreen)
-call s:SetColor("DiffDelete", s:fg, s:bgpink)
-call s:SetColor("DiffChange", s:fg, s:bgyellow)
+call s:SetColor("WarningMsg", s:orange, s:bgpalette[2], "bold")
+call s:SetColor("DiffAdd", s:fgpalette[2], s:bggreen)
+call s:SetColor("DiffDelete", s:fgpalette[2], s:bgpink)
+call s:SetColor("DiffChange", s:fgpalette[2], s:bgyellow)
 call s:SetColor("DiffText", s:orange, s:bgyellow)
 
 if has("spell")
   call s:SetSpColor("SpellBad", s:pink)
   call s:SetSpColor("SpellCap", s:lavender)
   call s:SetSpColor("SpellLocal", s:lavender)
-  call s:SetSpColor("SpellRare", s:light)
+  call s:SetSpColor("SpellRare", s:fgpalette[0])
 endif
 
 " Comment
@@ -199,13 +215,13 @@ call s:SetFgColor("SpecialChar", s:lavender, "italic")
 call s:SetFgColor("SpecialComment", s:ash, "bold,italic")
 call s:SetFgColor("Tag", s:pink, "italic")
 " Other
-call s:SetColor("Error", s:pink, s:bg, "undercurl")
-call s:SetFgColor("Ignore", s:bg)
+call s:SetColor("Error", s:pink, s:bgpalette[2], "undercurl")
+call s:SetFgColor("Ignore", s:bgpalette[2])
 call s:SetFgColor("Todo", s:ash, "bold,italic")
-call s:SetColor("Underlined", s:light, s:bg, "underline")
+call s:SetColor("Underlined", s:fgpalette[0], s:bgpalette[2], "underline")
 
 " Must be at the end, because of ctermbg=234 bug.
 " https://groups.google.com/forum/#!msg/vim_dev/afPqwAFNdrU/nqh6tOM87QUJ
-set background=dark
+let &background = s:bgsetting
 
 " vim: set sw=2 ts=2 sts=2 et tw=80 ft=vim fdm=marker:
