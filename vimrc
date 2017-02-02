@@ -146,4 +146,4 @@ if has('unix')
 elseif has('win32')
   let g:ctrlp_cache_dir = $HOME . '/_ctrlp'
 endif
-
+let g:ctrlp_root_markers = ['vimrc']
