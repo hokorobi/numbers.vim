@@ -136,6 +136,7 @@ let g:netrw_liststyle = 3    " Tree view
 let g:netrw_list_hide = netrw_gitignore#Hide() . ',\(^\|\s\s\)\zs\.\S\+'
 
 " Configure vim-airline
+let g:airline#extensions#wordcount#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_left_sep = ' >>> '
 let g:airline_right_sep = ' <<< '
