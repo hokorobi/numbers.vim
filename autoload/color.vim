@@ -14,17 +14,17 @@
 " - 'HSL' refers to an array of [h, s, l]
 "   where h in the set [0, 360], s, l in the set [0, 100]
 " color-format patterns:
-let s:patterns = {}
-let s:patterns['hex']      = '\v#?(\x{2})(\x{2})(\x{2})'
-let s:patterns['shortHex'] = '\v#(\x{1})(\x{1})(\x{1})' " Short version is more strict: starting # mandatory
-"let s:patterns['rgb']  = '\vrgb\s*\((\d+)\s*,(\d+)\s*,(\d+)\s*)\s*'
-"let s:patterns['rgba'] = '\vrgba\s*\((\d+)\s*,(\d+)\s*,(\d+)\s*,(\d+)\s*)\s*'
+let s:patterns = {
+      \ 'hex' : '\v#?(\x{2})(\x{2})(\x{2})',
+      \ 'rgb' : '\vrgb\s*\((\d+)\s*,(\d+)\s*,(\d+)\s*)\s*',
+      \ 'rgba': '\vrgba\s*\((\d+)\s*,(\d+)\s*,(\d+)\s*,(\d+)\s*)\s*',
+      \ }
 
 " Functions: {{{1
 
 " @params  String       string   The string to test
 " @returns Boolean     [0 or 1]  if string matches: rrggbb OR #rrggbb OR #rgb
-fu! color#Test (string)
+fu! color#Test(string)
   for key in keys(s:patterns)
     if a:string =~# s:patterns[key]
       return 1
@@ -35,40 +35,20 @@ endfu
 
 " @params (r, g, b|[r, g, b])
 " @returns String       A RGB color
-fu! color#RGBtoHex (...)
-  let [r, g, b] = ( a:0 == 1 ? a:1 : a:000 )
-  let num = printf('%02x', r)
-        \ . printf('%02x', g)
-        \ . printf('%02x', b)
-  return '#' . num
+fu! color#RGBtoHex(...)
+  let [r, g, b] = (a:0 == 1 ? a:1 : a:000)
+  return printf('#%02x%02x%02x', r, g, b)
 endfu
 
 " @param {String|Number} color
-fu! color#HexToRGB (color)
-  if type(a:color) == 2
-    let color = printf('%x', a:color)
-  else
-    let color = a:color | end
-
+fu! color#HexToRGB(color)
+  let color = (type(a:color) == v:t_number ? printf('%x', a:color) : a:color)
   let matches = matchlist(color, s:patterns['hex'])
-  let factor  = 0x1
-
-  if empty(matches)
-    let matches = matchlist(color, s:patterns['shortHex'])
-    let factor  = 0x10
-  end
-
   if len(matches) < 4
-    echohl Error
-    echom 'Could not parse ' . string(color) . ' ' .  string(matches)
-    echohl None
-    return | end
-
-  let r = str2nr(matches[1], 16) * factor
-  let g = str2nr(matches[2], 16) * factor
-  let b = str2nr(matches[3], 16) * factor
-
-  return [r, g, b]
+    echohl Error | echom 'Could not parse ' . string(color) | echohl None
+    return
+  endif
+  return map(matches[1: 3], 'str2nr(v:val, 16)')
 endfu
 
 " Converts an HSL color value to RGB. Conversion formula
@@ -81,7 +61,7 @@ endfu
 " @param   Number  l
 " @returns Array [r, g, b]     The RGB representation
 fu! color#HSLtoRGB(...) " (h, s, l)
-  let [h, s, l] = ( a:0 == 1 ? a:1 : a:000 )
+  let [h, s, l] = (a:0 == 1 ? a:1 : a:000)
 
   if s == 0 " Achromatic
     let r = float2nr(round(l * 2.55))
@@ -123,7 +103,7 @@ endfu
 " @param   Number  b
 " @returns Array [h, s, l]     The HSL representation
 fu! color#RGBtoHSL(...)
-  let [r, g, b] = ( a:0 == 1 ? a:1 : a:000 )
+  let [r, g, b] = (a:0 == 1 ? a:1 : a:000)
 
   let max = max([r, g, b]) / 255.0
   let min = min([r, g, b]) / 255.0
@@ -155,13 +135,13 @@ fu! color#RGBtoHSL(...)
 endfu
 
 " Composed functions:
-fu! color#HexToHSL (color)
+fu! color#HexToHSL(color)
   let [r, g, b] = color#HexToRGB(a:color)
   return color#RGBtoHSL(r, g, b)
 endfu
 
-fu! color#HSLtoHex (...)
-  let [h, s, l] = ( a:0 == 1 ? a:1 : a:000 )
+fu! color#HSLtoHex(...)
+  let [h, s, l] = (a:0 == 1 ? a:1 : a:000)
   let [r, g, b] = color#HSLtoRGB(h, s, l)
   return color#RGBtoHex(r, g, b)
 endfu
@@ -172,8 +152,7 @@ fu! color#Lighten(color, ...)
   let amount = 1 + ((a:0 ? a:1 : 5) / 100.0)
   let hsl = color#HexToHSL(a:color)
   let hsl[2] = hsl[2] * amount > 100.0 ? 100 : float2nr(round(hsl[2] * amount))
-  let hex = color#HSLtoHex(hsl)
-  return hex
+  return color#HSLtoHex(hsl)
 endfu
 
 " @params String                 color      The color
@@ -182,13 +161,12 @@ fu! color#Darken(color, ...)
   let amount = 1 - ((a:0 ? a:1 : 5) / 100.0)
   let hsl = color#HexToHSL(a:color)
   let hsl[2] = hsl[2] * amount < 0.0 ? 0 : float2nr(round(hsl[2] * amount))
-  let hex = color#HSLtoHex(hsl)
-  return hex
+  return color#HSLtoHex(hsl)
 endfu
 
 " Find the closest xterm-256 approximation to the given RGB value
 " @params (r, g, b|[r, g, b])
-" @returns Number     Between 0 and 255, compatible with xterm.
+" @returns Number       Between 0 and 255, compatible with xterm.
 fu! color#RGBtoShort(...)
   let [r, g, b] = ( a:0 == 1 ? a:1 : a:000 )
   let incs = [0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff]
@@ -206,11 +184,14 @@ fu! color#RGBtoShort(...)
       let i += 1
     endwhile
   endfor
-  let hex = '#'
-        \ . printf('%02x', closest[0])
-        \ . printf('%02x', closest[1])
-        \ . printf('%02x', closest[2])
+  let hex = call('printf', ['#%02x%02x%02x'] + closest)
   return s:hex_to_short[hex]
+endfu
+
+" @params  String       color      The color
+" @returns Number       Between 0 and 255, compatible with xterm.
+fu! color#HexToShort(color)
+  return color#RGBtoShort(color#HexToRGB(a:color))
 endfu
 
 " Color look-up table
