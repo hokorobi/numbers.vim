@@ -30,48 +30,53 @@ endif
 
 " Functions {{{
 fu! s:SetColor(name, fg, bg, ...)
+  let fg = (type(a:fg) == 3 ? a:fg : [a:fg, color#HexToShort(a:fg)])
+  let bg = (type(a:bg) == 3 ? a:bg : [a:bg, color#HexToShort(a:bg)])
   execute "hi" a:name
-        \ "guifg=" . a:fg
-        \ "guibg=" . a:bg
+        \ "guifg=" . fg[0]
+        \ "guibg=" . bg[0]
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
   if &t_Co == 256
     execute "hi" a:name
-          \ "ctermfg=" . color#HexToShort(a:fg)
-          \ "ctermbg=" . color#HexToShort(a:bg)
+          \ "ctermfg=" . fg[1]
+          \ "ctermbg=" . bg[1]
           \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
   endif
 endf
 
 fu! s:SetFgColor(name, fg, ...)
+  let fg = (type(a:fg) == 3 ? a:fg : [a:fg, color#HexToShort(a:fg)])
   execute "hi" a:name
-        \ "guifg=" . a:fg
+        \ "guifg=" . fg[0]
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
   if &t_Co == 256
     execute "hi" a:name
-          \ "ctermfg=" . color#HexToShort(a:fg)
+          \ "ctermfg=" . fg[1]
           \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
   endif
 endf
 
 fu! s:SetBgColor(name, bg, ...)
+  let bg = (type(a:bg) == 3 ? a:bg : [a:bg, color#HexToShort(a:bg)])
   execute "hi" a:name
-        \ "guibg=" . a:bg
+        \ "guibg=" . bg[0]
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
   if &t_Co == 256
     execute "hi" a:name
-          \ "ctermbg=" . color#HexToShort(a:bg)
+          \ "ctermbg=" . bg[1]
           \ "cterm=" . (a:0 > 0 ? a:1 : "NONE")
   endif
 endf
 
 fu! s:SetSpColor(name, sp)
+  let sp = (type(a:sp) == 3 ? a:sp : [a:sp, color#HexToShort(a:sp)])
   execute "hi" a:name
-        \ "guisp=" . a:sp
+        \ "guisp=" . sp[0]
         \ "gui=undercurl"
   if &t_Co == 256
     execute "hi" a:name
           \ "ctermfg=bg"
-          \ "ctermbg=" . color#HexToShort(a:sp)
+          \ "ctermbg=" . sp[1]
   endif
 endf
 " }}}
@@ -81,18 +86,18 @@ let s:uih = 220 " Hue
 let s:uis = 13  " Saturation
 let s:uil = {'dark': 18, 'light': 66} " Lightness
 
-let s:fg = color#HSLtoHex(s:uih, s:uis, s:uil.light) " #9da5b4
-let s:bg = color#HSLtoHex(s:uih, s:uis, s:uil.dark ) " #282c34
+let s:fg = [color#HSLtoHex(s:uih, s:uis, s:uil.light), 248] " #9da5b4
+let s:bg = [color#HSLtoHex(s:uih, s:uis, s:uil.dark ), 236] " #282c34
 
-let s:light = color#Lighten(s:fg, 28) " #d1d5dc
-let s:grey1 = color#Lighten(s:fg, 8 ) " #abb2bf
-let s:grey2 = s:fg                    " #9da5b4
-let s:grey3 = color#Darken( s:fg, 48) " #4b5362
-let s:grey4 = color#Lighten(s:bg, 48) " #3c424e
-let s:dark1 = color#Lighten(s:bg, 28) " #333842
-let s:dark2 = s:bg                    " #282c34
-let s:dark3 = color#Darken( s:bg, 16) " #21252b
-let s:black = color#Darken( s:bg, 40) " #181b20
+let s:light = [color#Lighten(s:fg, 28), 252] " #d1d5dc
+let s:grey1 = [color#Lighten(s:fg, 8 ), 249] " #abb2bf
+let s:grey2 = s:fg                           " #9da5b4
+let s:grey3 = [ color#Darken(s:fg, 48), 240] " #4b5362
+let s:grey4 = [color#Lighten(s:bg, 48), 238] " #3c424e
+let s:dark1 = [color#Lighten(s:bg, 28), 237] " #333842
+let s:dark2 = s:bg                           " #282c34
+let s:dark3 = [ color#Darken(s:bg, 16), 235] " #21252b
+let s:black = [ color#Darken(s:bg, 40), 234] " #181b20
 
 let s:pink     = '#f92672'
 let s:orange   = '#fd971f'
