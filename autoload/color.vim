@@ -169,23 +169,18 @@ endfu
 " @returns Number       Between 0 and 255, compatible with xterm.
 fu! color#RGBtoShort(...)
   let [r, g, b] = ( a:0 == 1 ? a:1 : a:000 )
-  let incs = [0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff]
-  let closest = []
-  for part in [r, g, b]
-    let i = 0
-    while (i < len(incs) - 1)
-      let [lower, upper] = [incs[i], incs[i + 1]]
-      if part >= lower && part <= upper
-        let lowerdiff = abs(lower - part)
-        let upperdiff = abs(upper - part)
-        let closest += [lowerdiff < upperdiff ? lower : upper]
-        break
-      endif
-      let i += 1
-    endwhile
+  let best_key = ''
+  let best_dst = -1
+  for key in keys(s:hex_to_short)
+    let [kr, kg, kb] = color#HexToRGB(key)
+    let dr = r - kr | let dg = g - kg | let db = b - kb
+    let dist = dr * dr + dg * dg + db * db
+    if best_dst == -1 || dist < best_dst
+      let best_dst = dist
+      let best_key = key
+    endif
   endfor
-  let hex = call('printf', ['%02x%02x%02x'] + closest)
-  return s:hex_to_short[hex]
+  return s:hex_to_short[best_key]
 endfu
 
 " @params  String       color      The color
