@@ -81,13 +81,13 @@ inoremap <S-Up> <C-o>{
 nnoremap <S-Down> }
 inoremap <S-Down> <C-o>}
 
-nnoremap <F9> :silent bp
-vnoremap <F9> :<C-u>silent bp
-inoremap <F9> <Esc>:silent bp
+nnoremap <F9> :silent bp<CR>
+vnoremap <F9> :<C-u>silent bp<CR>
+inoremap <F9> <Esc>:silent bp<CR>
 
-nnoremap <F10> :silent bn
-vnoremap <F10> :<C-u>silent bn
-inoremap <F10> <Esc>:silent bn
+nnoremap <F10> :silent bn<CR>
+vnoremap <F10> :<C-u>silent bn<CR>
+inoremap <F10> <Esc>:silent bn<CR>
 
 if !has('macunix')
   nnoremap <C-z> u
@@ -139,3 +139,11 @@ let g:netrw_list_hide = netrw_gitignore#Hide() . ',\(^\|\s\s\)\zs\.\S\+'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_left_sep = ' >>> '
 let g:airline_right_sep = ' <<< '
+
+" Configure ctrlpif
+if has('unix')
+  let g:ctrlp_cache_dir = $HOME . '/.ctrlp'
+elseif has('win32')
+  let g:ctrlp_cache_dir = $HOME . '/_ctrlp'
+endif
+
