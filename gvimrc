@@ -1,5 +1,5 @@
 " Basic interface settings
-set guioptions-=T lines=35 columns=120
+set guioptions-=T lines=40 columns=120
 
 " Set fonts
 if has('gui_macvim')
