@@ -22,9 +22,19 @@ let s:bgsetting = &background
 " }}}
 
 " Functions {{{
+let s:palette_mapping_cache = {}
+
 fu! s:SetColor(name, fg, bg, ...)
-  let fg = (type(a:fg) == 3 ? a:fg : [a:fg, color#HexToShort(a:fg)])
-  let bg = (type(a:bg) == 3 ? a:bg : [a:bg, color#HexToShort(a:bg)])
+  if type(a:fg) == 1 && !has_key(s:palette_mapping_cache, a:fg)
+    let s:palette_mapping_cache[a:fg] = (&t_Co == 256 ?
+          \ color#HexToShort(a:fg) : '')
+  endif
+  if type(a:bg) == 1 && !has_key(s:palette_mapping_cache, a:bg)
+    let s:palette_mapping_cache[a:bg] = (&t_Co == 256 ?
+          \ color#HexToShort(a:bg) : '')
+  endif
+  let fg = (type(a:fg) == 3 ? a:fg : [a:fg, s:palette_mapping_cache[a:fg]])
+  let bg = (type(a:bg) == 3 ? a:bg : [a:bg, s:palette_mapping_cache[a:bg]])
   execute "hi" a:name
         \ "guifg=" . fg[0]
         \ "guibg=" . bg[0]
@@ -38,7 +48,11 @@ fu! s:SetColor(name, fg, bg, ...)
 endf
 
 fu! s:SetFgColor(name, fg, ...)
-  let fg = (type(a:fg) == 3 ? a:fg : [a:fg, color#HexToShort(a:fg)])
+  if type(a:fg) == 1 && !has_key(s:palette_mapping_cache, a:fg)
+    let s:palette_mapping_cache[a:fg] = (&t_Co == 256 ?
+          \ color#HexToShort(a:fg) : '')
+  endif
+  let fg = (type(a:fg) == 3 ? a:fg : [a:fg, s:palette_mapping_cache[a:fg]])
   execute "hi" a:name
         \ "guifg=" . fg[0]
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
@@ -50,7 +64,11 @@ fu! s:SetFgColor(name, fg, ...)
 endf
 
 fu! s:SetBgColor(name, bg, ...)
-  let bg = (type(a:bg) == 3 ? a:bg : [a:bg, color#HexToShort(a:bg)])
+  if type(a:bg) == 1 && !has_key(s:palette_mapping_cache, a:bg)
+    let s:palette_mapping_cache[a:bg] = (&t_Co == 256 ?
+          \ color#HexToShort(a:bg) : '')
+  endif
+  let bg = (type(a:bg) == 3 ? a:bg : [a:bg, s:palette_mapping_cache[a:bg]])
   execute "hi" a:name
         \ "guibg=" . bg[0]
         \ "gui=" . (a:0 > 0 ? a:1 : "NONE")
@@ -62,7 +80,11 @@ fu! s:SetBgColor(name, bg, ...)
 endf
 
 fu! s:SetSpColor(name, sp)
-  let sp = (type(a:sp) == 3 ? a:sp : [a:sp, color#HexToShort(a:sp)])
+  if type(a:sp) == 1 && !has_key(s:palette_mapping_cache, a:sp)
+    let s:palette_mapping_cache[a:sp] = (&t_Co == 256 ?
+          \ color#HexToShort(a:sp) : '')
+  endif
+  let sp = (type(a:sp) == 3 ? a:sp : [a:sp, s:palette_mapping_cache[a:sp]])
   execute "hi" a:name
         \ "guisp=" . sp[0]
         \ "gui=undercurl"
