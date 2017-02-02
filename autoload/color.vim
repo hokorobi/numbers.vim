@@ -185,8 +185,7 @@ fu! color#RGBtoShort(...)
     endwhile
   endfor
   let hex = call('printf', ['#%02x%02x%02x'] + closest)
-  return float2nr(round(r / 51.0 * 36 + g / 51.0 * 6 + b / 51.0 + 16))
-"   return s:hex_to_short[hex]
+  return s:hex_to_short[hex]
 endfu
 
 " @params  String       color      The color
