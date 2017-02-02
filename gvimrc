@@ -1,7 +1,7 @@
 " Basic interface settings
 set guioptions-=T lines=35 columns=120
 
-" Set fonts 
+" Set fonts
 if has('gui_macvim')
   set guifont=Source\ Code\ Pro:h14
 elseif has('gui_win32')
