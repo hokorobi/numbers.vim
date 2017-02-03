@@ -141,10 +141,13 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline_left_sep = ' >>> '
 let g:airline_right_sep = ' <<< '
 
-" Configure ctrlpif
+" Configure ctrlp
 if has('unix')
   let g:ctrlp_cache_dir = $HOME . '/.ctrlp'
 elseif has('win32')
   let g:ctrlp_cache_dir = $HOME . '/_ctrlp'
 endif
 let g:ctrlp_root_markers = ['vimrc']
+
+" Configure delimitMate
+let g:delimitMate_expand_cr = 0
