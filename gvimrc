@@ -1,6 +1,9 @@
 " Basic interface settings
 set guioptions-=T lines=40 columns=120
 
+" Balloon
+set balloonexpr=keny#FoldSpellBalloon() ballooneval
+
 " Set fonts
 if has('gui_macvim')
   set guifont=Source\ Code\ Pro:h14
