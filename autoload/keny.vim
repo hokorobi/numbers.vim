@@ -7,30 +7,58 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! keny#ToggleComments(leader, ...)
-  if getline('.') !=# ''
-    let l:leader = escape(a:leader, '\/*')
-    let l:tail   = a:0 > 0 ? escape(a:1, '\/*') : ''
-    " Add or remove commenting syntax depending on
-    " whether there is commenting syntax at the beginning of a line
-    if getline('.') =~ '^' . l:leader . '\(.*\)' . l:tail . '$'
-      silent exec 's/^' . l:leader . '\(.*\)' . l:tail . '$/\1/'
+  if getline('.') !~# '^\s*$'
+    " Save the value of last search register
+    let saved_last_search_pattern = @/
+    " Toggle line comments
+    let leader = escape(a:leader, '\/*')
+    let tail   = a:0 > 0 ? escape(a:1, '\/*') : ''
+    if getline('.') =~# '^' . leader . '\(.*\)' . tail . '$'
+      silent exec 's/^' . leader . '\(.*\)' . tail . '$/\1/'
     else
-      silent exec 's/^\(.*\)$/' . l:leader . '\1' . l:tail . '/'
+      silent exec 's/^\(.*\)$/' . leader . '\1' . tail . '/'
     endif
+    " Restore the value of last search register
+    " and thus remove highlighting of whitespaces
+    let @/ = saved_last_search_pattern
   endif
-  " Move cursor to the beginning of the next line
+  " Move cursor to the next line
   silent exec 'normal! +'
   return ''
 endfunction
 
 function! keny#SplitLineNicely()
-  " Save previous value of last search register
-  let l:saved_last_search_pattern = @/
-  " :substitute replaces the content of the register with the
-  " pattern highlighting all whitespaces in the file
+  " Save the value of last search register
+  let saved_last_search_pattern = @/
+  " This will highlight all whitespaces
   substitute /\s\+/\r/g
-  " Restore previous search register
-  let @/ = l:saved_last_search_pattern
+  " Restore the value of last search register
+  " and thus remove highlighting of whitespaces
+  let @/ = saved_last_search_pattern
+endfunction
+
+function! keny#FoldSpellBalloon()
+  let lines = []
+  if foldclosed(v:beval_lnum) >= 0
+    " If the cursor is on a fold    
+    let fold_start = foldclosed(v:beval_lnum)
+    let fold_end = foldclosedend(v:beval_lnum)
+    let n_lines_folded = fold_end - fold_start + 1
+    " If too many lines in fold, show only the first 14
+    " and the last 14 lines
+    if (n_lines_folded > 31)
+      let lines = getline(fold_start, fold_start + 14)
+      let lines += ['-- Snipped ' . (n_lines_folded - 30) . ' lines --']
+      let lines += getline(fold_end - 14, fold_end)
+    else
+      " If less than 30 lines, show all of them
+      let lines = getline(fold_start, fold_end)
+    endif
+  elseif len(spellbadword(v:beval_text)[0]) > 0
+    " If the cursor is on a misspelled word
+    let lines = spellsuggest(spellbadword(v:beval_text)[0], 5, 0)
+  endif
+  return join(lines, has("balloon_multiline") ? "\n" : " ")
 endfunction
 
 let &cpo = s:save_cpo

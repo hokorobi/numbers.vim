@@ -30,6 +30,9 @@ endif
 " Basic interface elements
 set number ruler showcmd showmode wildmenu laststatus=2
 
+" Balloon
+set balloonexpr=keny#FoldSpellBalloon() ballooneval
+
 " Indentation, wrap, and white spaces
 set autoindent softtabstop=2 shiftwidth=2 expandtab wrap
 let &showbreak = "\u2192"
