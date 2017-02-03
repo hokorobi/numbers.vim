@@ -28,7 +28,8 @@ if has('multi_byte')
 endif
 
 " Basic interface elements
-set number ruler showcmd showmode wildmenu laststatus=2
+set number foldcolumn=3 foldlevel=5 ruler laststatus=2
+set showcmd showmode wildmenu
 
 " Indentation, wrap, and white spaces
 set autoindent softtabstop=2 shiftwidth=2 expandtab wrap
