@@ -113,7 +113,7 @@ syn match sasMacroReserved "\v\%%(abort|by|copy|display|do|else|end|global|goto|
 syn cluster sasBasicSyntax contains=sasOperator,sasReserved,sasNumber,sasString,sasFormatTag,sasComment,sasFunction,sasMacroReserved,sasMacroFunc,sasMacroVariable,sasSectLbl
 
 " Define statements that can be accessed out of data step or procedure sections
-syn match sasGlobalStatement "\v%(^|;)@<=\s*%(catname|data|dm|endsas|filename|footnote\d*|libname|lock|options|page|proc( \w+)=|quit|run|run cancel|sasfile|skip|sysecho|title\d*)>" display
+syn match sasGlobalStatement "\v%(^|;)@<=\s*%(catname|data|dm|endsas|filename|footnote\d*|libname|lock|options|page|proc%( \w+)=|quit|run|run cancel|sasfile|skip|sysecho|title\d*)>" display
 syn match sasGlobalStatement "\v%(^|;)@<=\s*ods%( %(chtml|csvall|docbook|document|escapechar|exclude|graphics|html3|html|htmlcss|imode|listing|markup|output|package|path|pcl|pdf|preferences|phtml|printer|proclabel|proctitle|ps|results|rtf|select|show|tagsets\.%(chtml|core|csv|csvall|csvbyline|default|docbook|excelxp|html4|htmlcss|htmlpanel|imode|msoffice2k|mvshtml|phtml|pyx|rtf|sasreport|wml|wmlolist|xhtml)|trace|usegopt|verify|wml))=>" display
 
 " Data step statements, 9.4
