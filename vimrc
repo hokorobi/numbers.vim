@@ -30,6 +30,7 @@ endif
 " Basic interface elements
 set number foldcolumn=3 foldlevel=5 ruler laststatus=2
 set showcmd showmode wildmenu
+set scrolloff=3 sidescrolloff=3
 
 " Indentation, wrap, and white spaces
 set autoindent softtabstop=2 shiftwidth=2 expandtab wrap
