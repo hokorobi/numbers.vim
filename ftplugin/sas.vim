@@ -10,7 +10,7 @@ set cpo&vim
 " Local settings
 setlocal softtabstop=2 shiftwidth=2 expandtab conceallevel=3
 setlocal hidden omnifunc=sascomplete#Complete
-setlocal cms=/*%s*/
+setlocal cms=/*%s*/ foldmethod=syntax
 setlocal makeprg=sas\ -noverbose\ -sysin\ '%:p'
 
 " Find autoexec files from $PATH
@@ -23,8 +23,8 @@ endfor
 " Restore view
 augroup SASView
   autocmd!
-  au BufWritePost,BufLeave,WinLeave *.sas mkview
   au BufWinEnter *.sas silent loadview
+  au BufWritePost,BufLeave,WinLeave *.sas mkview
 augroup END
 
 " Key mappings
