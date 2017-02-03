@@ -6,13 +6,16 @@ let g:loaded_keny = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! keny#ToggleComments(leader, ...)
+function! keny#ToggleComments()
   if getline('.') !~# '^\s*$'
     " Save the value of last search register
     let saved_last_search_pattern = @/
+    " Retrieve leader and tail from &cms
+    let escape_chars = '\/*'
+    let [leader, tail] = map(split(substitute(substitute(
+          \ &cms, '\S\zs%s',' %s','') ,'%s\ze\S', '%s ', ''), '%s', 1),
+          \ 'escape(v:val, escape_chars)')
     " Toggle line comments
-    let leader = escape(a:leader, '\/*')
-    let tail   = a:0 > 0 ? escape(a:1, '\/*') : ''
     if getline('.') =~# '^' . leader . '\(.*\)' . tail . '$'
       silent exec 's/^' . leader . '\(.*\)' . tail . '$/\1/'
     else

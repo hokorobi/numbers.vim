@@ -7,13 +7,15 @@ let b:did_ftplugin = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
-" Enable spell check
-setlocal textwidth=78 formatoptions+=t spell spelllang=en_us
+" Local settings
+setlocal textwidth=78 formatoptions+=t
+setlocal spell spelllang=en_us
+setlocal cms=<!--%s-->
 
 " Set comment toggle
-nnoremap <buffer> <silent> <F5> :call keny#ToggleComments('<!-- ', ' -->')<CR>
-vnoremap <buffer> <silent> <F5> :call keny#ToggleComments('<!-- ', ' -->')<CR>
-inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments('<!-- ', ' -->')<CR>
+nnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
+vnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
+inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments()<CR>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

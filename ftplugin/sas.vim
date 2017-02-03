@@ -10,6 +10,7 @@ set cpo&vim
 " Local settings
 setlocal softtabstop=2 shiftwidth=2 expandtab conceallevel=3
 setlocal hidden omnifunc=sascomplete#Complete
+setlocal cms=/*%s*/
 setlocal makeprg=sas\ -noverbose\ -sysin\ '%:p'
 
 " Find autoexec files from $PATH
@@ -44,9 +45,9 @@ vnoremap <buffer> <silent> <F8> :<C-u>call <SID>RunSAS()<CR>
 inoremap <buffer> <silent> <F8> <C-o>:call <SID>RunSAS()<CR>
 
 " Set comment toggle
-nnoremap <buffer> <silent> <F5> :call keny#ToggleComments('/* ', ' */')<CR>
-vnoremap <buffer> <silent> <F5> :call keny#ToggleComments('/* ', ' */')<CR>
-inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments('/* ', ' */')<CR>
+nnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
+vnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
+inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments()<CR>
 
 " Local functions
 function! s:SwitchSASBuffer(dest, readwrite)

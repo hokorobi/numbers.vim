@@ -7,10 +7,13 @@ let b:did_ftplugin = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
+" Local settings
+setlocal cms=\"%s
+
 " Set comment toggle
-nnoremap <buffer> <silent> <F5> :call keny#ToggleComments('" ')<CR>
-vnoremap <buffer> <silent> <F5> :call keny#ToggleComments('" ')<CR>
-inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments('" ')<CR>
+nnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
+vnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
+inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments()<CR>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

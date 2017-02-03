@@ -9,6 +9,7 @@ set cpo&vim
 
 " Local settings
 setlocal softtabstop=4 shiftwidth=4 expandtab
+setlocal cms=#%s
 
 " Set compiler
 setlocal makeprg=python
@@ -23,9 +24,9 @@ vnoremap <buffer> <silent> <S-F8> :w !python3<CR>
 inoremap <buffer> <silent> <S-F8> <C-o>:w !python3<CR>
 
 " Set comment toggle
-nnoremap <buffer> <silent> <F5> :call keny#ToggleComments('# ')<CR>
-vnoremap <buffer> <silent> <F5> :call keny#ToggleComments('# ')<CR>
-inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments('# ')<CR>
+nnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
+vnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
+inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments()<CR>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
