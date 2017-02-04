@@ -1,4 +1,7 @@
-" Basic interface settings
+" Maintainer: Zhenhuan Hu <zhu@mcw.edu>
+" Version: 2017-02-03
+
+" User Interface {{{
 set guioptions-=T lines=40 columns=120
 
 " Set fonts
@@ -10,8 +13,49 @@ elseif has('gui_win32')
     set renderoptions=type:directx,level:0.75,gamma:1.25,contrast:0.25,geom:1,renmode:5,taamode:1
   endif
 endif
+" }}}
 
-" Menus
+" Key Mappings {{{
+" Navigation
+nnoremap <S-Up> {
+inoremap <S-Up> <C-o>{
+nnoremap <S-Down> }
+inoremap <S-Down> <C-o>}
+
+" Switch windows
+nnoremap <C-Up> <C-w>k
+inoremap <C-Up> <C-o><C-w>k
+nnoremap <C-Down> <C-w>j
+inoremap <C-Down> <C-o><C-w>j
+nnoremap <C-Left> <C-w>h
+inoremap <C-Left> <C-o><C-w>h
+nnoremap <C-Right> <C-w>l
+inoremap <C-Right> <C-o><C-w>l
+
+" Move lines
+nnoremap <silent> <M-Up> mz:m-2<CR>`z
+nnoremap <silent> <M-Down> mz:m+<CR>`z
+vnoremap <silent> <M-Up> :m'<-2<CR>`>my`<mzgv`yo`z
+vnoremap <silent> <M-Down> :m'>+<CR>`<my`>mzgv`yo`z
+inoremap <silent> <M-Up> <C-o>mz<C-o>:m-2<CR><C-o>`z
+inoremap <silent> <M-Down> <C-o>mz<C-o>:m+<CR><C-o>`z
+
+vnoremap <silent> <M-Left> <`<0v`>$
+vnoremap <silent> <M-Right> >`<0v`>$
+
+if has('macunix')
+  nmap <D-Up> <M-Up>
+  nmap <D-Down> <M-Down>
+  vmap <D-Up> <M-Up>
+  vmap <D-Down> <M-Down>
+  imap <D-Up> <M-Up>
+  imap <D-Down> <M-Down>
+  vmap <D-Left> <M-Left>
+  vmap <D-Right> <M-Right>
+endif
+" }}}
+
+" Menus {{{
 if has('gui_macvim')
   an 10.326 File.-KSEP1-                                  <Nop>
   an 10.327 File.Reopen\ Using\ Encoding.Unicode\ (UTF-8) :conf e ++enc=utf-8<CR>
@@ -48,3 +92,6 @@ vnoreme <silent> Edit.Convert.Join\ Lines                 J<CR>
 an Edit.Convert.-KSEP3-                                   <Nop>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-8     :setlocal fenc=utf-8<CR>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-16    :setlocal fenc=utf-16<CR>
+" }}}
+
+" vim:foldmethod=marker:foldlevel=0

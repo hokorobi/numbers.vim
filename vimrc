@@ -1,13 +1,13 @@
 " Maintainer: Zhenhuan Hu <zhu@mcw.edu>
-" Version: 2017-01-19
+" Version: 2017-02-03
 
-" set verbose=15 vfile=$HOME/vfile.txt
-
-" General
-set nocompatible noswapfile nobackup autoread
-set backspace=indent,eol,start whichwrap+=<,>,[,]
+" General {{{
+" Enable filetype plugins
 filetype plugin indent on
-fixdel
+
+set nocompatible
+set noswapfile nobackup
+set autoread
 
 " Addtional paths
 if has('unix')
@@ -21,19 +21,23 @@ endif
 " File format options
 set fileformats=unix,dos
 if has('multi_byte')
-  if &termencoding ==# ''
-    let &termencoding = &encoding
-  endif
   set encoding=utf-8 fileencodings=utf-8,gb18030,big5,sjis,latin1
+  if &termencoding ==# '' | let &termencoding = &encoding | endif
 endif
+" }}}
 
-" Basic interface elements
-set number foldcolumn=3 foldlevel=5 ruler laststatus=2
+" User Interface {{{
+set number foldcolumn=3 foldlevelstart=1 ruler laststatus=2
 set showcmd showmode wildmenu
 set scrolloff=3 sidescrolloff=3
 
-" Indentation, wrap, and white spaces
-set autoindent softtabstop=2 shiftwidth=2 expandtab wrap
+" Backspace
+set backspace=indent,eol,start whichwrap+=<,>,[,]
+fixdel
+
+" Indent and wrap
+set wrap
+set autoindent softtabstop=2 shiftwidth=2 expandtab
 let &showbreak = "\u2192"
 if version > 704
   set breakindent breakindentopt+=sbr
@@ -41,8 +45,9 @@ endif
 
 " Searching behaviors
 set hlsearch ignorecase smartcase
+"}}}
 
-" Color
+" Color Scheme {{{
 set background=dark
 colorscheme waikiki
 
@@ -53,8 +58,9 @@ if version >= 500
   endif
   syntax sync fromstart
 endif
+" }}}
 
-" Key mappings
+" Key Mappings {{{
 let mapleader = ','
 nnoremap <leader>, ,
 nnoremap <leader>es :vsplit $MYVIMRC<CR>
@@ -62,27 +68,25 @@ nnoremap <leader>ss :source $MYVIMRC<CR>
 nnoremap <leader>ww :w<CR>
 nnoremap <leader>wq :wq<CR>
 nnoremap <leader>qq :q<CR>
-nnoremap <leader>cd :cd %:p:h<CR>
+nnoremap <leader>tn :tabnew<CR>
+nnoremap <leader>to :tabonly<CR>
+nnoremap <leader>tc :tabclose<CR>
+nnoremap <leader>cd :cd %:p:h<CR>:pwd<CR>
 nnoremap <leader>fi mzgg=G`z
-nnoremap <leader>it "= strftime('%b %d, %Y')<CR>p
-nnoremap <leader>er /error<CR>
-nnoremap <leader>wr /warning<CR>
+nnoremap <leader>sc :setlocal spell!<CR>
 
+" Fold
 nnoremap <leader><Space> za
 vnoremap <leader><Space> zf
-vnoremap <BS> d
 
+" Bracketing
 xnoremap ( c(<C-r>")
 xnoremap [ c[<C-r>"]
 xnoremap { c{<C-r>"}
 xnoremap ' c'<C-r>"'
 xnoremap " c"<C-r>""
 
-nnoremap <S-Up> {
-inoremap <S-Up> <C-o>{
-nnoremap <S-Down> }
-inoremap <S-Down> <C-o>}
-
+" Navigation
 nnoremap <F9> :silent bp<CR>
 vnoremap <F9> :<C-u>silent bp<CR>
 inoremap <F9> <Esc>:silent bp<CR>
@@ -91,7 +95,10 @@ nnoremap <F10> :silent bn<CR>
 vnoremap <F10> :<C-u>silent bn<CR>
 inoremap <F10> <Esc>:silent bn<CR>
 
+" Windows shortcuts
 if !has('macunix')
+  vnoremap <BS> d
+
   nnoremap <C-z> u
   vnoremap <C-z> <Esc>ugv
   inoremap <C-z> <C-o>u
@@ -128,7 +135,9 @@ if !has('macunix')
   vnoremap <C-s> <C-c>:update<CR>
   inoremap <C-s> <C-o>:update<CR>
 endif
+" }}}
 
+" Plugin Configurations {{{
 " Configure netrw
 let g:netrw_banner = 0
 let g:newtw_winsize = 25     " 25% of page size
@@ -153,3 +162,6 @@ let g:ctrlp_root_markers = ['vimrc']
 
 " Configure delimitMate
 let g:delimitMate_expand_cr = 0
+" }}}
+
+" vim:foldmethod=marker:foldlevel=0
