@@ -93,15 +93,15 @@ inoreme <silent> Edit.Insert.Folder\ Listing\.\.\.        <C-r>=globpath(browsed
 an Edit.Insert.-KSEP1-                                    <Nop>
 inoreme <silent> Edit.Insert.Time\ Stamp                  <C-r>=strftime('%c')<CR>
 inoreme <silent> Edit.Insert.Today                        <C-r>=strftime('%b %d, %Y')<CR>
-vnoreme <silent> 20.423 Edit.Convert.Make\ Uppercase      U<CR>
-vnoreme <silent> Edit.Convert.Make\ Lowercase             u<CR>
-vnoreme <silent> Edit.Convert.Toggle\ Case                ~<CR>
+vnoreme <silent> 20.423 Edit.Convert.Make\ Uppercase      Ugv
+vnoreme <silent> Edit.Convert.Make\ Lowercase             ugv
+vnoreme <silent> Edit.Convert.Toggle\ Case                ~gv
 an Edit.Convert.-KSEP1-                                   <Nop>
-vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Left  <<CR>
-vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Right ><CR>
+vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Left  <`>$v`<0<
+vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Right >`<0v`>$>
 an Edit.Convert.-KSEP2-                                   <Nop>
 vnoreme <silent> Edit.Convert.Split\ Line                 :call keny#SplitLineNicely()<CR>
-vnoreme <silent> Edit.Convert.Join\ Lines                 J<CR>
+vnoreme <silent> Edit.Convert.Join\ Lines                 J
 an Edit.Convert.-KSEP3-                                   <Nop>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-8     :setlocal fenc=utf-8<CR>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-16    :setlocal fenc=utf-16<CR>
