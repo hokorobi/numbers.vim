@@ -13,6 +13,11 @@ elseif has('gui_win32')
     set renderoptions=type:directx,level:0.75,gamma:1.25,contrast:0.25,geom:1,renmode:5,taamode:1
   endif
 endif
+
+augroup UserInterface
+  autocmd!
+  autocmd VimResized * exe "normal \<C-w>="
+augroup END
 " }}}
 
 " Key Mappings {{{
