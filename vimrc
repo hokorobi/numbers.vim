@@ -29,7 +29,6 @@ endif
 " User Interface {{{
 set number foldcolumn=3 foldlevelstart=1 ruler laststatus=2
 set showcmd showmode wildmenu
-set scrolloff=3 sidescrolloff=3
 
 " Backspace
 set backspace=indent,eol,start whichwrap+=<,>,[,]
