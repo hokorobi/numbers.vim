@@ -77,6 +77,7 @@ nnoremap <leader>sc :setlocal spell!<CR>
 
 " Searching
 vnoremap / "+y/<C-r>+
+nnoremap <C-l> :nohl<CR><C-l>
 
 " Bracketing
 xnoremap ( c(<C-r>")
