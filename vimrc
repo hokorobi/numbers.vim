@@ -75,9 +75,8 @@ nnoremap <leader>cd :cd %:p:h<CR>:pwd<CR>
 nnoremap <leader>fi mzgg=G`z
 nnoremap <leader>sc :setlocal spell!<CR>
 
-" Fold
-nnoremap <leader><Space> za
-vnoremap <leader><Space> zf
+" Searching
+vnoremap / "+y/<C-r>+
 
 " Bracketing
 xnoremap ( c(<C-r>")

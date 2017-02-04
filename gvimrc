@@ -39,27 +39,27 @@ inoremap <C-Right> <C-o><C-w>l
 
 " Move lines
 nnoremap <silent> <M-Up> mz:m-2<CR>`z
-nnoremap <silent> <M-Down> mz:m+<CR>`z
 vnoremap <silent> <M-Up> :m'<-2<CR>`>v`<
-vnoremap <silent> <M-Down> :m'>+<CR>`<v`>
 inoremap <silent> <M-Up> <C-o>mz<C-o>:m-2<CR><C-o>`z
+nnoremap <silent> <M-Down> mz:m+<CR>`z
+vnoremap <silent> <M-Down> :m'>+<CR>`<v`>
 inoremap <silent> <M-Down> <C-o>mz<C-o>:m+<CR><C-o>`z
 
 nnoremap <silent> <M-Left> V<V0
-nnoremap <silent> <M-Right> V>V$
 vnoremap <silent> <M-Left> <`>$v`<0
+nnoremap <silent> <M-Right> V>V$
 vnoremap <silent> <M-Right> >`<0v`>$
 
 if has('macunix')
   nmap <D-Up> <M-Up>
-  nmap <D-Down> <M-Down>
   vmap <D-Up> <M-Up>
-  vmap <D-Down> <M-Down>
   imap <D-Up> <M-Up>
+  nmap <D-Down> <M-Down>
+  vmap <D-Down> <M-Down>
   imap <D-Down> <M-Down>
   nmap <D-Left> <M-Left>
-  nmap <D-Right> <M-Right>
   vmap <D-Left> <M-Left>
+  nmap <D-Right> <M-Right>
   vmap <D-Right> <M-Right>
 endif
 " }}}
