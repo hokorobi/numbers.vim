@@ -74,6 +74,9 @@ nnoremap <leader>tc :tabclose<CR>
 nnoremap <leader>cd :cd %:p:h<CR>:pwd<CR>
 nnoremap <leader>fi mzgg=G`z
 nnoremap <leader>sc :setlocal spell!<CR>
+vnoremap <leader>uc Ugv
+vnoremap <leader>lc ugv
+vnoremap <leader>tc ~gv
 
 " Searching
 vnoremap / "+y/<C-r>+
