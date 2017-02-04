@@ -97,6 +97,8 @@ vnoreme <silent> 20.423 Edit.Convert.Make\ Uppercase      Ugv
 vnoreme <silent> Edit.Convert.Make\ Lowercase             ugv
 vnoreme <silent> Edit.Convert.Toggle\ Case                ~gv
 an Edit.Convert.-KSEP1-                                   <Nop>
+vnoreme <silent> Edit.Convert.Shift\ Selection\ Up        :m'<-2<CR>`>v`<
+vnoreme <silent> Edit.Convert.Shift\ Selection\ Down      :m'>+<CR>`<v`>
 vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Left  <`>$v`<0<
 vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Right >`<0v`>$>
 an Edit.Convert.-KSEP2-                                   <Nop>
