@@ -45,7 +45,9 @@ vnoremap <silent> <M-Down> :m'>+<CR>`<v`>
 inoremap <silent> <M-Up> <C-o>mz<C-o>:m-2<CR><C-o>`z
 inoremap <silent> <M-Down> <C-o>mz<C-o>:m+<CR><C-o>`z
 
-vnoremap <silent> <M-Left> <`<0v`>$
+nnoremap <silent> <M-Left> V<V0
+nnoremap <silent> <M-Right> V>V$
+vnoremap <silent> <M-Left> <`>$v`<0
 vnoremap <silent> <M-Right> >`<0v`>$
 
 if has('macunix')
@@ -55,6 +57,8 @@ if has('macunix')
   vmap <D-Down> <M-Down>
   imap <D-Up> <M-Up>
   imap <D-Down> <M-Down>
+  nmap <D-Left> <M-Left>
+  nmap <D-Right> <M-Right>
   vmap <D-Left> <M-Left>
   vmap <D-Right> <M-Right>
 endif
