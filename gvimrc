@@ -45,10 +45,12 @@ nnoremap <silent> <M-Down> mz:m+<CR>`z
 vnoremap <silent> <M-Down> :m'>+<CR>`<v`>
 inoremap <silent> <M-Down> <C-o>mz<C-o>:m+<CR><C-o>`z
 
-nnoremap <silent> <M-Left> V<V0
+nnoremap <silent> <M-Left> :call keny#ShiftLineLeftRight(-1)<CR>
 vnoremap <silent> <M-Left> <`>$v`<0
-nnoremap <silent> <M-Right> V>V$
+inoremap <silent> <M-Left> <C-o>:call keny#ShiftLineLeftRight(-1)<CR>
+nnoremap <silent> <M-Right> :call keny#ShiftLineLeftRight(1)<CR>
 vnoremap <silent> <M-Right> >`<0v`>$
+inoremap <silent> <M-Right> <C-o>:call keny#ShiftLineLeftRight(1)<CR>
 
 if has('macunix')
   nmap <D-Up> <M-Up>
@@ -59,8 +61,10 @@ if has('macunix')
   imap <D-Down> <M-Down>
   nmap <D-Left> <M-Left>
   vmap <D-Left> <M-Left>
+  imap <D-Left> <M-Left>
   nmap <D-Right> <M-Right>
   vmap <D-Right> <M-Right>
+  imap <D-Right> <M-Right>
 endif
 " }}}
 

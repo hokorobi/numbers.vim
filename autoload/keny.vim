@@ -40,6 +40,22 @@ function! keny#SplitLineNicely()
   let @/ = saved_last_search_pattern
 endfunction
 
+function! keny#ShiftLineLeftRight(dir)
+  let cur_pos = getpos('.')
+  if a:dir < 0 && getline('.') =~# '^\s\+'
+    let shift = getline('.') =~# '^\s\{' . shiftwidth() . ',}' ?
+          \ shiftwidth() :
+          \ len(matchstr(getline('.'), '^\s\+'))
+    normal! v<
+    let cur_pos[2] -= shift
+  elseif a:dir > 0
+    normal! v>
+    let cur_pos[2] += shiftwidth()
+  endif
+  call cursor(cur_pos[1: 3])
+  return ''  
+endfunction
+
 function! keny#FoldSpellBalloon()
   let lines = []
   if foldclosed(v:beval_lnum) >= 0
