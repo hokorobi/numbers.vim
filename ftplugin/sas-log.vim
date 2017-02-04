@@ -9,15 +9,15 @@ set cpo&vim
 
 " Key mappings
 nnoremap <buffer> <silent> <F2> :call <SID>SwitchSASBuffer('sas', 1)<CR>
-vnoremap <buffer> <silent> <F2> :<C-u>call <SID>SwitchSASBuffer('sas', 1)<CR>
+vnoremap <buffer> <silent> <F2> <C-c>:call <SID>SwitchSASBuffer('sas', 1)<CR>
 inoremap <buffer> <silent> <F2> <Esc>:call <SID>SwitchSASBuffer('sas', 1)<CR>
 
 nnoremap <buffer> <silent> <F3> :call <SID>SwitchSASBuffer('log', 0)<CR>
-vnoremap <buffer> <silent> <F3> :<C-u>call <SID>SwitchSASBuffer('log', 0)<CR>
+vnoremap <buffer> <silent> <F3> <C-c>:call <SID>SwitchSASBuffer('log', 0)<CR>
 inoremap <buffer> <silent> <F3> <Esc>:call <SID>SwitchSASBuffer('log', 0)<CR>
 
 nnoremap <buffer> <silent> <F4> :call <SID>SwitchSASBuffer('lst', 0)<CR>
-vnoremap <buffer> <silent> <F4> :<C-u>call <SID>SwitchSASBuffer('lst', 0)<CR>
+vnoremap <buffer> <silent> <F4> <C-c>:call <SID>SwitchSASBuffer('lst', 0)<CR>
 inoremap <buffer> <silent> <F4> <Esc>:call <SID>SwitchSASBuffer('lst', 0)<CR>
 
 " Local functions
