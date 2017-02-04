@@ -35,8 +35,8 @@ inoremap <C-Right> <C-o><C-w>l
 " Move lines
 nnoremap <silent> <M-Up> mz:m-2<CR>`z
 nnoremap <silent> <M-Down> mz:m+<CR>`z
-vnoremap <silent> <M-Up> :m'<-2<CR>`>my`<mzgv`yo`z
-vnoremap <silent> <M-Down> :m'>+<CR>`<my`>mzgv`yo`z
+vnoremap <silent> <M-Up> :m'<-2<CR>`>v`<
+vnoremap <silent> <M-Down> :m'>+<CR>`<v`>
 inoremap <silent> <M-Up> <C-o>mz<C-o>:m-2<CR><C-o>`z
 inoremap <silent> <M-Down> <C-o>mz<C-o>:m+<CR><C-o>`z
 
