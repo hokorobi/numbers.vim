@@ -6,6 +6,14 @@ let g:loaded_keny = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! keny#SelectAll()
+  if !empty(&selectmode)
+    execute "normal gggH\<C-o>G"
+  else
+    execute "normal ggVG"
+  endif
+endfunction
+
 function! keny#ToggleComments()
   if getline('.') !~# '^\s*$'
     " Save the value of last search register
@@ -27,7 +35,6 @@ function! keny#ToggleComments()
   endif
   " Move cursor to the next line
   silent exec 'normal! +'
-  return ''
 endfunction
 
 function! keny#SplitLinesNicely()
@@ -53,7 +60,6 @@ function! keny#ShiftLineLeftRight(dir)
     let cur_pos[2] += shiftwidth()
   endif
   call cursor(cur_pos[1: 3])
-  return ''
 endfunction
 
 function! keny#StripTrailingWhiteSpaces()

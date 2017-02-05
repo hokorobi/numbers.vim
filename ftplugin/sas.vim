@@ -41,13 +41,17 @@ vnoremap <buffer> <silent> <F4> <C-c>:call <SID>SwitchSASBuffer('lst', 0)<CR>
 inoremap <buffer> <silent> <F4> <Esc>:call <SID>SwitchSASBuffer('lst', 0)<CR>
 
 nnoremap <buffer> <silent> <F8> :call <SID>RunSAS()<CR>
-vnoremap <buffer> <silent> <F8> <C-c>:call <SID>RunSAS()<CR><C-\><C-g>
+vnoremap <buffer> <silent> <F8> :call <SID>RunSAS()<CR>
 inoremap <buffer> <silent> <F8> <C-o>:call <SID>RunSAS()<CR>
+cnoremap <buffer> <silent> <F8> <C-c>:call <SID>RunSAS()<CR>
+onoremap <buffer> <silent> <F8> <C-c>:call <SID>RunSAS()<CR>
 
 " Set comment toggle
 nnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
 vnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
-inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments()<CR>
+inoremap <buffer> <silent> <F5> <C-o>:call keny#ToggleComments()<CR>
+cnoremap <buffer> <silent> <F5> <C-c>:call keny#ToggleComments()<CR>
+onoremap <buffer> <silent> <F5> <C-c>:call keny#ToggleComments()<CR>
 
 " Local functions
 function! s:SwitchSASBuffer(dest, readwrite)

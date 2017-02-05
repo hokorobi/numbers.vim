@@ -14,11 +14,15 @@ setlocal cms=#%s
 nnoremap <buffer> <silent> <F8> :w !perl<CR>
 vnoremap <buffer> <silent> <F8> :w !perl<CR>
 inoremap <buffer> <silent> <F8> <C-o>:w !perl<CR>
+cnoremap <buffer> <silent> <F8> <C-c>:w !perl<CR>
+onoremap <buffer> <silent> <F8> <C-c>:w !perl<CR>
 
 " Set comment toggle
 nnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
 vnoremap <buffer> <silent> <F5> :call keny#ToggleComments()<CR>
-inoremap <buffer> <silent> <F5> <C-r>=keny#ToggleComments()<CR>
+inoremap <buffer> <silent> <F5> <C-o>:call keny#ToggleComments()<CR>
+cnoremap <buffer> <silent> <F5> <C-c>:call keny#ToggleComments()<CR>
+onoremap <buffer> <silent> <F5> <C-c>:call keny#ToggleComments()<CR>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
