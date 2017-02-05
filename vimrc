@@ -64,7 +64,7 @@ let mapleader = ','
 nnoremap <leader>, ,
 nnoremap <leader>es :vsplit $MYVIMRC<CR>
 nnoremap <leader>ss :source $MYVIMRC<CR>
-nnoremap <leader>ww :w<CR>
+nnoremap <leader>ww :update<CR>
 nnoremap <leader>wq :wq<CR>
 nnoremap <leader>qq :q<CR>
 nnoremap <leader>tn :tabnew<CR>
@@ -77,12 +77,12 @@ nnoremap <leader>vp vip
 nnoremap <leader>cd :cd %:p:h<CR>:pwd<CR>
 nnoremap <leader>fi mzgg=G`z
 nnoremap <leader>sc :setlocal spell!<CR>
-vnoremap <leader>uc Ugv
-vnoremap <leader>lc ugv
-vnoremap <leader>tc ~gv
+xnoremap <leader>uc Ugv
+xnoremap <leader>lc ugv
+xnoremap <leader>tc ~gv
 
 " Searching
-vnoremap / "+y/<C-r>+
+xnoremap / "+y/<C-r>+
 nnoremap <C-l> :nohl<CR><C-l>
 
 " Bracketing
@@ -93,29 +93,27 @@ xnoremap ' c'<C-r>"'
 xnoremap " c"<C-r>""
 
 " Navigation
-nnoremap <F9> :silent bp<CR>
-vnoremap <F9> :<C-u>silent bp<CR>
-inoremap <F9> <Esc>:silent bp<CR>
-
-nnoremap <F10> :silent bn<CR>
-vnoremap <F10> :<C-u>silent bn<CR>
-inoremap <F10> <Esc>:silent bn<CR>
+nnoremap G Gzz
+nnoremap n nzz
+nnoremap N Nzz
+nnoremap { {zz
+nnoremap } }zz
 
 " Windows shortcuts
 if !has('macunix')
   vnoremap <BS> d
 
   nnoremap <C-z> u
-  vnoremap <C-z> <Esc>ugv
+  vnoremap <C-z> <C-c>ugv
   inoremap <C-z> <C-o>u
   cnoremap <C-z> <C-c>u
-  onoremap <C-z> <Esc>u
+  onoremap <C-z> <C-c>u
 
   nnoremap <C-y> <C-r>
-  vnoremap <C-y> <Esc><C-r>gv
+  vnoremap <C-y> <C-c><C-r>gv
   inoremap <C-y> <C-o><C-r>
   cnoremap <C-y> <C-c><C-r>
-  onoremap <C-y> <Esc><C-r>
+  onoremap <C-y> <C-c><C-r>
 
   vnoremap <C-x> "+x
   vnoremap <C-c> "+y
@@ -131,15 +129,11 @@ if !has('macunix')
   exec 'vnoremap <script> <C-v>' paste#paste_cmd['v']
   exec 'inoremap <script> <C-v>' '<C-g>u' . paste#paste_cmd['i']
 
-  nnoremap <silent> <C-a> gggH<C-o>G
-  vnoremap <C-a> <Esc>gggH<C-o>G
-  inoremap <C-a> <C-o>gg<C-o>gH<C-o>G
-  cnoremap <C-a> <C-c>gggH<C-o>G
-  onoremap <C-a> <Esc>gggH<C-o>G
-
-  nnoremap <C-s> :update<CR>
-  vnoremap <C-s> <C-c>:update<CR>
-  inoremap <C-s> <C-o>:update<CR>
+  nnoremap <silent> <C-a> :call keny#SelectAll()<CR>
+  vnoremap <silent> <C-a> :call keny#SelectAll()<CR>
+  inoremap <silent> <C-a> <C-o>:call keny#SelectAll()<CR>
+  cnoremap <silent> <C-a> <C-c>:call keny#SelectAll()<CR>
+  onoremap <silent> <C-a> <C-c>:call keny#SelectAll()<CR>
 endif
 " }}}
 

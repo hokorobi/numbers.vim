@@ -22,17 +22,31 @@ augroup END
 
 " Key Mappings {{{
 " Navigation
-nnoremap <S-Up> {
-vnoremap <S-Up> <C-c>{
-inoremap <S-Up> <C-o>{
-nnoremap <S-Down> }
-vnoremap <S-Down> <C-c>}
-inoremap <S-Down> <C-o>}
+nnoremap <S-Up> {zz
+vnoremap <S-Up> <C-c>{zz
+inoremap <S-Up> <C-o>{<C-o>zz
+nnoremap <S-Down> }zz
+vnoremap <S-Down> <C-c>}zz
+inoremap <S-Down> <C-o>}<C-o>zz
 
 nnoremap <C-S-Up> 1<C-u>
 nnoremap <C-S-Down> 1<C-d>
 
+" Switch buffers
+nnoremap <silent> <S-Tab> :bn<CR>
+vnoremap <silent> <S-Tab> <C-c>:bn<CR>
+inoremap <silent> <S-Tab> <C-o>:bn<CR> 
+
+" Switch tabs
+nnoremap <silent> <C-Tab> :tabnext<CR>
+vnoremap <silent> <C-Tab> <C-c>:tabnext<CR>
+inoremap <silent> <C-Tab> <C-o>:tabnext<CR>
+
 " Switch windows
+nnoremap <C-S-Tab> <C-w>w
+vnoremap <C-S-Tab> <C-c><C-w>w
+inoremap <C-S-Tab> <C-o><C-w>w
+
 nnoremap <C-Up> <C-w>k
 vnoremap <C-Up> <C-c><C-w>k
 inoremap <C-Up> <C-o><C-w>k
@@ -54,11 +68,11 @@ nnoremap <silent> <M-Down> mz:m+<CR>`z
 vnoremap <silent> <M-Down> :m'>+<CR>`<v`>
 inoremap <silent> <M-Down> <C-\><C-o>mz<C-o>:m+<CR><C-o>`z
 
-nnoremap <silent> <M-Left> :call keny#ShiftLineLeftRight(-1)<CR>
 vnoremap <silent> <M-Left> <`>$v`<0
+nnoremap <silent> <M-Left> :call keny#ShiftLineLeftRight(-1)<CR>
 inoremap <silent> <M-Left> <C-o>:call keny#ShiftLineLeftRight(-1)<CR>
-nnoremap <silent> <M-Right> :call keny#ShiftLineLeftRight(1)<CR>
 vnoremap <silent> <M-Right> >`<0v`>$
+nnoremap <silent> <M-Right> :call keny#ShiftLineLeftRight(1)<CR>
 inoremap <silent> <M-Right> <C-o>:call keny#ShiftLineLeftRight(1)<CR>
 
 if has('macunix')
