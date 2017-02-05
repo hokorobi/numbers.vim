@@ -30,11 +30,7 @@ vnoremap <S-Down> <C-c>}
 inoremap <S-Down> <C-o>}
 
 nnoremap <C-S-Up> 1<C-u>
-vnoremap <C-S-Up> <C-c>1<C-u>
-inoremap <C-S-Up> <C-o>1<C-u>
 nnoremap <C-S-Down> 1<C-d>
-vnoremap <C-S-Down> <C-c>1<C-d>
-inoremap <C-S-Down> <C-o>1<C-d>
 
 " Switch windows
 nnoremap <C-Up> <C-w>k
