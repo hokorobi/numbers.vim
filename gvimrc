@@ -23,27 +23,33 @@ augroup END
 " Key Mappings {{{
 " Navigation
 nnoremap <S-Up> {
+vnoremap <S-Up> <C-c>{
 inoremap <S-Up> <C-o>{
 nnoremap <S-Down> }
+vnoremap <S-Down> <C-c>}
 inoremap <S-Down> <C-o>}
 
 " Switch windows
 nnoremap <C-Up> <C-w>k
+vnoremap <C-Up> <C-c><C-w>k
 inoremap <C-Up> <C-o><C-w>k
 nnoremap <C-Down> <C-w>j
+vnoremap <C-Down> <C-c><C-w>j
 inoremap <C-Down> <C-o><C-w>j
 nnoremap <C-Left> <C-w>h
+vnoremap <C-Left> <C-c><C-w>h
 inoremap <C-Left> <C-o><C-w>h
 nnoremap <C-Right> <C-w>l
+vnoremap <C-Right> <C-c><C-w>l
 inoremap <C-Right> <C-o><C-w>l
 
 " Move lines
 nnoremap <silent> <M-Up> mz:m-2<CR>`z
 vnoremap <silent> <M-Up> :m'<-2<CR>`>v`<
-inoremap <silent> <M-Up> <C-o>mz<C-o>:m-2<CR><C-o>`z
+inoremap <silent> <M-Up> <C-\><C-o>mz<C-o>:m-2<CR><C-o>`z
 nnoremap <silent> <M-Down> mz:m+<CR>`z
 vnoremap <silent> <M-Down> :m'>+<CR>`<v`>
-inoremap <silent> <M-Down> <C-o>mz<C-o>:m+<CR><C-o>`z
+inoremap <silent> <M-Down> <C-\><C-o>mz<C-o>:m+<CR><C-o>`z
 
 nnoremap <silent> <M-Left> :call keny#ShiftLineLeftRight(-1)<CR>
 vnoremap <silent> <M-Left> <`>$v`<0
@@ -69,6 +75,7 @@ endif
 " }}}
 
 " Menus {{{
+" Main menu: File
 if has('gui_macvim')
   an 10.326 File.-KSEP1-                                  <Nop>
   an 10.327 File.Reopen\ Using\ Encoding.Unicode\ (UTF-8) :conf e ++enc=utf-8<CR>
@@ -86,13 +93,28 @@ an File.Reopen\ Using\ Encoding.Japanese\ (ISO-2022-JP)   :conf e ++enc=iso-2022
 an File.Reopen\ Using\ Encoding.Japanese\ (EUC-JP)        :conf e ++enc=euc-jp<CR>
 an File.Reopen\ Using\ Encoding.Western\ (Latin-1)        :conf e ++enc=latin1<CR>
 
+" Main menu: Edit
 an 20.421 Edit.-KSEP1-                                    <Nop>
-inoreme <silent> 20.422 Edit.Insert.File\ Path\.\.\.      <C-r>=browse(0, "Insert File Path", $HOME, '')<CR>
-inoreme <silent> Edit.Insert.Folder\ Path\.\.\.           <C-r>=browsedir("Insert Folder Path", $HOME)<CR>
-inoreme <silent> Edit.Insert.Folder\ Listing\.\.\.        <C-r>=globpath(browsedir("Insert Folder Listing", $HOME), '*')<CR>
+nnoreme <silent> 20.422 Edit.Insert.File\ Path\.\.\.      "=browse(0, 'Insert File Path', expand('%:p:h'), '')<CR>P
+inoreme <silent> Edit.Insert.File\ Path\.\.\.             <C-r>=browse(0, 'Insert File Path', expand('%:p:h'), '')<CR>
+nnoreme <silent> Edit.Insert.Folder\ Path\.\.\.           "=browsedir('Insert Folder Path', expand('%:p:h'))<CR>P
+inoreme <silent> Edit.Insert.Folder\ Path\.\.\.           <C-r>=browsedir('Insert Folder Path', expand('%:p:h'))<CR>
 an Edit.Insert.-KSEP1-                                    <Nop>
+nnoreme <silent> Edit.Insert.Current\ Filename            "=expand('%')<CR>P
+inoreme <silent> Edit.Insert.Current\ Filename            <C-r>=expand('%')<CR>
+nnoreme <silent> Edit.Insert.Current\ Filename\ &&\ Path  "=expand('%:p')<CR>P
+inoreme <silent> Edit.Insert.Current\ Filename\ &&\ Path  <C-r>=expand('%:p')<CR>
+nnoreme <silent> Edit.Insert.Current\ Working\ Path       "=expand('%:p:h')<CR>P
+inoreme <silent> Edit.Insert.Current\ Working\ Path       <C-r>=expand('%:p:h')<CR>
+an Edit.Insert.-KSEP2-                                    <Nop>
+nnoreme <silent> Edit.Insert.Time\ Stamp                  "=strftime('%c')<CR>P
 inoreme <silent> Edit.Insert.Time\ Stamp                  <C-r>=strftime('%c')<CR>
+nnoreme <silent> Edit.Insert.Today                        "=strftime('%b %d, %Y')<CR>P
 inoreme <silent> Edit.Insert.Today                        <C-r>=strftime('%b %d, %Y')<CR>
+nnoreme <silent> Edit.Insert.Today\ (mm/dd/yy)            "=strftime('%m/%d/%y')<CR>P
+inoreme <silent> Edit.Insert.Today\ (mm/dd/yy)            <C-r>=strftime('%m/%d/%y')<CR>
+nnoreme <silent> Edit.Insert.Today\ (yyyy-mm-dd)          "=strftime('%Y-%m-%d')<CR>P
+inoreme <silent> Edit.Insert.Today\ (yyyy-mm-dd)          <C-r>=strftime('%Y-%m-%d')<CR>
 vnoreme <silent> 20.423 Edit.Convert.Make\ Uppercase      Ugv
 vnoreme <silent> Edit.Convert.Make\ Lowercase             ugv
 vnoreme <silent> Edit.Convert.Toggle\ Case                ~gv
@@ -102,11 +124,51 @@ vnoreme <silent> Edit.Convert.Shift\ Selection\ Down      :m'>+<CR>`<v`>
 vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Left  <`>$v`<0<
 vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Right >`<0v`>$>
 an Edit.Convert.-KSEP2-                                   <Nop>
-vnoreme <silent> Edit.Convert.Split\ Line                 :call keny#SplitLineNicely()<CR>
+vnoreme <silent> Edit.Convert.Split\ Lines                :call keny#SplitLinesNicely()<CR>
 vnoreme <silent> Edit.Convert.Join\ Lines                 J
 an Edit.Convert.-KSEP3-                                   <Nop>
+vnoreme <silent> Edit.Convert.Strip\ Trailing\ Blanks     :call keny#StripTrailingWhiteSpaces()<CR>
+vnoreme <silent> Edit.Convert.Merge\ Blank\ Lines         :call keny#MergeBlankLines()<CR>
+an Edit.Convert.-KSEP4-                                   <Nop>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-8     :setlocal fenc=utf-8<CR>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-16    :setlocal fenc=utf-16<CR>
+
+" Popup menu
+nnoremenu PopUp.-KSEP1-                                   <Nop>
+nnoremenu <silent> PopUp.Current\ Filename                "=expand('%')<CR>P
+nnoremenu <silent> PopUp.Current\ Filename\ &&\ Path      "=expand('%:p')<CR>P
+nnoremenu <silent> PopUp.Current\ Working\ Path           "=expand('%:p:h')<CR>P
+nnoremenu PopUp.-KSEP2-                                   <Nop>
+nnoremenu <silent> PopUp.Time\ Stamp                      "=strftime('%c')<CR>P
+nnoremenu <silent> PopUp.Today                            "=strftime('%b %d, %Y')<CR>P
+nnoremenu <silent> PopUp.Today\ (mm/dd/yy)                "=strftime('%m/%d/%y')<CR>P
+nnoremenu <silent> PopUp.Today\ (yyyy-mm-dd)              "=strftime('%Y-%m-%d')<CR>P
+
+inoremenu PopUp.-KSEP1-                                   <Nop>
+inoremenu <silent> PopUp.Current\ Filename                <C-r>=expand('%')<CR>
+inoremenu <silent> PopUp.Current\ Filename\ &&\ Path      <C-r>=expand('%:p')<CR>
+inoremenu <silent> PopUp.Current\ Working\ Path           <C-r>=expand('%:p:h')<CR>
+inoremenu PopUp.-KSEP2-                                   <Nop>
+inoremenu <silent> PopUp.Time\ Stamp                      <C-r>=strftime('%c')<CR>
+inoremenu <silent> PopUp.Today                            <C-r>=strftime('%b %d, %Y')<CR>
+inoremenu <silent> PopUp.Today\ (mm/dd/yy)                <C-r>=strftime('%m/%d/%y')<CR>
+inoremenu <silent> PopUp.Today\ (yyyy-mm-dd)              <C-r>=strftime('%Y-%m-%d')<CR>
+
+vnoremenu PopUp.-KSEP1-                                   <Nop>
+vnoremenu <silent> PopUp.Make\ Uppercase                  Ugv
+vnoremenu <silent> PopUp.Make\ Lowercase                  ugv
+vnoremenu <silent> PopUp.Toggle\ Case                     ~gv
+vnoremenu PopUp.-KSEP2-                                   <Nop>
+vnoremenu <silent> PopUp.Shift\ Selection\ Up             :m'<-2<CR>`>v`<
+vnoremenu <silent> PopUp.Shift\ Selection\ Down           :m'>+<CR>`<v`>
+vnoremenu <silent> PopUp.Shift\ Selection\ to\ Left       <`>$v`<0<
+vnoremenu <silent> PopUp.Shift\ Selection\ to\ Right      >`<0v`>$>
+vnoremenu PopUp.-KSEP3-                                   <Nop>
+vnoremenu <silent> PopUp.Split\ Lines                     :call keny#SplitLinesNicely()<CR>
+vnoremenu <silent> PopUp.Join\ Lines                      J
+vnoremenu PopUp.-KSEP4-                                   <Nop>
+vnoremenu <silent> PopUp.Strip\ Trailing\ Blanks          :call keny#StripTrailingWhiteSpaces()<CR>
+vnoremenu <silent> PopUp.Merge\ Blank\ Lines              :call keny#MergeBlankLines()<CR>
 " }}}
 
 " vim:foldmethod=marker:foldlevel=0

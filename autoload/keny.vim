@@ -30,11 +30,11 @@ function! keny#ToggleComments()
   return ''
 endfunction
 
-function! keny#SplitLineNicely()
+function! keny#SplitLinesNicely()
   " Save the value of last search register
   let saved_last_search_pattern = @/
   " This will highlight all whitespaces
-  substitute /\s\+/\r/g
+  substitute /\s\+/\r/ge
   " Restore the value of last search register
   " and thus remove highlighting of whitespaces
   let @/ = saved_last_search_pattern
@@ -53,13 +53,31 @@ function! keny#ShiftLineLeftRight(dir)
     let cur_pos[2] += shiftwidth()
   endif
   call cursor(cur_pos[1: 3])
-  return ''  
+  return ''
+endfunction
+
+function! keny#StripTrailingWhiteSpaces()
+  " Save the value of last search register
+  let saved_last_search_pattern = @/
+  substitute /\s\+$//e
+  " Restore the value of last search register
+  " and thus remove highlighting of whitespaces
+  let @/ = saved_last_search_pattern
+endfunction
+
+function! keny#MergeBlankLines()
+  " Save the value of last search register
+  let saved_last_search_pattern = @/
+  substitute /\n\{3,}/\r\r/ge
+  " Restore the value of last search register
+  " and thus remove highlighting of whitespaces
+  let @/ = saved_last_search_pattern
 endfunction
 
 function! keny#FoldSpellBalloon()
   let lines = []
   if foldclosed(v:beval_lnum) >= 0
-    " If the cursor is on a fold    
+    " If the cursor is on a fold
     let fold_start = foldclosed(v:beval_lnum)
     let fold_end = foldclosedend(v:beval_lnum)
     let n_lines_folded = fold_end - fold_start + 1
