@@ -115,21 +115,22 @@ nnoreme <silent> Edit.Insert.Today\ (mm/dd/yy)            "=strftime('%m/%d/%y')
 inoreme <silent> Edit.Insert.Today\ (mm/dd/yy)            <C-r>=strftime('%m/%d/%y')<CR>
 nnoreme <silent> Edit.Insert.Today\ (yyyy-mm-dd)          "=strftime('%Y-%m-%d')<CR>P
 inoreme <silent> Edit.Insert.Today\ (yyyy-mm-dd)          <C-r>=strftime('%Y-%m-%d')<CR>
+
 vnoreme <silent> 20.423 Edit.Convert.Make\ Uppercase      Ugv
 vnoreme <silent> Edit.Convert.Make\ Lowercase             ugv
 vnoreme <silent> Edit.Convert.Toggle\ Case                ~gv
 an Edit.Convert.-KSEP1-                                   <Nop>
 vnoreme <silent> Edit.Convert.Shift\ Selection\ Up        :m'<-2<CR>`>v`<
 vnoreme <silent> Edit.Convert.Shift\ Selection\ Down      :m'>+<CR>`<v`>
-vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Left  <`>$v`<0<
-vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Right >`<0v`>$>
+vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Left  <`>$v`<0
+vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Right >`<0v`>$
 an Edit.Convert.-KSEP2-                                   <Nop>
+vnoreme <silent> Edit.Convert.Wrap\ Lines                 gqgv
+vnoreme <silent> Edit.Convert.Join\ Lines                 Jgv
 vnoreme <silent> Edit.Convert.Split\ Lines                :call keny#SplitLinesNicely()<CR>
-vnoreme <silent> Edit.Convert.Join\ Lines                 J
-an Edit.Convert.-KSEP3-                                   <Nop>
 vnoreme <silent> Edit.Convert.Strip\ Trailing\ Blanks     :call keny#StripTrailingWhiteSpaces()<CR>
 vnoreme <silent> Edit.Convert.Merge\ Blank\ Lines         :call keny#MergeBlankLines()<CR>
-an Edit.Convert.-KSEP4-                                   <Nop>
+an Edit.Convert.-KSEP3-                                   <Nop>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-8     :setlocal fenc=utf-8<CR>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-16    :setlocal fenc=utf-16<CR>
 
@@ -161,14 +162,14 @@ vnoremenu <silent> PopUp.Toggle\ Case                     ~gv
 vnoremenu PopUp.-KSEP2-                                   <Nop>
 vnoremenu <silent> PopUp.Shift\ Selection\ Up             :m'<-2<CR>`>v`<
 vnoremenu <silent> PopUp.Shift\ Selection\ Down           :m'>+<CR>`<v`>
-vnoremenu <silent> PopUp.Shift\ Selection\ to\ Left       <`>$v`<0<
-vnoremenu <silent> PopUp.Shift\ Selection\ to\ Right      >`<0v`>$>
+vnoremenu <silent> PopUp.Shift\ Selection\ to\ Left       <`>$v`<0
+vnoremenu <silent> PopUp.Shift\ Selection\ to\ Right      >`<0v`>$
 vnoremenu PopUp.-KSEP3-                                   <Nop>
+vnoremenu <silent> PopUp.Wrap\ Lines                      gqgv
+vnoremenu <silent> PopUp.Join\ Lines                      Jgv
 vnoremenu <silent> PopUp.Split\ Lines                     :call keny#SplitLinesNicely()<CR>
-vnoremenu <silent> PopUp.Join\ Lines                      J
-vnoremenu PopUp.-KSEP4-                                   <Nop>
-vnoremenu <silent> PopUp.Strip\ Trailing\ Blanks          :call keny#StripTrailingWhiteSpaces()<CR>
 vnoremenu <silent> PopUp.Merge\ Blank\ Lines              :call keny#MergeBlankLines()<CR>
+vnoremenu <silent> PopUp.Strip\ Trailing\ Blanks          :call keny#StripTrailingWhiteSpaces()<CR>
 " }}}
 
 " vim:foldmethod=marker:foldlevel=0
