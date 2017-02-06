@@ -26,7 +26,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 " Initialization
-let g:numbers_save_number = [&number, &relativenumber]
+let g:numbers_original_settings = [&number, &relativenumber]
 let g:numbers_enable_at_startup = get(g:, 'numbers_enable_at_startup', 1)
 let g:numbers_windows_excluded = get(g:, 'windows_excluded',
       \ ['unite', 'tagbar', 'startify', 'gundo', 'vimshell', 'w3m', 'nerdtree']

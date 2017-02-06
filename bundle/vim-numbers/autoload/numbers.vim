@@ -38,7 +38,7 @@ function! numbers#Enable()
 endfunction
 
 function! numbers#Disable()
-  let [&number, &relativenumber] = g:numbers_save_number
+  let [&number, &relativenumber] = g:numbers_original_settings
   augroup NumbersAutoCommand
     autocmd!
   augroup END
