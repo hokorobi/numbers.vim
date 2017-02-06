@@ -2,7 +2,7 @@
 " Maintainer:     Mahdi Yusuf <yusuf.mahdi@gmail.com>
 "                 Zhenhuan Hu <zhu@mcw.edu>
 " Version:        1.0.0
-" Description:    vim plugin for automatic switching between absolute and
+" Description:    vim plugin for intelligently switching between absolute and
 "                 relative line numbers.
 " Last Change:    Feb 06, 2017
 " License:        MIT License
