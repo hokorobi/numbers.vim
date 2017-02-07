@@ -1,8 +1,12 @@
 " Vim syntax file
 " Language:     SAS
 " Maintainer:   Zhen-Huan Hu <wildkeny@gmail.com>
-" Version:      2.0.5
-" Last Change:  2017-01-21
+" Version:      2.1.0
+" Last Change:  Feb 06, 2017
+"
+" 2017 Feb 6
+"
+" Add syntax folding marks
 "
 " 2016 Oct 10
 "
