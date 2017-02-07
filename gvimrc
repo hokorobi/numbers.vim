@@ -32,11 +32,6 @@ inoremap <S-Down> <C-o>}<C-o>zz
 nnoremap <C-S-Up> 1<C-u>
 nnoremap <C-S-Down> 1<C-d>
 
-" Switch buffers
-nnoremap <silent> <S-Tab> :bn<CR>
-vnoremap <silent> <S-Tab> <C-c>:bn<CR>
-inoremap <silent> <S-Tab> <C-o>:bn<CR> 
-
 " Switch tabs
 nnoremap <silent> <C-Tab> :tabnext<CR>
 vnoremap <silent> <C-Tab> <C-c>:tabnext<CR>
