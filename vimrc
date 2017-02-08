@@ -93,6 +93,7 @@ xnoremap ' c'<C-r>"'
 xnoremap " c"<C-r>""
 
 " Navigation
+nnoremap gg ggzz
 nnoremap G Gzz
 nnoremap n nzz
 nnoremap N Nzz
