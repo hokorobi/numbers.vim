@@ -3,8 +3,8 @@ numbers.vim
 
 This is a fork of the numbers.vim plugin originally developed by Mahdi Yusuf.
 The majority of the plugin codes have been rewritten, including bug fixes and
-an alternative approach to determine whether number column is needed. Manual
-toggle commands have been removed from the original plugin.
+an alternative approach to determine whether a number column is needed.
+Manual toggle commands have been removed from the original plugin.
 
 This plugin alternates between relative numbering (`relativenumber`) and
 absolute numbering (`number`) for the active window depending on the current
