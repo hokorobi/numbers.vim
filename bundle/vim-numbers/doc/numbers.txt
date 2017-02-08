@@ -18,8 +18,9 @@ Help on using numbers                                                *numbers*
 
 The |numbers| plugin intelligently alternates between relative numbering
 (|relativenumber|) and absolute numbering (|number|) for the active window
-depending on the mode you are in. In a GUI, it also functions based on whether
-or not the app has focus.
+depending on the current mode. Relative numbering is used in |Normal| mode
+while absolute numbering is used in |Insert| mode. In a GUI, it also functions
+based on whether or not the app has focus.
 
 ==============================================================================
 2. CONFIGURATION                                       *numbers-configuration*
@@ -40,8 +41,10 @@ g:numbers_windows_excluded~
 
 Default: ['unite', 'tagbar', 'startify', 'gundo', 'vimshell', 'w3m']
 
-If you see numbers where they don't belong like in the help menus or other vim
-plugins, be sure to add your plugins to the exclusion list.
+The plugin should already be able to determine whether a number column is
+needed under most situations. If you see number columns where they don't
+belong like in the help menus or other vim plugin windows, you can add the
+plugins to the exclusion list.
 
 ==============================================================================
 3. COMMANDS                                                 *numbers-commands*
