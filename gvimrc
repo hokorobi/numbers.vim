@@ -21,6 +21,10 @@ augroup END
 " }}}
 
 " Key Mappings {{{
+" Searching
+xnoremap <C-f> y:promptfind <C-r>"<CR>
+xnoremap <C-h> y:promptrepl <C-r>"<CR>
+
 " Navigation
 nnoremap <S-Up> {zz
 vnoremap <S-Up> <C-c>{zz
