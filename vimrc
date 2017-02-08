@@ -83,6 +83,8 @@ xnoremap <leader>tc ~gv
 
 " Searching
 xnoremap / "+y/<C-r>+
+xnoremap <C-f> y:promptfind <C-r>"<CR>
+xnoremap <C-h> y:promptrepl <C-r>"<CR>
 nnoremap <C-l> :nohl<CR><C-l>
 
 " Bracketing
