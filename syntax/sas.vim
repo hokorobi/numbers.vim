@@ -1,10 +1,10 @@
 " Vim syntax file
 " Language:     SAS
 " Maintainer:   Zhen-Huan Hu <wildkeny@gmail.com>
-" Version:      2.1.0
-" Last Change:  Feb 06, 2017
+" Version:      2.1.1
+" Last Change:  Feb 09, 2017
 "
-" 2017 Feb 6
+" 2017 Feb 9
 "
 " Add syntax folding marks
 "
@@ -123,7 +123,7 @@ syn match sasGlobalStatement "\v%(^|;)@1<=\s*ods%( %(chtml|csvall|docbook|docume
 " Data step statements, 9.4
 syn keyword sasDataStepControl by continue do else end go goto if leave link otherwise over return select then to until when while contained
 syn match sasDataStepStatement "\v%(^|;)@1<=\s*%(abort|array|attrib|by|call|cards|cards4|datalines|datalines4|%(dcl|declare)%( %(hash|hiter|javaobj))=|delete|describe|display|drop|error|execute|file|format|infile|informat|input|keep|label|length|lines|lines4|list|lostcard|merge|modify|output|put|putlog|redirect|remove|rename|replace|retain|set|stop|update|where|window)>" display contained
-syn region sasDataStep start="\v%(^|;)@1<=\s*data>" end="\v%(^|;)@1<=\s*(run>|((data|proc|endsas)>)@=)" fold contains=@sasBasicSyntax,sasGlobalStatement,sasDataStepControl,sasDataStepStatement
+syn region sasDataStep start="\v%(^|;)@1<=\s*data>" end="\v%(^|;)@1<=%(\s*%(data|endsas|proc|run)>)@=" fold contains=@sasBasicSyntax,sasGlobalStatement,sasDataStepControl,sasDataStepStatement
 
 " Procedures, base SAS, 9.4
 syn match sasProcStatement "\v%(^|;)@1<=\s*%(abort|age|append|array|attrib|audit|block|break|by|calid|cdfplot|change|checkbox|class|classlev|column|compute|contents|copy|create|datarow|dbencoding|define|delete|deletefunc|deletesubr|delimiter|device|dialog|dur|endcomp|exact|exchange|exclude|explore|fin|fmtlib|fontfile|fontpath|format|formats|freq|function|getnames|guessingrows|hbar|hdfs|histogram|holidur|holifin|holistart|holivar|id|idlabel|informat|inset|invalue|item|key|keylabel|keyword|label|line|link|listfunc|listsubr|mapmiss|mapreduce|mean|menu|messages|meta|modify|opentype|outargs|outdur|outfin|output|outstart|pageby|partial|picture|pie|pig|plot|ppplot|printer|probplot|profile|prompter|qqplot|radiobox|ranks|rbreak|rbutton|rebuild|record|remove|rename|repair|report|roptions|save|select|selection|separator|source|star|start|statistics|struct|submenu|subroutine|sum|sumby|table|tables|test|text|trantab|truetype|type1|types|value|var|vbar|ways|weight|where|with|write)>" display contained
@@ -132,35 +132,35 @@ syn match sasProcStatement "\v%(^|;)@1<=\s*%(band|bubble|colaxis|compare|density
 " ODS procedures, 9.4
 syn match sasProcStatement "\v%(^|;)@1<=\s*%(categoryaxis|chartattrs|copy|delete|dir|doc|doc close|hcolumn|hide|import|keylegend|line|link|list|make|move|note|obanote|obbnote|obfootn|obpage|obstitle|obtempl|obtitle|pie|primaryaxis|rename|replay|scatter|secondaryaxis|setlabel|unhide|vcolumn)>" display contained
 " PROC statement
-syn region sasProc start="\v%(^|;)@1<=\s*proc" end="\v%(^|;)@1<=\s*((run|quit)>|((data|proc|endsas)>)@=)" fold contains=@sasBasicSyntax,sasGlobalStatement,sasProcStatement
+syn region sasProc start="\v%(^|;)@1<=\s*proc" end="\v%(^|;)@1<=%(\s*%(data|endsas|proc|quit|run)>)@=" fold contains=@sasBasicSyntax,sasGlobalStatement,sasProcStatement
 
 " Procedures, SAS/GRAPH, 9.4
 syn match sasGraphProcStatement "\v%(^|;)@1<=\s*%(add|area|axis\d{0,2}|bar|block|bubble2|byline|cc|ccopy|cdef|cdelete|chart|cmap|choro|copy|delete|device|dial|donut|exclude|flow|fs|goptions|gout|grid|group|hbar|hbar3d|hbullet|hslider|htrafficlight|id|igout|legend\d{0,2}|list|modify|move|nobyline|note|pattern\d{0,3}|pie|pie3d|plot|plot2|preview|prism|quit|rename|replay|select|scatter|speedometer|star|surface|symbol\d{0,3}|tc|tcopy|tdef|tdelete|template|tile|toggle|treplay|vbar|vbar3d|vtrafficlight|vbullet|vslider)>" display contained
-syn region sasGraphProc start="\v%(^|;)@1<=\s*proc\s+%(g3d|g3grid|ganno|gareabar|gbarline|gchart|gcontour|gdevice|geocode|gfont|ginside|gkpi|gmap|goptions|gplot|gproject|gradar|greduce|gremove|greplay|gslide|gtile|mapimport)>" end="\v%(^|;)@1<=\s*((run|quit)>|((data|proc|endsas)>)@=)" fold contains=@sasBasicSyntax,sasGlobalStatement,sasGraphProcStatement
+syn region sasGraphProc start="\v%(^|;)@1<=\s*proc\s+%(g3d|g3grid|ganno|gareabar|gbarline|gchart|gcontour|gdevice|geocode|gfont|ginside|gkpi|gmap|goptions|gplot|gproject|gradar|greduce|gremove|greplay|gslide|gtile|mapimport)>" end="\v%(^|;)@1<=%(\s*%(data|endsas|proc|run)>)@=" fold contains=@sasBasicSyntax,sasGlobalStatement,sasGraphProcStatement
 
 " Procedures, SAS/STAT, 14.1
 syn match sasAnalyticalProcStatement "\v%(^|;)@1<=\s*%(absorb|add|array|assess|baseline|bayes|beginnodata|bivar|bootstrap|bounds|by|cdfplot|cells|class|cluster|code|compute|condition|contrast|control|coordinates|copy|cosan|cov|covtest|coxreg|der|design|determ|deviance|direct|directions|domain|effect|effectplot|effpart|em|endnodata|equality|estimate|exact|exactoptions|factor|factors|fcs|filter|fitindex|freq|fwdlink|gender|grid|group|grow|hazardratio|height|hyperprior|id|impjoint|inset|insetgroup|invar|invlink|ippplot|lincon|lineqs|lismod|lmtests|location|logistic|loglin|lpredplot|lsmeans|lsmestimate|manova|matings|matrix|mcmc|mean|means|missmodel|mnar|model|modelaverage|modeleffects|monotone|mstruct|mtest|multreg|name|nlincon|nloptions|oddsratio|onecorr|onesamplefreq|onesamplemeans|onewayanova|outfiles|output|paired|pairedfreq|pairedmeans|parameters|parent|parms|partial|partition|path|pathdiagram|pcov|performance|plot|population|poststrata|power|preddist|predict|predpplot|priors|process|probmodel|profile|prune|pvar|ram|random|ratio|reference|refit|refmodel|renameparm|repeated|replicate|repweights|response|restore|restrict|retain|reweight|ridge|rmsstd|roc|roccontrast|rules|samplesize|samplingunit|seed|size|scale|score|selection|show|simtests|simulate|slice|std|stderr|store|strata|structeq|supplementary|table|tables|test|testclass|testfreq|testfunc|testid|time|transform|treatments|trend|twosamplefreq|twosamplemeans|towsamplesurvival|twosamplewilcoxon|uds|units|univar|var|variance|varnames|weight|where|with|zeromodel)>" display contained
-syn region sasAnalyticalProc start="\v%(^|;)@1<=\s*proc\s+%(aceclus|adaptivereg|anova|bchoice|boxplot|calis|cancorr|candisc|catmod|cluster|corresp|discrim|distance|factor|fastclus|fmm|freq|gam|gampl|gee|genmod|glimmix|glm|glmmod|glmpower|glmselect|hpcandisc|hpfmm|hpgenselect|hplmixed|hplogistic|hpmixed|hpnlmod|hppls|hpprincomp|hpquantselect|hpreg|hpsplit|iclifetest|icphreg|inbreed|irt|kde|krige2d|lattice|lifereg|lifetest|loess|logistic|mcmc|mds|mi|mianalyze|mixed|modeclus|multtest|nested|nlin|nlmixed|npar1way|orthoreg|phreg|plan|plm|pls|power|princomp|prinqual|probit|quantlife|quantreg|quantselect|reg|robustreg|rsreg|score|seqdesign|seqtest|sim2d|simnormal|spp|stdize|stdrate|stepdisc|surveyfreq|surveyimpute|surveylogistic|surveymeans|surveyphreg|surveyreg|surveyselect|tpspline|transreg|tree|ttest|varclus|varcomp|variogram)>" end="\v%(^|;)@1<=\s*((run|quit)>|((data|proc|endsas)>)@=)" fold contains=@sasBasicSyntax,sasGlobalStatement,sasAnalyticalProcStatement
+syn region sasAnalyticalProc start="\v%(^|;)@1<=\s*proc\s+%(aceclus|adaptivereg|anova|bchoice|boxplot|calis|cancorr|candisc|catmod|cluster|corresp|discrim|distance|factor|fastclus|fmm|freq|gam|gampl|gee|genmod|glimmix|glm|glmmod|glmpower|glmselect|hpcandisc|hpfmm|hpgenselect|hplmixed|hplogistic|hpmixed|hpnlmod|hppls|hpprincomp|hpquantselect|hpreg|hpsplit|iclifetest|icphreg|inbreed|irt|kde|krige2d|lattice|lifereg|lifetest|loess|logistic|mcmc|mds|mi|mianalyze|mixed|modeclus|multtest|nested|nlin|nlmixed|npar1way|orthoreg|phreg|plan|plm|pls|power|princomp|prinqual|probit|quantlife|quantreg|quantselect|reg|robustreg|rsreg|score|seqdesign|seqtest|sim2d|simnormal|spp|stdize|stdrate|stepdisc|surveyfreq|surveyimpute|surveylogistic|surveymeans|surveyphreg|surveyreg|surveyselect|tpspline|transreg|tree|ttest|varclus|varcomp|variogram)>" end="\v%(^|;)@1<=%(\s*(data|endsas|proc|run)>)@=" fold contains=@sasBasicSyntax,sasGlobalStatement,sasAnalyticalProcStatement
 
 " Proc TEMPLATE, 9.4
 syn match sasProcTemplateStatement "\v%(^|;)@1<=\s*%(block|break|cellstyle|cellvalue|class|close|column|compute|continue|define( (column|crosstabs|event|footer|header|statgraph|style|table|tagset))=|delete|delstream|do|done|dynamic|edit|else|end|eval|flush|footer|header|import|iterate|link|list|mvar|ndent|next|nmvar|notes|open|path|put|putl|putlog|putstream|putvars|replace|set|source|stop|style|test|text[23]=|translate|trigger|unblock|unset|xdent)>" display contained
 syn match sasGTLStatement "\v%(^|;)@1<=\s*%(axislegend|axistable|bandplot|barchart|barchartparm|begingraph|beginpolygon|beginpolyline|bihistogram3dparm|blockplot|boxplot|boxplotparm|bubbleplot|continuouslegend|contourplotparm|dendrogram|discretelegend|drawarrow|drawimage|drawline|drawoval|drawrectangle|drawtext|dropline|ellipse|ellipseparm|endgraph|endinnermargin|endlayout|endpolygon|endpolyline|endsidebar|entry|entryfootnote|entrytitle|fringeplot|heatmap|heatmapparm|highlowplot|histogram|histogramparm|innermargin|layout%( %(datalattice|datapanel|globallegend|gridded|lattice|overlay|overlayequated|overlay3d|region))=|legenditem|legendtextitems|linechart|lineparm|loessplot|mergedlegend|modelband|needleplot|pbsplineplot|polygonplot|referenceline|regressionplot|scatterplot|seriesplot|sidebar|stepplot|surfaceplotparm|symbolchar|symbolimage|textplot|vectorplot|waterfallchart)>" display contained
-syn region sasProcTemplate start="\v%(^|;)@1<=\s*proc\s+template>" end="\v%(^|;)@1<=\s*((run|quit)>|((data|proc|endsas)>)@=)" fold contains=@sasBasicSyntax,sasGlobalStatement,sasProcTemplateStatement,sasGTLStatement
+syn region sasProcTemplate start="\v%(^|;)@1<=\s*proc\s+template>" end="\v%(^|;)@1<=%(\s*%(data|endsas|proc|quit|run)>)@=" fold contains=@sasBasicSyntax,sasGlobalStatement,sasProcTemplateStatement,sasGTLStatement
 
 " Proc SQL, 9.4
 syn keyword sasProcSQLClause add as asc between by calculated cascade case check connection constraint cross delete desc distinct drop else end escape except exists foreign from full group having in inner intersect into is join key left libname like modify natural newline notrim null on order outer references restrict right select separated set then to trimmed union unique update user using values when where contained
 syn match sasProcSQLStatement "\v%(^|;)@1<=\s*%(alter( table)=|connect|create%( %(index|table|view))=|delete|describe%( %(table|view))=|disconnect|drop%( %(index|table|view))=|execute|insert|reset|select|update|validate)>" display contained
-syn region sasProcSQL start="\v%(^|;)@1<=\s*proc\s+sql>" end="\v%(^|;)@1<=\s*((run|quit)>|((data|proc|endsas)>)@=)" fold contains=@sasBasicSyntax,sasGlobalStatement,sasProcSQLClause,sasProcSQLStatement
+syn region sasProcSQL start="\v%(^|;)@1<=\s*proc\s+sql>" end="\v%(^|;)@1<=%(\s*%(data|endsas|proc|quit|run)>)@=" fold contains=@sasBasicSyntax,sasGlobalStatement,sasProcSQLClause,sasProcSQLStatement
 
 " SAS/DS2, 9.4
 syn keyword sasDS2Control by continue data do else end enddata endpackage endthread go goto if leave method otherwise package point return select then thread to until when while contained
 syn match sasDS2Statement "\v%(^|;)@1<=\s*%(array|by|%(dcl|declare|drop)%( %(package|thread))=|forward|keep|merge|output|put|rename|retain|set%( from)=|stop|vararray|varlist)>" display contained
-syn region sasDS2 start="\v%(^|;)@1<=\s*proc\s+ds2>" end="\v%(^|;)@1<=\s*((run|quit)>|((data|proc|endsas)>)@=)" fold contains=@sasBasicSyntax,sasGlobalStatement,sasDS2Control,sasDS2Statement
+syn region sasDS2 start="\v%(^|;)@1<=\s*proc\s+ds2>" end="\v%(^|;)@1<=%(\s*%(data|endsas|proc|quit|run)>)@=" fold contains=@sasBasicSyntax,sasGlobalStatement,sasDS2Control,sasDS2Statement
 
 " SAS/IML, 14.1
 syn keyword sasIMLControl by data do else end goto if link return then to until while contained
 syn match sasIMLStatement "\v%(^|;)@1<=\s*%(abort|append%( %(var|from))=|call|close|closefile|create|delete|display|file|find|finish|free|index%( none)=|infile|input|list|load|mattrib|pause|print|purge|put|quit|read|remove|replace|reset|resume|remove|run|save|setin|setout|show|sort|start|stop|store|summary|use|window)>" display contained
-syn region sasIML start="\v%(^|;)@1<=\s*proc\s+iml>" end="\v%(^|;)@1<=\s*((quit)>|((data|proc|endsas)>)@=)" fold contains=@sasBasicSyntax,sasGlobalStatement,sasIMLControl,sasIMLStatement
+syn region sasIML start="\v%(^|;)@1<=\s*proc\s+iml>" end="\v%(^|;)@1<=%(\s*%(data|endsas|proc|quit)>)@=" fold contains=@sasBasicSyntax,sasGlobalStatement,sasIMLControl,sasIMLStatement
 
 " Macro definition
 syn region sasMacro start="\v\%macro>" end="\v\%mend>" fold contains=@sasBasicSyntax,sasGlobalStatement,sasDataStepControl,sasDataStepStatement,sasDataStep,sasProc,sasGraphProc,sasAnalyticalProc,sasProcTemplate,sasProcSQL,sasDS2,sasIML
