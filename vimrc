@@ -163,6 +163,12 @@ let g:ctrlp_root_markers = ['vimrc']
 
 " Configure delimitMate
 let g:delimitMate_expand_cr = 0
+
+" Configure taglist
+if has('win32') && len(globpath(&runtimepath, 'tools/ctags.exe', 0, 1)) > 0
+  let g:tlist_ctags_cmd = globpath(&runtimepath, 'tools/ctags.exe', 0, 1)[0]
+endif
+let g:tlist_show_menu = 1
 " }}}
 
 " vim:foldmethod=marker:foldlevel=0
