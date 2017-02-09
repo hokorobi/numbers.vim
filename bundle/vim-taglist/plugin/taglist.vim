@@ -355,7 +355,7 @@ let loaded_taglist = 'available'
 " Variable name format:
 "
 "       s:tlist_def_{vim_ftype}_settings
-" 
+"
 " vim_ftype - Filetype detected by Vim
 "
 " Value format:
@@ -727,7 +727,7 @@ function! s:Tlist_Log_Msg(msg)
       if len > 3000
         let s:tlist_msg = strpart(s:tlist_msg, len - 3000)
       endif
-      let s:tlist_msg = s:tlist_msg . strftime('%H:%M:%S') . ': ' . 
+      let s:tlist_msg = s:tlist_msg . strftime('%H:%M:%S') . ': ' .
             \ a:msg . "\n"
     endif
   endif
@@ -2318,22 +2318,24 @@ function! s:Tlist_Process_File(filename, ftype)
 
   let s:tlist_{fidx}_valid = 1
 
-  " Exuberant ctags arguments to generate a tag list
-  let ctags_args = ' -f - --format=2 --excmd=pattern --fields=nks '
-
-  " Form the ctags argument depending on the sort type
-  if s:tlist_{fidx}_sort_type == 'name'
-    let ctags_args = ctags_args . '--sort=yes'
-  else
-    let ctags_args = ctags_args . '--sort=no'
+  " Create ctags arguments
+  let ctags_args = ''
+  " Read contents of ctags configuration file
+  if exists('g:tlist_ctags_conf') && len(g:tlist_ctags_conf) > 0
+    for ctags_conf_lines in readfile(g:tlist_ctags_conf)
+      let ctags_args .= len(ctags_conf_lines) > 0 ? ' ' . ctags_conf_lines : ''
+    endfor
   endif
-
+  " Default ctags arguments for taglist plugin
+  let ctags_args .= ' -f - --format=2 --excmd=pattern --fields=nks'
+  " Add sort type to ctags arguments
+  let ctags_args .= ' ' . (s:tlist_{fidx}_sort_type == 'name' ?
+        \ '--sort=yes' :
+        \ '--sort=no')
   " Add the filetype specific arguments
-  let ctags_args = ctags_args . ' ' . s:tlist_{a:ftype}_ctags_args
-
+  let ctags_args .= ' ' . s:tlist_{a:ftype}_ctags_args
   " Ctags command to produce output with regexp for locating the tags
-  let ctags_cmd = g:tlist_ctags_cmd . ctags_args
-  let ctags_cmd = ctags_cmd . ' "' . a:filename . '"'
+  let ctags_cmd = g:tlist_ctags_cmd . ' ' . ctags_args . ' "' . a:filename . '"'
 
   if &shellxquote == '"'
     " Double-quotes within double-quotes will not work in the
@@ -2341,7 +2343,6 @@ function! s:Tlist_Process_File(filename, ftype)
     " then escape the double-quotes in the ctags command-line.
     let ctags_cmd = escape(ctags_cmd, '"')
   endif
-
   " In Windows 95, if not using cygwin, disable the 'shellslash'
   " option. Otherwise, this will cause problems when running the
   " ctags command.
@@ -2349,7 +2350,6 @@ function! s:Tlist_Process_File(filename, ftype)
     let old_shellslash = &shellslash
     set noshellslash
   endif
-
   if has('win32') && !has('win32unix') && !has('win95')
         \ && (&shell =~ 'cmd.exe')
     " Windows does not correctly deal with commands that have more than 1
@@ -2368,7 +2368,6 @@ function! s:Tlist_Process_File(filename, ftype)
       silent echo ctags_cmd
       redir END
     endif
-
     call s:Tlist_Log_Msg('Cmd inside batch file: ' . ctags_cmd)
     let ctags_cmd = '"' . s:taglist_tempfile . '"'
   endif
@@ -2382,7 +2381,6 @@ function! s:Tlist_Process_File(filename, ftype)
   if has('win95') && !has('win32unix')
     let &shellslash = old_shellslash
   endif
-
   if exists('s:taglist_tempfile')
     " Delete the temporary cmd file created on MS-Windows
     call delete(s:taglist_tempfile)
@@ -2509,7 +2507,7 @@ function! s:Tlist_Process_File(filename, ftype)
     let s:tlist_{fidx}_tag_count = tidx
   endif
 
-  call s:Tlist_Log_Msg('Processed ' . s:tlist_{fidx}_tag_count . 
+  call s:Tlist_Log_Msg('Processed ' . s:tlist_{fidx}_tag_count .
         \ ' tags in ' . a:filename)
 
   return fidx
@@ -4248,7 +4246,7 @@ function! s:Tlist_Refresh_Folds()
   " First remove all the existing folds
   normal! zE
 
-  if g:tlist_show_one_file 
+  if g:tlist_show_one_file
     " If only one file is displayed in the taglist window, then there
     " is no need to refresh the folds for the tags as the tags for the
     " current file will be removed anyway.
