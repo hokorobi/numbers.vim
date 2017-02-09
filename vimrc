@@ -168,7 +168,13 @@ let g:delimitMate_expand_cr = 0
 if has('win32') && len(globpath(&runtimepath, 'tools/ctags.exe', 0, 1)) > 0
   let g:tlist_ctags_cmd = globpath(&runtimepath, 'tools/ctags.exe', 0, 1)[0]
 endif
+if len(globpath(&runtimepath, 'tools/ctags.conf', 0, 1)) > 0
+  let g:tlist_ctags_conf = globpath(&runtimepath, 'tools/ctags.conf', 0, 1)[0]
+endif
+let g:tlist_auto_highlight_tag = 1
+let g:tlist_auto_update = 1
 let g:tlist_show_menu = 1
+let g:tlist_sas_settings = 'sas;l:libname;f:filename;d:data;p:procedure;h:hash;t:format;m:macro;v:variable'
 " }}}
 
 " vim:foldmethod=marker:foldlevel=0
