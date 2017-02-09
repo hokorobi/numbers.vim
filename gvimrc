@@ -142,29 +142,40 @@ vnoreme <silent> 20.423 Edit.Convert.Make\ Uppercase      Ugv
 vnoreme <silent> Edit.Convert.Make\ Lowercase             ugv
 vnoreme <silent> Edit.Convert.Toggle\ Case                ~gv
 an Edit.Convert.-KSEP1-                                   <Nop>
+vnoreme <silent> Edit.Convert.Toggle\ Comments            :call keny#ToggleComments()<CR>
+an Edit.Convert.-KSEP2-                                   <Nop>
 vnoreme <silent> Edit.Convert.Align\ Text\ Left           :left<CR>`>$v`<0
 vnoreme <silent> Edit.Convert.Center\ Text                :center<CR>`<0v`>$
 vnoreme <silent> Edit.Convert.Align\ Text\ Right          :right<CR>`<0v`>$
-an Edit.Convert.-KSEP2-                                   <Nop>
+an Edit.Convert.-KSEP3-                                   <Nop>
 vnoreme <silent> Edit.Convert.Shift\ Selection\ Up        :m'<-2<CR>`>v`<
 vnoreme <silent> Edit.Convert.Shift\ Selection\ Down      :m'>+<CR>`<v`>
 vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Left  <`>$v`<0
 vnoreme <silent> Edit.Convert.Shift\ Selection\ to\ Right >`<0v`>$
-an Edit.Convert.-KSEP3-                                   <Nop>
-vnoreme <silent> Edit.Convert.Wrap\ Lines                 gqgv
+an Edit.Convert.-KSEP4-                                   <Nop>
 vnoreme <silent> Edit.Convert.Join\ Lines                 Jgv
 vnoreme <silent> Edit.Convert.Split\ Lines                :call keny#SplitLinesNicely()<CR>
-vnoreme <silent> Edit.Convert.Strip\ Trailing\ Blanks     :call keny#StripTrailingWhiteSpaces()<CR>
+vnoreme <silent> Edit.Convert.Duplicate\ Lines            Y`>]pgv
+vnoreme <silent> Edit.Convert.Delete\ Lines               D
+vnoreme <silent> Edit.Convert.Wrap\ Lines                 gqgv
 vnoreme <silent> Edit.Convert.Merge\ Blank\ Lines         :call keny#MergeBlankLines()<CR>
-an Edit.Convert.-KSEP4-                                   <Nop>
+vnoreme <silent> Edit.Convert.Strip\ Trailing\ Blanks     :call keny#StripTrailingWhiteSpaces()<CR>
+an Edit.Convert.-KSEP5-                                   <Nop>
 an <silent> Edit.Convert.Change\ Line\ Endings\ To.MS-Win :setlocal ff=dos<CR>
 an <silent> Edit.Convert.Change\ Line\ Endings\ To.UNIX   :setlocal ff=unix<CR>
 an <silent> Edit.Convert.Change\ Line\ Endings\ To.Mac    :setlocal ff=mac<CR>
-an Edit.Convert.-KSEP5-                                   <Nop>
+an Edit.Convert.-KSEP6-                                   <Nop>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-8     :setlocal fenc=utf-8<CR>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-16    :setlocal fenc=utf-16<CR>
 
 " Popup menu
+an PopUp.-KSEP0-                                          <Nop>
+if has('gui_macvim')
+  an <silent> PopUp.Open\ Containing\ Folder              :if expand('%:p:h') != '' \| exec '!start open' expand('%:p:h:S') \| endif<CR>
+elseif has('gui_win32')
+  an <silent> PopUp.Open\ Containing\ Folder              :if expand('%:p:h') != '' \| exec '!start explorer.exe' expand('%:p:h:S') \| endif<CR>
+endif
+
 nnoremenu PopUp.-KSEP1-                                   <Nop>
 nnoremenu <silent> PopUp.Current\ Filename                "=expand('%')<CR>P
 nnoremenu <silent> PopUp.Current\ Filename\ &&\ Path      "=expand('%:p')<CR>P
@@ -190,18 +201,22 @@ vnoremenu <silent> PopUp.Make\ Uppercase                  Ugv
 vnoremenu <silent> PopUp.Make\ Lowercase                  ugv
 vnoremenu <silent> PopUp.Toggle\ Case                     ~gv
 vnoremenu PopUp.-KSEP2-                                   <Nop>
+vnoremenu <silent> PopUp.Toggle\ Comments                 :call keny#ToggleComments()<CR>
+vnoremenu PopUp.-KSEP3-                                   <Nop>
 vnoremenu <silent> PopUp.Align\ Text\ Left                :left<CR>`>$v`<0
 vnoremenu <silent> PopUp.Center\ Text                     :center<CR>`<0v`>$
 vnoremenu <silent> PopUp.Align\ Text\ Right               :right<CR>`<0v`>$
-vnoremenu PopUp.-KSEP3-                                   <Nop>
+vnoremenu PopUp.-KSEP4-                                   <Nop>
 vnoremenu <silent> PopUp.Shift\ Selection\ Up             :m'<-2<CR>`>v`<
 vnoremenu <silent> PopUp.Shift\ Selection\ Down           :m'>+<CR>`<v`>
 vnoremenu <silent> PopUp.Shift\ Selection\ to\ Left       <`>$v`<0
 vnoremenu <silent> PopUp.Shift\ Selection\ to\ Right      >`<0v`>$
-vnoremenu PopUp.-KSEP4-                                   <Nop>
-vnoremenu <silent> PopUp.Wrap\ Lines                      gqgv
+vnoremenu PopUp.-KSEP5-                                   <Nop>
 vnoremenu <silent> PopUp.Join\ Lines                      Jgv
 vnoremenu <silent> PopUp.Split\ Lines                     :call keny#SplitLinesNicely()<CR>
+vnoremenu <silent> PopUp.Duplicate\ Lines                 Y`>]pgv
+vnoremenu <silent> PopUp.Delete\ Lines                    D
+vnoremenu <silent> PopUp.Wrap\ Lines                      gqgv
 vnoremenu <silent> PopUp.Merge\ Blank\ Lines              :call keny#MergeBlankLines()<CR>
 vnoremenu <silent> PopUp.Strip\ Trailing\ Blanks          :call keny#StripTrailingWhiteSpaces()<CR>
 " }}}
