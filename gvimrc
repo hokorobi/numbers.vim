@@ -101,6 +101,7 @@ if has('gui_macvim')
   an 10.326 File.-KSEP1-                                  <Nop>
   an 10.327 File.Reopen\ Using\ Encoding.Unicode\ (UTF-8) :conf e ++enc=utf-8<CR>
 elseif has('gui_win32')
+  an 10.329 File.Browse\ Recent\ Files                    :browse oldfiles<CR>
   an 10.331 File.-KSEP1-                                  <Nop>
   an 10.332 File.Reopen\ Using\ Encoding.Unicode\ (UTF-8) :conf e ++enc=utf-8<CR>
 endif
@@ -156,6 +157,10 @@ vnoreme <silent> Edit.Convert.Split\ Lines                :call keny#SplitLinesN
 vnoreme <silent> Edit.Convert.Strip\ Trailing\ Blanks     :call keny#StripTrailingWhiteSpaces()<CR>
 vnoreme <silent> Edit.Convert.Merge\ Blank\ Lines         :call keny#MergeBlankLines()<CR>
 an Edit.Convert.-KSEP4-                                   <Nop>
+an <silent> Edit.Convert.Change\ Line\ Endings\ To.MS-Win :setlocal ff=dos<CR>
+an <silent> Edit.Convert.Change\ Line\ Endings\ To.UNIX   :setlocal ff=unix<CR>
+an <silent> Edit.Convert.Change\ Line\ Endings\ To.Mac    :setlocal ff=mac<CR>
+an Edit.Convert.-KSEP5-                                   <Nop>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-8     :setlocal fenc=utf-8<CR>
 an <silent> Edit.Convert.Convert\ Encoding\ to\ UTF-16    :setlocal fenc=utf-16<CR>
 
