@@ -158,6 +158,8 @@ vnoreme <silent> Edit.Convert.Split\ Lines                :call keny#SplitLinesN
 vnoreme <silent> Edit.Convert.Duplicate\ Lines            Y`>]pgv
 vnoreme <silent> Edit.Convert.Delete\ Lines               D
 vnoreme <silent> Edit.Convert.Wrap\ Lines                 gqgv
+vnoreme <silent> Edit.Convert.Sort\ Lines.Ascending       :sort i<CR>
+vnoreme <silent> Edit.Convert.Sort\ Lines.Descending      :sort! i<CR>
 vnoreme <silent> Edit.Convert.Merge\ Blank\ Lines         :call keny#MergeBlankLines()<CR>
 vnoreme <silent> Edit.Convert.Strip\ Trailing\ Blanks     :call keny#StripTrailingWhiteSpaces()<CR>
 an Edit.Convert.-KSEP5-                                   <Nop>
@@ -217,6 +219,8 @@ vnoremenu <silent> PopUp.Split\ Lines                     :call keny#SplitLinesN
 vnoremenu <silent> PopUp.Duplicate\ Lines                 Y`>]pgv
 vnoremenu <silent> PopUp.Delete\ Lines                    D
 vnoremenu <silent> PopUp.Wrap\ Lines                      gqgv
+vnoremenu <silent> PopUp.Sort\ Lines.Ascending            :sort i<CR>
+vnoremenu <silent> PopUp.Sort\ Lines.Descending           :sort! i<CR>
 vnoremenu <silent> PopUp.Merge\ Blank\ Lines              :call keny#MergeBlankLines()<CR>
 vnoremenu <silent> PopUp.Strip\ Trailing\ Blanks          :call keny#StripTrailingWhiteSpaces()<CR>
 " }}}
