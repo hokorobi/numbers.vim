@@ -13,7 +13,7 @@
 " :help numbers
 
 " LOAD GUARD: {{{1
-if exists("g:loaded_numbers") || v:version < 704 || &cp
+if exists("g:loaded_numbers") || v:version < 800 || &cp
   finish
 endif
 let g:loaded_numbers = 1

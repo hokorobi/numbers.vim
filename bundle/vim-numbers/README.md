@@ -15,7 +15,7 @@ app has focus.
 Requirements
 ------------
 
-  - Vim 7.4+
+  - Vim 8.0+
 
 Usage
 -----
