@@ -165,12 +165,6 @@ let g:ctrlp_root_markers = ['vimrc']
 let g:delimitMate_expand_cr = 0
 
 " Configure taglist
-if has('win32') && len(globpath(&runtimepath, 'tools/ctags.exe', 0, 1)) > 0
-  let g:tlist_ctags_cmd = globpath(&runtimepath, 'tools/ctags.exe', 0, 1)[0]
-endif
-if len(globpath(&runtimepath, 'tools/ctags.conf', 0, 1)) > 0
-  let g:tlist_ctags_conf = globpath(&runtimepath, 'tools/ctags.conf', 0, 1)[0]
-endif
 let g:tlist_auto_highlight_tag = 1
 let g:tlist_auto_update = 1
 let g:tlist_show_menu = 1

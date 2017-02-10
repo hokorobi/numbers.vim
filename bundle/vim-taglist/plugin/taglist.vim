@@ -85,7 +85,9 @@ if !exists('loaded_taglist')
 
   " Location of the exuberant ctags tool
   if !exists('tlist_ctags_cmd')
-    if executable('exuberant-ctags')
+    if has('win32') && len(globpath(&runtimepath, 'tools/ctags.exe', 0, 1)) > 0
+      let g:tlist_ctags_cmd = globpath(&runtimepath, 'tools/ctags.exe', 0, 1)[0]
+    elseif executable('exuberant-ctags')
       " On Debian Linux, exuberant ctags is installed
       " as exuberant-ctags
       let tlist_ctags_cmd = 'exuberant-ctags'
@@ -108,6 +110,12 @@ if !exists('loaded_taglist')
     endif
   endif
 
+  if !exists('tlist_ctags_conf')
+    if len(globpath(&runtimepath, 'tools/ctags.conf', 0, 1)) > 0
+      let g:tlist_ctags_conf = globpath(&runtimepath, 'tools/ctags.conf', 0, 1)[0]
+    endif
+  endif
+  
   " Automatically open the taglist window on Vim startup
   if !exists('tlist_auto_open')
     let tlist_auto_open = 0
