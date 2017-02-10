@@ -12,10 +12,6 @@
 " :helptags ~/.vim/doc
 " :help numbers
 
-" Allow use of line continuation
-let s:save_cpo = &cpo
-set cpo&vim
-
 " LOAD GUARD: {{{1
 if exists('g:loaded_autoload_numbers') || v:version < 704 || &cp
   finish
@@ -23,6 +19,10 @@ endif
 let g:loaded_autoload_numbers = 1
 
 " }}}1
+
+" Allow use of line continuation
+let s:save_cpo = &cpo
+set cpo&vim
 
 " GLOCAL FUNCTIONS: {{{1
 function! numbers#Enable()
