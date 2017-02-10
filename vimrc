@@ -145,7 +145,6 @@ let g:newtw_winsize = 25     " 25% of page size
 let g:netrw_browse_split = 4 " Open in prior window
 let g:netrw_altv = 1         " Open splits to the right
 let g:netrw_liststyle = 3    " Tree view
-let g:netrw_list_hide = netrw_gitignore#Hide() . ',\(^\|\s\s\)\zs\.\S\+'
 
 " Configure vim-airline
 let g:airline#extensions#wordcount#enabled = 1
