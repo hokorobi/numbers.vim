@@ -11,11 +11,12 @@
 "            holder be liable for any damamges resulting from the use of this
 "            software.
 "
-" The "Tag List" plugin is a source code browser plugin for Vim and provides
-" an overview of the structure of the programming language files and allows
-" you to efficiently browse through source code files for different
-" programming languages.  You can visit the taglist plugin home page for more
-" information:
+" The "TagList" plugin is a source code browser plugin for Vim and provides an
+" overview of the structure of the programming language files and enables you
+" to efficiently browse through source code files for various programming
+" languages.
+"
+" You can visit the taglist plugin home page for more information:
 "
 "       http://vim-taglist.sourceforge.net
 "
@@ -59,13 +60,13 @@
 " Line continuation used here
 if !exists('s:cpo_save')
   " If the taglist plugin is sourced recursively, the 'cpo' setting will be
-  " set to the default value.  To avoid this problem, save the cpo setting
+  " set to the default value. To avoid this problem, save the cpo setting
   " only when the plugin is loaded for the first time.
   let s:cpo_save = &cpo
 endif
 set cpo&vim
 
-if !exists('loaded_taglist')
+if !exists('g:loaded_taglist')
   " First time loading the taglist plugin
   "
   " To speed up the loading of Vim, the taglist plugin uses autoload
@@ -76,177 +77,94 @@ if !exists('loaded_taglist')
   " The taglist plugin requires the built-in Vim system() function. If this
   " function is not available, then don't load the plugin.
   if !exists('*system')
-    echomsg 'Taglist: Vim system() built-in function is not available. ' .
+    echomsg 'TagList: Vim system() built-in function is not available. ' .
           \ 'Plugin is not loaded.'
-    let loaded_taglist = 'no'
+    let g:loaded_taglist = 'no'
     let &cpo = s:cpo_save
     finish
   endif
 
   " Location of the exuberant ctags tool
-  if !exists('tlist_ctags_cmd')
+  if !exists('g:tlist_ctags_cmd')
     if has('win32') && len(globpath(&runtimepath, 'tools/ctags.exe', 0, 1)) > 0
       let g:tlist_ctags_cmd = globpath(&runtimepath, 'tools/ctags.exe', 0, 1)[0]
     elseif executable('exuberant-ctags')
-      " On Debian Linux, exuberant ctags is installed
-      " as exuberant-ctags
-      let tlist_ctags_cmd = 'exuberant-ctags'
+      let g:tlist_ctags_cmd = 'exuberant-ctags' " Debian Linux
     elseif executable('exctags')
-      " On Free-BSD, exuberant ctags is installed as exctags
-      let tlist_ctags_cmd = 'exctags'
+      let g:tlist_ctags_cmd = 'exctags' " Free-BSD
     elseif executable('ctags')
-      let tlist_ctags_cmd = 'ctags'
+      let g:tlist_ctags_cmd = 'ctags'
     elseif executable('ctags.exe')
-      let tlist_ctags_cmd = 'ctags.exe'
+      let g:tlist_ctags_cmd = 'ctags.exe'
     elseif executable('tags')
-      let tlist_ctags_cmd = 'tags'
+      let g:tlist_ctags_cmd = 'tags'
     else
-      echomsg 'Taglist: Exuberant ctags (http://ctags.sf.net) ' .
+      echomsg 'TagList: Exuberant ctags (http://ctags.sf.net) ' .
             \ 'not found in PATH. Plugin is not loaded.'
-      " Skip loading the plugin
-      let loaded_taglist = 'no'
+      let g:loaded_taglist = 'no'
       let &cpo = s:cpo_save
       finish
     endif
   endif
-
-  if !exists('tlist_ctags_conf')
+  " Location of the ctags configuration file
+  if !exists('g:tlist_ctags_conf')
     if len(globpath(&runtimepath, 'tools/ctags.conf', 0, 1)) > 0
       let g:tlist_ctags_conf = globpath(&runtimepath, 'tools/ctags.conf', 0, 1)[0]
     endif
   endif
-  
+
   " Automatically open the taglist window on Vim startup
-  if !exists('tlist_auto_open')
-    let tlist_auto_open = 0
-  endif
-
-  " When the taglist window is toggle opened, move the cursor to the
-  " taglist window
-  if !exists('tlist_gain_focus_on_toggleopen')
-    let tlist_gain_focus_on_toggleopen = 0
-  endif
-
+  let g:tlist_auto_open = get(g:, 'tlist_auto_open', 0)
+  " When the taglist window is toggle opened, move the cursor to the taglist window
+  let g:tlist_gain_focus_on_toggleopen = get(g:, 'tlist_gain_focus_on_toggleopen', 0)
   " Process files even when the taglist window is not open
-  if !exists('tlist_process_file_always')
-    let tlist_process_file_always = 0
-  endif
-
-  if !exists('tlist_show_menu')
-    let tlist_show_menu = 0
-  endif
-
+  let g:tlist_process_file_always = get(g:, 'tlist_process_file_always', 0)
+  " Show tags menu
+  let g:tlist_show_menu = get(g:, 'tlist_show_menu', 0)
   " Tag listing sort type - 'name' or 'order'
-  if !exists('tlist_sort_type')
-    let tlist_sort_type = 'order'
-  endif
-
+  let g:tlist_sort_type = get(g:, 'tlist_sort_type', 'order')
   " Tag listing window split (horizontal/vertical) control
-  if !exists('tlist_use_horiz_window')
-    let tlist_use_horiz_window = 0
-  endif
-
+  let g:tlist_use_horiz_window = get(g:, 'tlist_use_horiz_window', 0)
   " Open the vertically split taglist window on the left or on the right
-  " side.  This setting is relevant only if tlist_use_horiz_window is set to
-  " zero (i.e.  only for vertically split windows)
-  if !exists('tlist_use_right_window')
-    let tlist_use_right_window = 0
-  endif
-
+  " side. This setting is relevant only if tlist_use_horiz_window is set to
+  " zero (i.e.: only for vertically split windows)
+  let g:tlist_use_right_window = get(g:, 'tlist_use_right_window', 0)
   " Increase Vim window width to display vertically split taglist window.
-  " For MS-Windows version of Vim running in a MS-DOS window, this must be
-  " set to 0 otherwise the system may hang due to a Vim limitation.
-  if !exists('tlist_inc_win_width')
-    if (has('win16') || has('win95')) && !has('gui_running')
-      let tlist_inc_win_width = 0
-    else
-      let tlist_inc_win_width = 1
-    endif
-  endif
-
+  let g:tlist_inc_win_width = get(g:, 'tlist_inc_win_width', 1)
   " Vertically split taglist window width setting
-  if !exists('tlist_win_width')
-    let tlist_win_width = 30
-  endif
-
+  let g:tlist_win_width = get(g:, 'tlist_win_width', 30)
   " Horizontally split taglist window height setting
-  if !exists('tlist_win_height')
-    let tlist_win_height = 10
-  endif
-
+  let g:tlist_win_height = get(g:, 'tlist_win_height', 10)
   " Display tag prototypes or tag names in the taglist window
-  if !exists('tlist_display_prototype')
-    let tlist_display_prototype = 0
-  endif
-
+  let g:tlist_display_prototype = get(g:, 'tlist_display_prototype', 0)
   " Display tag scopes in the taglist window
-  if !exists('tlist_display_tag_scope')
-    let tlist_display_tag_scope = 1
-  endif
-
+  let g:tlist_display_tag_scope = get(g:, 'tlist_display_tag_scope', 1)
   " Use single left mouse click to jump to a tag. By default this is disabled.
   " Only double click using the mouse will be processed.
-  if !exists('tlist_use_single_click')
-    let tlist_use_single_click = 0
-  endif
-
+  let g:tlist_use_single_click = get(g:, 'tlist_use_single_click', 0)
   " Control whether additional help is displayed as part of the taglist or
-  " not.  Also, controls whether empty lines are used to separate the tag
-  " tree.
-  if !exists('tlist_compact_format')
-    let tlist_compact_format = 0
-  endif
-
-  " Exit Vim if only the taglist window is currently open. By default, this is
-  " set to zero.
-  if !exists('tlist_exit_onlywindow')
-    let tlist_exit_onlywindow = 0
-  endif
-
-  " Automatically close the folds for the non-active files in the taglist
-  " window
-  if !exists('tlist_file_fold_auto_close')
-    let tlist_file_fold_auto_close = 0
-  endif
-
+  " not, as well as whether empty lines are used to separate the tag tree.
+  let g:tlist_compact_format = get(g:, 'tlist_compact_format', 0)
+  " Exit Vim if the taglist window is the only window currently open.
+  let g:tlist_exit_onlywindow = get(g:, 'tlist_exit_onlywindow', 0)
+  " Automatically close the folds for the non-active files
+  let g:tlist_file_fold_auto_close = get(g:, 'tlist_file_fold_auto_close', 0)
   " Close the taglist window when a tag is selected
-  if !exists('tlist_close_on_select')
-    let tlist_close_on_select = 0
-  endif
-
-  " Automatically update the taglist window to display tags for newly
-  " edited files
-  if !exists('tlist_auto_update')
-    let tlist_auto_update = 1
-  endif
-
+  let g:tlist_close_on_select = get(g:, 'tlist_close_on_select', 0)
+  " Automatically update the taglist window to display tags
+  let g:tlist_auto_update = get(g:, 'tlist_auto_update', 0)
   " Automatically highlight the current tag
-  if !exists('tlist_auto_highlight_tag')
-    let tlist_auto_highlight_tag = 1
-  endif
-
+  let g:tlist_auto_highlight_tag = get(g:, 'tlist_auto_highlight_tag', 1)
   " Automatically highlight the current tag on entering a buffer
-  if !exists('tlist_highlight_tag_on_bufenter')
-    let tlist_highlight_tag_on_bufenter = 1
-  endif
-
+  let g:tlist_highlight_tag_on_bufenter = get(g:, 'tlist_highlight_tag_on_bufenter', 1)
   " Enable fold column to display the folding for the tag tree
-  if !exists('tlist_enable_fold_column')
-    let tlist_enable_fold_column = 1
-  endif
-
+  let g:tlist_enable_fold_column = get(g:, 'tlist_enable_fold_column', 1)
   " Display the tags for only one file in the taglist window
-  if !exists('tlist_show_one_file')
-    let tlist_show_one_file = 0
-  endif
-
-  if !exists('tlist_max_submenu_items')
-    let tlist_max_submenu_items = 20
-  endif
-
-  if !exists('tlist_max_tag_length')
-    let tlist_max_tag_length = 10
-  endif
+  let g:tlist_show_one_file = get(g:, 'tlist_show_one_file', 0)
+  " Maximum number of items listed in the sub-menu
+  let g:tlist_max_submenu_items = get(g:, 'tlist_max_submenu_items', 20)
+  " Maximum tag length
+  let g:tlist_max_tag_length = get(g:, 'tlist_max_tag_length', 10)
 
   " Do not change the name of the taglist title variable. The winmanager
   " plugin relies on this name to determine the title for the taglist
@@ -256,17 +174,12 @@ if !exists('loaded_taglist')
   " Taglist debug messages
   let s:tlist_msg = ''
 
-  " Define the taglist autocommand to automatically open the taglist window
-  " on Vim startup
   if g:tlist_auto_open
     autocmd VimEnter * nested call s:Tlist_Window_Check_Auto_Open()
   endif
-
-  " Refresh the taglist
   if g:tlist_process_file_always
     autocmd BufEnter * call s:Tlist_Refresh()
   endif
-
   if g:tlist_show_menu
     autocmd GUIEnter * call s:Tlist_Menu_Init()
   endif
@@ -327,7 +240,7 @@ if !exists('loaded_taglist')
   exe 'autocmd FuncUndefined TagList_* source ' .
         \ escape(expand('<sfile>'), ' ')
 
-  let loaded_taglist = 'fast_load_done'
+  let g:loaded_taglist = 'fast_load_done'
 
   if g:tlist_show_menu && has('gui_running')
     call s:Tlist_Menu_Init()
