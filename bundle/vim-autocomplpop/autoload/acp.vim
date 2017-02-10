@@ -100,7 +100,7 @@ endfunction
 " Log debugging information
 function s:LogDebugInfo(text)
   if g:acp_log_debug_info == 1
-    echom "[" . s:GetCurrentText() . "] " . a:text
+    echom 'AutoComplPop: [' . s:GetCurrentText() . '] ' . a:text
   endif
 endfunction
 
@@ -282,4 +282,4 @@ let s:behavs = []
 let &cpo = s:cpo_save
 unlet s:cpo_save
 
-" vim: set fdm=marker:
+" vim: set fdm=marker fdl=0:

@@ -215,4 +215,4 @@ endif
 let &cpo = s:cpo_save
 unlet s:cpo_save
 
-" vim: set fdm=marker:
+" vim: set fdm=marker fdl=0:
