@@ -1,16 +1,20 @@
 " File:           numbers.vim
 " Maintainer:     Zhenhuan Hu <zhu@mcw.edu>
-" Version:        1.0.0
+" Version:        1.0.1
 " Description:    vim plugin for automatic switching between absolute and
 "                 relative line numbers.
-" Last Change:    Feb 06, 2017
+" Last Change:    Feb 10, 2017
 " License:        MIT License
 " Location:       autoload/numbers.vim
 "
-" See numbers.txt for help.  This can be accessed by doing:
+" See numbers.txt for help. This can be accessed by doing:
 "
 " :helptags ~/.vim/doc
 " :help numbers
+
+" Allow use of line continuation
+let s:save_cpo = &cpo
+set cpo&vim
 
 " LOAD GUARD: {{{1
 if exists('g:loaded_autoload_numbers') || v:version < 704 || &cp
@@ -86,9 +90,7 @@ endfunction
 " Initialization
 let s:focused = {}
 
-" Allow use of line continuation
-let s:save_cpo = &cpo
-set cpo&vim
-
 " Restore &cpo
 let &cpo = s:save_cpo
+
+" vim: set fdm=marker fdl=0:

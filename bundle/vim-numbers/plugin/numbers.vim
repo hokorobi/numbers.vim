@@ -1,13 +1,13 @@
 " File:           numbers.vim
 " Maintainer:     Zhenhuan Hu <zhu@mcw.edu>
-" Version:        1.0.0
+" Version:        1.0.1
 " Description:    vim plugin for intelligently switching between absolute and
 "                 relative line numbers.
-" Last Change:    Feb 06, 2017
+" Last Change:    Feb 10, 2017
 " License:        MIT License
 " Location:       plugin/numbers.vim
 "
-" See numbers.txt for help.  This can be accessed by doing:
+" See numbers.txt for help. This can be accessed by doing:
 "
 " :helptags ~/.vim/doc
 " :help numbers
@@ -41,3 +41,5 @@ endif
 
 " Restore &cpo
 let &cpo = s:save_cpo
+
+" vim: set fdm=marker fdl=0:
