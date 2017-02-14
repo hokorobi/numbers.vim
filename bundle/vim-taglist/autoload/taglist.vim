@@ -3263,22 +3263,20 @@ endfunction
 " Add base menu
 function! s:MenuAddBaseMenu()
   call s:LogMsg('Adding the base menu')
-  " Add the menu
-  anoremenu <silent> T&ags.Refresh\ menu :call <SID>MenuRefresh()<CR>
-  anoremenu <silent> T&ags.Sort\ menu\ by.Name
-        \ :call <SID>ChangeSort('menu', 'set', 'name')<CR>
-  anoremenu <silent> T&ags.Sort\ menu\ by.Order
-        \ :call <SID>ChangeSort('menu', 'set', 'order')<CR>
-  anoremenu T&ags.-SEP1-           :
+  " Add main menu
+  an <silent> T&ags.Toggle\ Tag\ List     :call taglist#WindowToggle()<CR>
+  an T&ags.-SEP0-                         :
+  an <silent> T&ags.Refresh\ Menu         :call <SID>MenuRefresh()<CR>
+  an <silent> T&ags.Sort\ Menu\ By.Name   :call <SID>ChangeSort('menu', 'set', 'name')<CR>
+  an <silent> T&ags.Sort\ Menu\ By.Order  :call <SID>ChangeSort('menu', 'set', 'order')<CR>
+  an T&ags.-SEP1-                         :
+  " Add popup menu
   if &mousemodel =~ 'popup'
-    anoremenu PopUp.-TAGS-SEP1- <Nop>
-    anoremenu <silent> PopUp.T&ags.Refresh\ menu
-          \ :call <SID>MenuRefresh()<CR>
-    anoremenu <silent> PopUp.T&ags.Sort\ menu\ by.Name
-          \ :call <SID>ChangeSort('menu', 'set', 'name')<CR>
-    anoremenu <silent> PopUp.T&ags.Sort\ menu\ by.Order
-          \ :call <SID>ChangeSort('menu', 'set', 'order')<CR>
-    anoremenu PopUp.T&ags.-SEP1-           :
+    an PopUp.T&ags.-SEP0-                         :
+    an <silent> PopUp.T&ags.Refresh\ Menu         :call <SID>MenuRefresh()<CR>
+    an <silent> PopUp.T&ags.Sort\ Menu\ By.Name   :call <SID>ChangeSort('menu', 'set', 'name')<CR>
+    an <silent> PopUp.T&ags.Sort\ Menu\ By.Order  :call <SID>ChangeSort('menu', 'set', 'order')<CR>
+    an PopUp.T&ags.-SEP1-                         :
   endif
 endfunction
 
