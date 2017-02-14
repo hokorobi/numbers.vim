@@ -1,8 +1,10 @@
 " File: taglist.vim
-" Author: Yegappan Lakshmanan (yegappan AT yahoo DOT com)
-" Version: 4.6
-" Last Modified: Feb 26, 2013
+" Maintainer: Zhenhuan Hu (zhu@mcw.edu)
+" Original Author: Yegappan Lakshmanan (yegappan AT yahoo DOT com)
+" Version: 5.0.0
+" Last Modified: Feb 14, 2017
 " Copyright: Copyright (C) 2002-2013 Yegappan Lakshmanan
+"                          2017      Zhenhuan Hu
 "            Permission is hereby granted to use and distribute this code,
 "            with or without modifications, provided that this copyright
 "            notice is copied with it. Like anything else that's free,
