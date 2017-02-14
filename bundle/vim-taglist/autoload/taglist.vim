@@ -3272,7 +3272,7 @@ function! s:MenuAddBaseMenu()
   an T&ags.-SEP1-                         :
   " Add popup menu
   if &mousemodel =~ 'popup'
-    an PopUp.T&ags.-SEP0-                         :
+    an PopUp.-SEP1-                               :
     an <silent> PopUp.T&ags.Refresh\ Menu         :call <SID>MenuRefresh()<CR>
     an <silent> PopUp.T&ags.Sort\ Menu\ By.Name   :call <SID>ChangeSort('menu', 'set', 'name')<CR>
     an <silent> PopUp.T&ags.Sort\ Menu\ By.Order  :call <SID>ChangeSort('menu', 'set', 'order')<CR>
