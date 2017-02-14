@@ -38,78 +38,78 @@ set cpo&vim
 "               tags of this type
 
 let s:tlist_def_settings = {
-      \ 'ant'       : 'ant;p:projects;t:targets',
-      \ 'asm'       : 'asm;d:define;l:label;m:macro;t:type',
-      \ 'asp'       : 'asp;c:constants;v:variable;f:function;s:subroutine',
-      \ 'aspvbs'    : 'asp;c:constants;v:variable;f:function;s:subroutine',
-      \ 'awk'       : 'awk;f:function',
+      \ 'ant'       : 'ant;p:projects;t:targets;',
+      \ 'asm'       : 'asm;d:define;l:label;m:macro;t:type;',
+      \ 'asp'       : 'asp;c:constants;v:variable;f:function;s:subroutine;',
+      \ 'aspvbs'    : 'asp;c:constants;v:variable;f:function;s:subroutine;',
+      \ 'awk'       : 'awk;f:function;',
       \ 'basic'     : 'basic;c:constant;l:label;g:enum;v:variable;' .
-      \               't:type;f:function',
-      \ 'beta'      : 'beta;f:fragment;s:slot;v:pattern',
+      \               't:type;f:function;',
+      \ 'beta'      : 'beta;f:fragment;s:slot;v:pattern;',
       \ 'c'         : 'c;d:macro;g:enum;s:struct;u:union;t:typedef;' .
-      \               'v:variable;f:function',
+      \               'v:variable;f:function;',
       \ 'cpp'       : 'c++;n:namespace;v:variable;d:macro;t:typedef;' .
-      \               'c:class;g:enum;s:struct;u:union;f:function',
+      \               'c:class;g:enum;s:struct;u:union;f:function;',
       \ 'cs'        : 'c#;d:macro;t:typedef;n:namespace;c:class;' .
       \               'E:event;g:enum;s:struct;i:interface;' .
-      \               'p:properties;m:method',
+      \               'p:properties;m:method;',
       \ 'cobol'     : 'cobol;d:data;f:file;g:group;p:paragraph;' .
-      \               'P:program;s:section',
+      \               'P:program;s:section;',
       \ 'd'         : 'c++;n:namespace;v:variable;t:typedef;' .
-      \               'c:class;g:enum;s:struct;u:union;f:function',
-      \ 'dosbatch'  : 'dosbatch;l:labels;v:variables',
-      \ 'eiffel'    : 'eiffel;c:class;f:feature',
-      \ 'erlang'    : 'erlang;d:macro;r:record;m:module;f:function',
+      \               'c:class;g:enum;s:struct;u:union;f:function;',
+      \ 'dosbatch'  : 'dosbatch;l:labels;v:variables;',
+      \ 'eiffel'    : 'eiffel;c:class;f:feature;',
+      \ 'erlang'    : 'erlang;d:macro;r:record;m:module;f:function;',
       \ 'flex'      : 'flex;v:global;c:classes;p:properties;' .
-      \               'm:methods;f:functions;x:mxtags',
+      \               'm:methods;f:functions;x:mxtags;',
       \ 'fortran'   : 'fortran;p:program;b:block data;' .
       \               'c:common;e:entry;i:interface;k:type;l:label;m:module;' .
-      \               'n:namelist;t:derived;v:variable;f:function;s:subroutine',
-      \ 'go'        : 'go;f:function;p:package;t:struct',
-      \ 'html'      : 'html;a:anchor;f:function',
-      \ 'java'      : 'java;p:package;c:class;i:interface;g:enum;f:field;m:method',
-      \ 'javascript': 'javascript;c:class;m:method;v:global;f:function;p:properties',
-      \ 'lisp'      : 'lisp;f:function',
-      \ 'lua'       : 'lua;f:function',
-      \ 'make'      : 'make;m:macro',
-      \ 'matlab'    : 'matlab;f:function',
+      \               'n:namelist;t:derived;v:variable;f:function;s:subroutine;',
+      \ 'go'        : 'go;f:function;p:package;t:struct;',
+      \ 'html'      : 'html;a:anchor;f:function;',
+      \ 'java'      : 'java;p:package;c:class;i:interface;g:enum;f:field;m:method;',
+      \ 'javascript': 'javascript;c:class;m:method;v:global;f:function;p:properties;',
+      \ 'lisp'      : 'lisp;f:function;',
+      \ 'lua'       : 'lua;f:function;',
+      \ 'make'      : 'make;m:macro;',
+      \ 'matlab'    : 'matlab;f:function;',
       \ 'ocamal'    : 'ocamal;M:module;v:global;t:type;' .
-      \               'c:class;f:function;m:method;C:constructor;e:exception',
-      \ 'pascal'    : 'pascal;f:function;p:procedure',
-      \ 'perl'      : 'perl;c:constant;l:label;p:package;s:subroutine',
-      \ 'php'       : 'php;c:class;i:interface;d:constant;v:variable;f:function',
-      \ 'python'    : 'python;c:class;m:member;f:function',
-      \ 'pyrex'     : 'python;c:class;m:memder;f:function',
-      \ 'rexx'      : 'rexx;s:subroutine',
-      \ 'ruby'      : 'ruby;c:class;f:method;F:function;m:singleton method',
-      \ 'scheme'    : 'scheme;s:set;f:function',
-      \ 'sh'        : 'sh;f:function',
-      \ 'csh'       : 'sh;f:function',
-      \ 'zsh'       : 'sh;f:function',
-      \ 'slang'     : 'slang;n:namespace;f:function',
+      \               'c:class;f:function;m:method;C:constructor;e:exception;',
+      \ 'pascal'    : 'pascal;f:function;p:procedure;',
+      \ 'perl'      : 'perl;c:constant;l:label;p:package;s:subroutine;',
+      \ 'php'       : 'php;c:class;i:interface;d:constant;v:variable;f:function;',
+      \ 'python'    : 'python;c:class;m:member;f:function;',
+      \ 'pyrex'     : 'python;c:class;m:memder;f:function;',
+      \ 'rexx'      : 'rexx;s:subroutine;',
+      \ 'ruby'      : 'ruby;c:class;f:method;F:function;m:singleton method;',
+      \ 'scheme'    : 'scheme;s:set;f:function;',
+      \ 'sh'        : 'sh;f:function;',
+      \ 'csh'       : 'sh;f:function;',
+      \ 'zsh'       : 'sh;f:function;',
+      \ 'slang'     : 'slang;n:namespace;f:function;',
       \ 'sml'       : 'sml;e:exception;c:functor;s:signature;' .
-      \               'r:structure;t:type;v:value;c:functor;f:function',
+      \               'r:structure;t:type;v:value;c:functor;f:function;',
       \ 'sql'       : 'sql;f:functions;' .
       \               'P:packages;p:procedures;t:tables;T:triggers;' .
       \               'v:variables;e:events;U:publications;R:services;' .
       \               'D:domains;x:MLTableScripts;y:MLConnScripts;z:MLProperties;'.
       \               'i:indexes;c:cursors;V:views;d:prototypes;'.
       \               'l:local variables;F:record fields;'.
-      \               'L:block label;r:records;s:subtypes',
-      \ 'tcl'       : 'tcl;c:class;f:method;m:method;p:procedure',
-      \ 'expect'    : 'tcl;c:class;f:method;p:procedure',
+      \               'L:block label;r:records;s:subtypes;',
+      \ 'tcl'       : 'tcl;c:class;f:method;m:method;p:procedure;',
+      \ 'expect'    : 'tcl;c:class;f:method;p:procedure;',
       \ 'tex'       : 'tex;c:chapters;s:sections;u:subsections;'.
-      \               'b:subsubsections;p:parts;P:paragraphs;G:subparagraphs',
+      \               'b:subsubsections;p:parts;P:paragraphs;G:subparagraphs;',
       \ 'vera'      : 'vera;c:class;d:macro;e:enumerator;' .
       \               'f:function;g:enum;m:member;p:program;' .
       \               'P:prototype;t:task;T:typedef;v:variable;' .
-      \               'x:externvar',
+      \               'x:externvar;',
       \ 'verilog'   : 'verilog;m:module;c:constant;P:parameter;' .
-      \               'e:event;r:register;t:task;w:write;p:port;v:variable;f:function',
+      \               'e:event;r:register;t:task;w:write;p:port;v:variable;f:function;',
       \ 'vhdl'      : 'vhdl;c:constant;t:type;T:subtype;r:record;' .
-      \               'e:entity;f:function;p:procedure;P:package',
-      \ 'vim'       : 'vim;v:variable;a:autocmds;c:commands;m:map;f:function',
-      \ 'yacc'      : 'yacc;l:label',
+      \               'e:entity;f:function;p:procedure;P:package;',
+      \ 'vim'       : 'vim;v:variable;a:autocmds;c:commands;m:map;f:function;',
+      \ 'yacc'      : 'yacc;l:label;',
       \ }
 " }}}1
 
@@ -921,10 +921,10 @@ function! s:FileTypeInit(ftype)
   " ctags args. Otherwise, use the settings specified by the user
   if exists('g:tlist_' . a:ftype . '_settings')
     " User specified ctags arguments
-    let settings = g:tlist_{a:ftype}_settings . ';'
+    let settings = g:tlist_{a:ftype}_settings
   elseif has_key(s:tlist_def_settings, a:ftype)
     " Default ctags arguments
-    let settings = s:tlist_def_settings[a:ftype] . ';'
+    let settings = s:tlist_def_settings[a:ftype]
   else
     " No default settings for this file type. This filetype is
     " not supported
