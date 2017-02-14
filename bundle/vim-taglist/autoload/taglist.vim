@@ -24,11 +24,9 @@ let s:cpo_save = &cpo
 set cpo&vim
 
 " LANGUAGE SETTINGS: {{{1
-" Variable name format:
+"       s:tlist_def_settings
 "
-"       s:tlist_def_{vim_ftype}_settings
-"
-" vim_ftype   - File type detected by Vim
+" Key         - File type detected by Vim
 "
 " Value format:
 "
@@ -38,186 +36,81 @@ set cpo&vim
 " flag        - Flag supported by exuberant ctags to generate a tag type
 " name        - Name of the tag type used in the taglist window to display the
 "               tags of this type
-"
 
-" Ant language
-let s:tlist_def_ant_settings = 'ant;p:projects;t:targets'
-
-" assembly language
-let s:tlist_def_asm_settings = 'asm;d:define;l:label;m:macro;t:type'
-
-" aspperl language
-let s:tlist_def_aspperl_settings =
-      \ 'asp;c:constants;v:variable;f:function;s:subroutine'
-
-" aspvbs language
-let s:tlist_def_aspvbs_settings =
-      \ 'asp;c:constants;v:variable;f:function;s:subroutine'
-
-" awk language
-let s:tlist_def_awk_settings = 'awk;f:function'
-
-" basic language
-let s:tlist_def_basic_settings =
-      \ 'basic;c:constant;l:label;g:enum;v:variable;' .
-      \ 't:type;f:function'
-
-" beta language
-let s:tlist_def_beta_settings = 'beta;f:fragment;s:slot;v:pattern'
-
-" c language
-let s:tlist_def_c_settings = 'c;d:macro;g:enum;s:struct;u:union;t:typedef;' .
-      \ 'v:variable;f:function'
-
-" c++ language
-let s:tlist_def_cpp_settings = 'c++;n:namespace;v:variable;d:macro;t:typedef;' .
-      \ 'c:class;g:enum;s:struct;u:union;f:function'
-
-" c# language
-let s:tlist_def_cs_settings = 'c#;d:macro;t:typedef;n:namespace;c:class;' .
-      \ 'E:event;g:enum;s:struct;i:interface;' .
-      \ 'p:properties;m:method'
-
-" cobol language
-let s:tlist_def_cobol_settings = 'cobol;d:data;f:file;g:group;p:paragraph;' .
-      \ 'P:program;s:section'
-" D programming language
-let s:tlist_def_d_settings = 'c++;n:namespace;v:variable;t:typedef;' .
-      \'c:class;g:enum;s:struct;u:union;f:function'
-
-" Dosbatch
-let s:tlist_def_dosbatch_settings = 'dosbatch;l:labels;v:variables'
-
-" eiffel language
-let s:tlist_def_eiffel_settings = 'eiffel;c:class;f:feature'
-
-" erlang language
-let s:tlist_def_erlang_settings = 'erlang;d:macro;r:record;m:module;f:function'
-
-" expect (same as tcl) language
-let s:tlist_def_expect_settings = 'tcl;c:class;f:method;p:procedure'
-
-" flex
-let s:tlist_def_flex_settings = 'flex;v:global;c:classes;p:properties;'.
-      \ 'm:methods;f:functions;x:mxtags'
-
-" fortran language
-let s:tlist_def_fortran_settings = 'fortran;p:program;b:block data;' .
-      \ 'c:common;e:entry;i:interface;k:type;l:label;m:module;' .
-      \ 'n:namelist;t:derived;v:variable;f:function;s:subroutine'
-
-" GO language
-let s:tlist_def_go_settings = 'go;f:function;p:package;t:struct'
-
-" HTML language
-let s:tlist_def_html_settings = 'html;a:anchor;f:function'
-
-" java language
-let s:tlist_def_java_settings = 'java;p:package;c:class;i:interface;' .
-      \ 'g:enum;f:field;m:method'
-
-" javascript language
-let s:tlist_def_javascript_settings =
-      \ 'javascript;c:class;m:method;v:global;f:function;p:properties'
-
-" lisp language
-let s:tlist_def_lisp_settings = 'lisp;f:function'
-
-" lua language
-let s:tlist_def_lua_settings = 'lua;f:function'
-
-" makefiles
-let s:tlist_def_make_settings = 'make;m:macro'
-
-" Matlab
-let s:tlist_def_matlab_settings = 'matlab;f:function'
-
-" Ocamal
-let s:tlist_def_ocamal_settings = 'ocamal;M:module;v:global;t:type;'.
-      \ 'c:class;f:function;m:method;C:constructor;e:exception'
-
-" pascal language
-let s:tlist_def_pascal_settings = 'pascal;f:function;p:procedure'
-
-" perl language
-let s:tlist_def_perl_settings = 'perl;c:constant;l:label;p:package;s:subroutine'
-
-" php language
-let s:tlist_def_php_settings =
-      \ 'php;c:class;i:interface;d:constant;v:variable;f:function'
-
-" python language
-let s:tlist_def_python_settings = 'python;c:class;m:member;f:function'
-
-" cython language
-let tlist_pyrex_settings='python;c:classe;m:memder;f:function'
-
-" rexx language
-let s:tlist_def_rexx_settings = 'rexx;s:subroutine'
-
-" ruby language
-let s:tlist_def_ruby_settings = 'ruby;c:class;f:method;F:function;' .
-      \ 'm:singleton method'
-
-" scheme language
-let s:tlist_def_scheme_settings = 'scheme;s:set;f:function'
-
-" shell language
-let s:tlist_def_sh_settings = 'sh;f:function'
-
-" C shell language
-let s:tlist_def_csh_settings = 'sh;f:function'
-
-" Z shell language
-let s:tlist_def_zsh_settings = 'sh;f:function'
-
-" slang language
-let s:tlist_def_slang_settings = 'slang;n:namespace;f:function'
-
-" sml language
-let s:tlist_def_sml_settings = 'sml;e:exception;c:functor;s:signature;' .
-      \ 'r:structure;t:type;v:value;c:functor;f:function'
-
-" sql language
-let s:tlist_def_sql_settings = 'sql;f:functions;' .
-      \ 'P:packages;p:procedures;t:tables;T:triggers;' .
-      \ 'v:variables;e:events;U:publications;R:services;' .
-      \ 'D:domains;x:MLTableScripts;y:MLConnScripts;z:MLProperties;'.
-      \ 'i:indexes;c:cursors;V:views;'.
-      \ 'd:prototypes;'.
-      \ 'l:local variables;'.
-      \ 'F:record fields;'.
-      \ 'L:block label;'.
-      \ 'r:records;'.
-      \ 's:subtypes'
-
-" tcl language
-let s:tlist_def_tcl_settings = 'tcl;c:class;f:method;m:method;p:procedure'
-
-" Tex
-let s:tlist_def_tex_settings = 'tex;c:chapters;s:sections;u:subsections;'.
-      \ 'b:subsubsections;p:parts;P:paragraphs;G:subparagraphs'
-
-" vera language
-let s:tlist_def_vera_settings = 'vera;c:class;d:macro;e:enumerator;' .
-      \ 'f:function;g:enum;m:member;p:program;' .
-      \ 'P:prototype;t:task;T:typedef;v:variable;' .
-      \ 'x:externvar'
-
-"verilog language
-let s:tlist_def_verilog_settings = 'verilog;m:module;c:constant;P:parameter;' .
-      \ 'e:event;r:register;t:task;w:write;p:port;v:variable;f:function'
-
-" VHDL
-let s:tlist_def_vhdl_settings = 'vhdl;c:constant;t:type;T:subtype;r:record;e:entity;f:function;p:procedure;P:package'
-
-" vim language
-let s:tlist_def_vim_settings =
-      \ 'vim;v:variable;a:autocmds;c:commands;m:map;f:function'
-
-" yacc language
-let s:tlist_def_yacc_settings = 'yacc;l:label'
-
+let s:tlist_def_settings = {
+      \ 'ant'       : 'ant;p:projects;t:targets',
+      \ 'asm'       : 'asm;d:define;l:label;m:macro;t:type',
+      \ 'asp'       : 'asp;c:constants;v:variable;f:function;s:subroutine',
+      \ 'aspvbs'    : 'asp;c:constants;v:variable;f:function;s:subroutine',
+      \ 'awk'       : 'awk;f:function',
+      \ 'basic'     : 'basic;c:constant;l:label;g:enum;v:variable;' .
+      \               't:type;f:function',
+      \ 'beta'      : 'beta;f:fragment;s:slot;v:pattern',
+      \ 'c'         : 'c;d:macro;g:enum;s:struct;u:union;t:typedef;' .
+      \               'v:variable;f:function',
+      \ 'cpp'       : 'c++;n:namespace;v:variable;d:macro;t:typedef;' .
+      \               'c:class;g:enum;s:struct;u:union;f:function',
+      \ 'cs'        : 'c#;d:macro;t:typedef;n:namespace;c:class;' .
+      \               'E:event;g:enum;s:struct;i:interface;' .
+      \               'p:properties;m:method',
+      \ 'cobol'     : 'cobol;d:data;f:file;g:group;p:paragraph;' .
+      \               'P:program;s:section',
+      \ 'd'         : 'c++;n:namespace;v:variable;t:typedef;' .
+      \               'c:class;g:enum;s:struct;u:union;f:function',
+      \ 'dosbatch'  : 'dosbatch;l:labels;v:variables',
+      \ 'eiffel'    : 'eiffel;c:class;f:feature',
+      \ 'erlang'    : 'erlang;d:macro;r:record;m:module;f:function',
+      \ 'flex'      : 'flex;v:global;c:classes;p:properties;' .
+      \               'm:methods;f:functions;x:mxtags',
+      \ 'fortran'   : 'fortran;p:program;b:block data;' .
+      \               'c:common;e:entry;i:interface;k:type;l:label;m:module;' .
+      \               'n:namelist;t:derived;v:variable;f:function;s:subroutine',
+      \ 'go'        : 'go;f:function;p:package;t:struct',
+      \ 'html'      : 'html;a:anchor;f:function',
+      \ 'java'      : 'java;p:package;c:class;i:interface;g:enum;f:field;m:method',
+      \ 'javascript': 'javascript;c:class;m:method;v:global;f:function;p:properties',
+      \ 'lisp'      : 'lisp;f:function',
+      \ 'lua'       : 'lua;f:function',
+      \ 'make'      : 'make;m:macro',
+      \ 'matlab'    : 'matlab;f:function',
+      \ 'ocamal'    : 'ocamal;M:module;v:global;t:type;' .
+      \               'c:class;f:function;m:method;C:constructor;e:exception',
+      \ 'pascal'    : 'pascal;f:function;p:procedure',
+      \ 'perl'      : 'perl;c:constant;l:label;p:package;s:subroutine',
+      \ 'php'       : 'php;c:class;i:interface;d:constant;v:variable;f:function',
+      \ 'python'    : 'python;c:class;m:member;f:function',
+      \ 'pyrex'     : 'python;c:class;m:memder;f:function',
+      \ 'rexx'      : 'rexx;s:subroutine',
+      \ 'ruby'      : 'ruby;c:class;f:method;F:function;m:singleton method',
+      \ 'scheme'    : 'scheme;s:set;f:function',
+      \ 'sh'        : 'sh;f:function',
+      \ 'csh'       : 'sh;f:function',
+      \ 'zsh'       : 'sh;f:function',
+      \ 'slang'     : 'slang;n:namespace;f:function',
+      \ 'sml'       : 'sml;e:exception;c:functor;s:signature;' .
+      \               'r:structure;t:type;v:value;c:functor;f:function',
+      \ 'sql'       : 'sql;f:functions;' .
+      \               'P:packages;p:procedures;t:tables;T:triggers;' .
+      \               'v:variables;e:events;U:publications;R:services;' .
+      \               'D:domains;x:MLTableScripts;y:MLConnScripts;z:MLProperties;'.
+      \               'i:indexes;c:cursors;V:views;d:prototypes;'.
+      \               'l:local variables;F:record fields;'.
+      \               'L:block label;r:records;s:subtypes',
+      \ 'tcl'       : 'tcl;c:class;f:method;m:method;p:procedure',
+      \ 'expect'    : 'tcl;c:class;f:method;p:procedure',
+      \ 'tex'       : 'tex;c:chapters;s:sections;u:subsections;'.
+      \               'b:subsubsections;p:parts;P:paragraphs;G:subparagraphs',
+      \ 'vera'      : 'vera;c:class;d:macro;e:enumerator;' .
+      \               'f:function;g:enum;m:member;p:program;' .
+      \               'P:prototype;t:task;T:typedef;v:variable;' .
+      \               'x:externvar',
+      \ 'verilog'   : 'verilog;m:module;c:constant;P:parameter;' .
+      \               'e:event;r:register;t:task;w:write;p:port;v:variable;f:function',
+      \ 'vhdl'      : 'vhdl;c:constant;t:type;T:subtype;r:record;' .
+      \               'e:entity;f:function;p:procedure;P:package',
+      \ 'vim'       : 'vim;v:variable;a:autocmds;c:commands;m:map;f:function',
+      \ 'yacc'      : 'yacc;l:label',
+      \ }
 " }}}1
 
 " INITIALIZATION: {{{1
@@ -1030,20 +923,16 @@ function! s:FileTypeInit(ftype)
   call s:LogMsg('FileTypeInit(' . a:ftype . ')')
   " If the user didn't specify any settings, then use the default
   " ctags args. Otherwise, use the settings specified by the user
-  let var = 'g:tlist_' . a:ftype . '_settings'
-  if exists(var)
+  if exists('g:tlist_' . a:ftype . '_settings')
     " User specified ctags arguments
-    let settings = {var} . ';'
+    let settings = g:tlist_{a:ftype}_settings . ';'
+  elseif has_key(s:tlist_def_settings, a:ftype)
+    " Default ctags arguments
+    let settings = s:tlist_def_settings[a:ftype] . ';'
   else
-    let var = 's:tlist_def_' . a:ftype . '_settings'
-    if exists(var)
-      " Default ctags arguments
-      let settings = s:tlist_def_{a:ftype}_settings . ';'
-    else
-      " No default settings for this file type. This filetype is
-      " not supported
-      return 0
-    endif
+    " No default settings for this file type. This filetype is
+    " not supported
+    return 0
   endif
   " Format of the option that specifies the filetype and ctags arugments:
   "
@@ -1369,12 +1258,9 @@ function! s:SkipFile(filename, ftype)
   " If it is not available, then check whether user specified settings are
   " available. If both are not available, then don't list the tags for this
   " filetype
-  let var = 's:tlist_def_' . a:ftype . '_settings'
-  if !exists(var)
-    let var = 'g:tlist_' . a:ftype . '_settings'
-    if !exists(var)
-      return 1
-    endif
+  if !has_key(s:tlist_def_settings, a:ftype) &&
+        \ !exists('g:tlist_' . a:ftype . '_settings') 
+    return 1
   endif
   " Skip files which are not readable or files which are not yet stored
   " to the disk
