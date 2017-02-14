@@ -168,6 +168,7 @@ command! -nargs=0 -bar                TlistRefresh           call taglist#Refres
 command! -nargs=0 -bar                TlistOpen              call taglist#WindowOpen()
 command! -nargs=0 -bar                TlistClose             call taglist#WindowClose()
 command! -nargs=0 -bar                TlistToggle            call taglist#WindowToggle()
+command! -nargs=0 -bar                Tlist                  TlistToggle
 command! -nargs=+ -complete=file      TlistAddFiles          call taglist#AddFiles(<f-args>)
 command! -nargs=+ -complete=dir       TlistAddFilesRecursive call taglist#AddFilesRecursive(<f-args>)
 command! -nargs=0 -bar                TlistUpdate            call taglist#UpdateCurrentFile()
