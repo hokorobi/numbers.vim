@@ -27,7 +27,7 @@ endif
 " }}}
 
 " User Interface {{{
-set number foldcolumn=3 foldlevelstart=1 ruler laststatus=2
+set number foldcolumn=3 foldlevelstart=3 ruler laststatus=2
 set showcmd showmode wildmenu
 
 " Backspace
