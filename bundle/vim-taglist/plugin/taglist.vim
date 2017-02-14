@@ -190,7 +190,7 @@ augroup TagListInitCmds
     autocmd VimEnter * nested call taglist#WindowCheckAutoOpen()
   endif
   if g:tlist_process_file_always
-    autocmd BufEnter,BufWritePost * call taglist#Refresh()
+    autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#Refresh()
   endif
   " When a buffer is deleted, remove the file from the taglist
   autocmd BufDelete * silent call taglist#BufferRemoved(expand('<afile>:p'))

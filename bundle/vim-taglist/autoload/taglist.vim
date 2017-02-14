@@ -165,7 +165,7 @@ function! taglist#MenuInit()
   augroup TagListMenuCmds
     autocmd!
     if !g:tlist_process_file_always
-      autocmd BufEnter,BufWritePost * call taglist#Refresh()
+      autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#Refresh()
     endif
     autocmd BufLeave * call s:MenuRemoveFile()
   augroup END
@@ -1165,7 +1165,7 @@ endfunction
 "
 "     tag_name<TAB>file_name<TAB>ex_cmd;"<TAB>extension_fields
 "
-function! s:ParseTagline(tag_line)
+function! s:ParseTagLine(tag_line)
   if a:tag_line == ''
     " Skip empty lines
     return
@@ -1214,6 +1214,29 @@ function! s:ParseTagline(tag_line)
   let {fidx_tidx}_tag_name = tag_name
 endfunction
 
+" Check whether tag listing is supported for the specified file
+function! s:SkipFile(filename, ftype)
+  " Skip buffers with no names and buffers with filetype not set
+  if a:filename == '' || a:ftype == ''
+    return 1
+  endif
+  " Skip files which are not supported by exuberant ctags
+  " First check whether default settings for this filetype are available.
+  " If it is not available, then check whether user specified settings are
+  " available. If both are not available, then don't list the tags for this
+  " filetype
+  if !has_key(s:tlist_def_settings, a:ftype) &&
+        \ !exists('g:tlist_' . a:ftype . '_settings') 
+    return 1
+  endif
+  " Skip files which are not readable or files which are not yet stored
+  " to the disk
+  if !filereadable(a:filename)
+    return 1
+  endif
+  return 0
+endfunction
+
 " Initialize the variables for a new file
 function! s:InitFile(filename, ftype)
   call s:LogMsg('InitFile(' . a:filename . ')')
@@ -1243,29 +1266,6 @@ function! s:InitFile(filename, ftype)
     let i = i + 1
   endwhile
   return fidx
-endfunction
-
-" Check whether tag listing is supported for the specified file
-function! s:SkipFile(filename, ftype)
-  " Skip buffers with no names and buffers with filetype not set
-  if a:filename == '' || a:ftype == ''
-    return 1
-  endif
-  " Skip files which are not supported by exuberant ctags
-  " First check whether default settings for this filetype are available.
-  " If it is not available, then check whether user specified settings are
-  " available. If both are not available, then don't list the tags for this
-  " filetype
-  if !has_key(s:tlist_def_settings, a:ftype) &&
-        \ !exists('g:tlist_' . a:ftype . '_settings') 
-    return 1
-  endif
-  " Skip files which are not readable or files which are not yet stored
-  " to the disk
-  if !filereadable(a:filename)
-    return 1
-  endif
-  return 0
 endfunction
 
 " Get the list of tags defined in the specified file and store them
@@ -1378,7 +1378,7 @@ function! s:ProcessFile(filename, ftype)
   call s:LogMsg('Generated tags information for ' . a:filename)
   if v:version > 601
     " The following script local variables are used by the
-    " ParseTagline() function.
+    " ParseTagLine() function.
     let s:ctags_flags = s:tlist_{a:ftype}_ctags_flags
     let s:fidx = fidx
     let s:tidx = 0
@@ -1386,7 +1386,7 @@ function! s:ProcessFile(filename, ftype)
     " command is used to parse the tag lines instead of using the
     " matchstr()/stridx()/strpart() functions for performance reason
     call substitute(cmd_output, "\\([^\n]\\+\\)\n",
-          \ '\=s:ParseTagline(submatch(1))', 'g')
+          \ '\=s:ParseTagLine(submatch(1))', 'g')
     " Save the number of tags for this file
     let s:tlist_{fidx}_tag_count = s:tidx
     " The following script local variables are no longer needed
@@ -2302,7 +2302,7 @@ function! s:WindowInit()
           \ !g:tlist_process_file_always &&
           \ (!has('gui_running') || !g:tlist_show_menu)
       " Auto refresh the taglist window
-      autocmd BufEnter,BufWritePost * call taglist#Refresh()
+      autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#Refresh()
     endif
     if !g:tlist_use_horiz_window
       if v:version < 700
