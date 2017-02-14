@@ -133,7 +133,7 @@ let s:tlist_app_name = 'none'
 " Are we displaying brief help text
 let s:tlist_brief_help = 1
 " List of files removed on user request
-let s:tlist_removed_flist = ''
+let s:tlist_removed_flist = []
 " Index of current file displayed in the taglist window
 let s:tlist_cur_file_idx = -1
 " Taglist menu is empty or not
@@ -209,7 +209,7 @@ function! taglist#Refresh()
   if fidx == -1
     " Check whether this file is removed based on user request
     " If it is, then don't display the tags for this file
-    if s:UserRemovedFile(filename)
+    if s:IsRemovedFile(filename)
       return
     endif
     " If the taglist should not be auto updated, then return
@@ -619,7 +619,7 @@ function! taglist#SessionLoad(...)
       " As we are loading the tags from the session file, if this
       " file was previously deleted by the user, now we need to
       " add it back. So remove the file from the deleted list.
-      call s:UpdateRemoveList(fname, 0)
+      call s:UpdateRemovedFileList(fname, 0)
     endif
     let fidx = s:InitFile(fname, ftype)
     let s:tlist_{fidx}_filename = fname
@@ -897,23 +897,19 @@ function! s:ExeCmdWithoutAcmds(cmd)
 endfunction
 
 " Returns 1 if a file is removed by a user from the taglist
-function! s:UserRemovedFile(filename)
-  return stridx(s:tlist_removed_flist, a:filename . "\n") != -1
+function! s:IsRemovedFile(filename)
+  return match(s:tlist_removed_flist, '^' . a:filename . '$') != -1
 endfunction
 
 " Update the list of user removed files from the taglist
 " add == 1, add the file to the removed list
 " add == 0, delete the file from the removed list
-function! s:UpdateRemoveList(filename, add)
+function! s:UpdateRemovedFileList(filename, add)
   if a:add
-    let s:tlist_removed_flist = s:tlist_removed_flist . a:filename . "\n"
-  else
-    let idx = stridx(s:tlist_removed_flist, a:filename . "\n")
-    let text_before = strpart(s:tlist_removed_flist, 0, idx)
-    let rem_text = strpart(s:tlist_removed_flist, idx)
-    let next_idx = stridx(rem_text, "\n")
-    let text_after = strpart(rem_text, next_idx + 1)
-    let s:tlist_removed_flist = text_before . text_after
+    call add(s:tlist_removed_flist, a:filename)
+  elseif s:IsRemovedFile(a:filename)
+    let idx = match(s:tlist_removed_flist, '^' . a:filename . '$')
+    call remove(s:tlist_removed_flist, idx)
   endif
 endfunction
 
@@ -1486,7 +1482,7 @@ function! UpdateFile(filename, ftype)
     " If the tags were removed previously based on a user request,
     " as we are going to update the tags (based on the user request),
     " remove the filename from the deleted list
-    call s:UpdateRemoveList(fname, 0)
+    call s:UpdateRemovedFileList(fname, 0)
   endif
   " If the taglist window is opened, update it
   let winnum = bufwinnr(g:TagList_title)
@@ -1626,7 +1622,7 @@ function! s:RemoveFile(fidx, user_request)
   if a:user_request
     " As the user requested to remove the file from taglist,
     " add it to the removed list
-    call s:UpdateRemoveList(fname, 1)
+    call s:UpdateRemovedFileList(fname, 1)
   endif
   " Remove the file name from the taglist list of filenames
   let idx = stridx(s:tlist_file_names, fname . "\n")
@@ -2393,7 +2389,7 @@ function! s:WindowRefreshFile(filename, ftype)
   if !file_listed
     " Check whether this file is removed based on user request
     " If it is, then don't display the tags for this file
-    if s:UserRemovedFile(a:filename)
+    if s:IsRemovedFile(a:filename)
       return
     endif
   endif
@@ -3406,7 +3402,7 @@ function! s:MenuUpdateFile(clear_menu)
   if fidx == -1 || !s:tlist_{fidx}_valid
     " Check whether this file is removed based on user request
     " If it is, then don't display the tags for this file
-    if s:UserRemovedFile(filename)
+    if s:IsRemovedFile(filename)
       return
     endif
     " Process the tags for the file
