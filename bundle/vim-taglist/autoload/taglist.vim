@@ -1336,9 +1336,7 @@ function! s:ProcessFile(filename, ftype)
   let ctags_args = ''
   " Read contents of ctags configuration file
   if exists('g:tlist_ctags_conf') && len(g:tlist_ctags_conf) > 0
-    for ctags_conf_lines in readfile(g:tlist_ctags_conf)
-      let ctags_args .= (ctags_conf_lines =~ '^--') ? ' ' . ctags_conf_lines : ''
-    endfor
+    let ctags_args .= '--options=' . shellescape(g:tlist_ctags_conf) . ' '
   endif
   " Default ctags arguments for taglist plugin
   let ctags_args .= ' -f - --format=2 --excmd=pattern --fields=nks'
@@ -1351,52 +1349,13 @@ function! s:ProcessFile(filename, ftype)
         \ ' --' . s:tlist_session_settings[a:ftype]['ftype'] . '-types=' .
         \ join(keys(s:tlist_session_settings[a:ftype]['flags']), '')
   " Ctags command to produce output with regexp for locating the tags
-  let ctags_cmd = g:tlist_ctags_cmd . ' ' . ctags_args . ' "' . a:filename . '"'
-
-  if &shellxquote == '"'
-    " Double-quotes within double-quotes will not work in the
-    " command-line.If the 'shellxquote' option is set to double-quotes,
-    " then escape the double-quotes in the ctags command-line.
-    let ctags_cmd = escape(ctags_cmd, '"')
-  endif
-  " In Windows 95, if not using cygwin, disable the 'shellslash'
-  " option. Otherwise, this will cause problems when running the
-  " ctags command.
-  if has('win95') && !has('win32unix')
-    let old_shellslash = &shellslash
-    set noshellslash
-  endif
-  if has('win32') && !has('win32unix') && !has('win95')
-        \ && (&shell =~ 'cmd.exe')
-    " Windows does not correctly deal with commands that have more than 1
-    " set of double quotes.  It will strip them all resulting in:
-    " 'C:\Program' is not recognized as an internal or external command
-    " operable program or batch file.  To work around this, place the
-    " command inside a batch file and call the batch file.
-    " Do this only on Win2K, WinXP and above.
-    " Contributed by: David Fishburn.
-    let s:taglist_tempfile = fnamemodify(tempname(), ':h') .
-          \ '\taglist.cmd'
-    call writefile([ctags_cmd], s:taglist_tempfile, 'b')
-    call s:LogMsg('Cmd inside batch file: ' . ctags_cmd)
-    let ctags_cmd = '"' . s:taglist_tempfile . '"'
-  endif
-
-  call s:LogMsg('Cmd: ' . ctags_cmd)
+  let ctags_cmd = g:tlist_ctags_cmd . ' ' . ctags_args . ' ' . shellescape(a:filename)
   " Run ctags and get the tag list
+  call s:LogMsg('Run: ' . ctags_cmd)
   let cmd_output = system(ctags_cmd)
-  " Restore the value of the 'shellslash' option.
-  if has('win95') && !has('win32unix')
-    let &shellslash = old_shellslash
-  endif
-  if exists('s:taglist_tempfile')
-    " Delete the temporary cmd file created on MS-Windows
-    call delete(s:taglist_tempfile)
-  endif
   " Handle errors
   if v:shell_error
-    let msg = "Taglist: Failed to generate tags for " . a:filename
-    call s:WarningMsg(msg)
+    call s:WarningMsg('Failed to generate tags for ' . a:filename)
     if cmd_output != ''
       call s:WarningMsg(cmd_output)
     endif
