@@ -1260,17 +1260,27 @@ endfunction
 " Initialize the variables for a new file
 function! s:InitFile(filename, ftype)
   call s:LogMsg('InitFile(' . a:filename . ')')
-"   if !has_key(s:tlist_file_dict, a:filename)
-"     let s:tlist_file_dict[a:filename] = {
-"           \ 'file_type' : a:ftype,
-"           \ 'sort_type' : g:tlist_sort_type,
+"   if !has_key(s:tlist_session_files, a:filename)
+"     " Initialize the file variables
+"     let s:tlist_session_files[a:filename] = {
+"           \ 'ftype'     : a:ftype,
+"           \ 'sortby'    : g:tlist_sort_type,
 "           \ 'mtime'     : -1,
 "           \ 'start'     : 0,
 "           \ 'end'       : 0,
 "           \ 'valid'     : 0,
+"           \ 'visible'   : 0,
 "           \ 'tag_count' : 0,
 "           \ 'menu_cmd'  : '',
+"           \ 'flags'     : {},
 "           \ }
+"     " Initialize the tag flag variables
+"     for flag in keys(s:tlist_session_settings[a:ftype]['flags'])
+"       s:tlist_session_files['flags'][flag] = {
+"             \ 'count'   : 0,
+"             \ 'offset'  : 0,
+"             \ }
+"     endfor
 "   endif
   " Add new files at the end of the list
   let fidx = s:tlist_file_count
