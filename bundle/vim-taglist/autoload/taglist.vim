@@ -1081,13 +1081,9 @@ endfunction
 
 " Extract the tag type from the tag text
 function! s:ExtractTagType(tag_line)
-  " The tag type is after the tag prototype field. The prototype field
-  " ends with the /;"\t string. We add 4 at the end to skip the characters
-  " in this special string..
-  let start = strridx(a:tag_line, '/;"' . "\t") + 4
-  let end   = strridx(a:tag_line, 'line:') - 1
-  let ttype = strpart(a:tag_line, start, end - start)
-  return ttype
+  " The tag type starts after the tag prototype field
+  " ended with the /;"\t string, and ends before the \tline: string
+  return matchstr(a:tag_line, '/;"\t\zs.\{-}\ze\tline:')
 endfunction
 
 " Extract the tag scope from the tag text
@@ -1100,6 +1096,61 @@ function! s:ExtractTagScope(tag_line)
   let tag_scope = strpart(a:tag_line, end + 1)
   let tag_scope = strpart(tag_scope, stridx(tag_scope, ':') + 1)
   return tag_scope
+endfunction
+
+" Parse a tag line from the ctags output. Separate the tag output based on the
+" tag type and store it in the tag type variable.
+" The format of each line in the ctags output is:
+"
+"     tag_name<TAB>file_name<TAB>ex_cmd;"<TAB>extension_fields
+"
+function! s:ParseTagLine(tag_line)
+  if a:tag_line == ''
+    " Skip empty lines
+    return
+  endif
+  " Extract the tag type
+  let ttype = s:ExtractTagType(a:tag_line)
+  " Make sure the tag type is a valid and supported one
+  if ttype == '' || stridx(s:ctags_flags, ttype) == -1
+    " Line is not in proper tags format or Tag type is not supported
+    return
+  endif
+  " Update the total tag count
+  let s:tidx = s:tidx + 1
+  " The following variables are used to optimize this code.  Vim is slow in
+  " using curly brace names. To reduce the amount of processing needed, the
+  " curly brace variables are pre-processed here
+  let fidx_tidx = 's:tlist_' . s:fidx . '_' . s:tidx
+  let fidx_ttype = 's:tlist_' . s:fidx . '_' . ttype
+  " Update the count of this tag type
+  let ttype_idx = {fidx_ttype}_count + 1
+  let {fidx_ttype}_count = ttype_idx
+  " Store the ctags output for this tag
+  let {fidx_tidx}_tag = a:tag_line
+  " Store the tag index and the tag type index (back pointers)
+  let {fidx_ttype}_{ttype_idx} = s:tidx
+  let {fidx_tidx}_ttype_idx = ttype_idx
+  " Extract the tag name
+  let tag_name = strpart(a:tag_line, 0, stridx(a:tag_line, "\t"))
+  " Extract the tag scope/prototype
+  if g:tlist_display_prototype
+    let ttxt = '    ' . s:GetTagPrototype(s:fidx, s:tidx)
+  else
+    let ttxt = '    ' . tag_name
+    " Add the tag scope, if it is available and is configured. Tag
+    " scope is the last field after the 'line:<num>\t' field
+    if g:tlist_display_tag_scope
+      let tag_scope = s:GetTagScope(s:fidx, s:tidx)
+      if tag_scope != ''
+        let ttxt = ttxt . ' [' . tag_scope . ']'
+      endif
+    endif
+  endif
+  " Add this tag to the tag type variable
+  let {fidx_ttype} = {fidx_ttype} . ttxt . "\n"
+  " Save the tag name
+  let {fidx_tidx}_tag_name = tag_name
 endfunction
 
 " Return the tag type for the specified tag index
@@ -1181,61 +1232,6 @@ function! s:GetTagLinenum(fidx, tidx)
     let {tline_var} = strpart(tag_line, start, end - start) + 0
   endif
   return {tline_var}
-endfunction
-
-" Parse a tag line from the ctags output. Separate the tag output based on the
-" tag type and store it in the tag type variable.
-" The format of each line in the ctags output is:
-"
-"     tag_name<TAB>file_name<TAB>ex_cmd;"<TAB>extension_fields
-"
-function! s:ParseTagLine(tag_line)
-  if a:tag_line == ''
-    " Skip empty lines
-    return
-  endif
-  " Extract the tag type
-  let ttype = s:ExtractTagType(a:tag_line)
-  " Make sure the tag type is a valid and supported one
-  if ttype == '' || stridx(s:ctags_flags, ttype) == -1
-    " Line is not in proper tags format or Tag type is not supported
-    return
-  endif
-  " Update the total tag count
-  let s:tidx = s:tidx + 1
-  " The following variables are used to optimize this code.  Vim is slow in
-  " using curly brace names. To reduce the amount of processing needed, the
-  " curly brace variables are pre-processed here
-  let fidx_tidx = 's:tlist_' . s:fidx . '_' . s:tidx
-  let fidx_ttype = 's:tlist_' . s:fidx . '_' . ttype
-  " Update the count of this tag type
-  let ttype_idx = {fidx_ttype}_count + 1
-  let {fidx_ttype}_count = ttype_idx
-  " Store the ctags output for this tag
-  let {fidx_tidx}_tag = a:tag_line
-  " Store the tag index and the tag type index (back pointers)
-  let {fidx_ttype}_{ttype_idx} = s:tidx
-  let {fidx_tidx}_ttype_idx = ttype_idx
-  " Extract the tag name
-  let tag_name = strpart(a:tag_line, 0, stridx(a:tag_line, "\t"))
-  " Extract the tag scope/prototype
-  if g:tlist_display_prototype
-    let ttxt = '    ' . s:GetTagPrototype(s:fidx, s:tidx)
-  else
-    let ttxt = '    ' . tag_name
-    " Add the tag scope, if it is available and is configured. Tag
-    " scope is the last field after the 'line:<num>\t' field
-    if g:tlist_display_tag_scope
-      let tag_scope = s:GetTagScope(s:fidx, s:tidx)
-      if tag_scope != ''
-        let ttxt = ttxt . ' [' . tag_scope . ']'
-      endif
-    endif
-  endif
-  " Add this tag to the tag type variable
-  let {fidx_ttype} = {fidx_ttype} . ttxt . "\n"
-  " Save the tag name
-  let {fidx_tidx}_tag_name = tag_name
 endfunction
 
 " Check whether tag listing is supported for the specified file
