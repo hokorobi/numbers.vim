@@ -3200,8 +3200,10 @@ function! s:MenuGetTagTypeCmd(fidx, ftype, flag)
       while j <= final_index
         let tidx = s:tlist_{fidx_ttype}_{j}
         let tname = s:tlist_{a:fidx}_{tidx}_tag_name
+        let tname = substitute(tname, '&', '&&', 'g')
+        let tname = escape(tname, ' .')
         let mcmd = mcmd . m_prefix . '\&' .
-              \ s:menu_char_prefix[m_prefix_idx] . '\.' .
+              \ s:menu_char_prefix[m_prefix_idx] . '\.\ ' .
               \ tname . ' :call <SID>MenuJumpToTag(' .
               \ tidx . ')<CR>|'
         let m_prefix_idx = m_prefix_idx + 1
@@ -3216,8 +3218,10 @@ function! s:MenuGetTagTypeCmd(fidx, ftype, flag)
     while j <= tcnt
       let tidx = s:tlist_{fidx_ttype}_{j}
       let tname = s:tlist_{a:fidx}_{tidx}_tag_name
+      let tname = substitute(tname, '&', '&&', 'g')
+      let tname = escape(tname, ' .')
       let mcmd = mcmd . m_prefix . '\&' .
-            \ s:menu_char_prefix[m_prefix_idx] . '\.' .
+            \ s:menu_char_prefix[m_prefix_idx] . '\.\ ' .
             \ tname . ' :call <SID>MenuJumpToTag(' . tidx
             \ . ')<CR>|'
       let m_prefix_idx = m_prefix_idx + 1
