@@ -1327,7 +1327,7 @@ function! s:ProcessFile(filename, ftype)
   " Read contents of ctags configuration file
   if exists('g:tlist_ctags_conf') && len(g:tlist_ctags_conf) > 0
     for ctags_conf_lines in readfile(g:tlist_ctags_conf)
-      let ctags_args .= len(ctags_conf_lines) > 0 ? ' ' . ctags_conf_lines : ''
+      let ctags_args .= (ctags_conf_lines =~ '^--') ? ' ' . ctags_conf_lines : ''
     endfor
   endif
   " Default ctags arguments for taglist plugin
