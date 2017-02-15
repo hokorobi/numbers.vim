@@ -124,6 +124,8 @@ let s:tlist_debug_file = ''
 let s:tlist_winsize_chgd = -1
 " Taglist window is maximized or not
 let s:tlist_win_maximized = 0
+" Dictionary of the status of files
+let s:tlist_file_dict = {}
 " Name of files in the taglist
 let s:tlist_file_names = ''
 " Number of files in the taglist
@@ -176,6 +178,10 @@ endfunction
 function! taglist#Refresh()
   call s:LogMsg('Refresh(tlist_skip_refresh = ' .
         \ s:tlist_skip_refresh . ', ' . bufname('%') . ')')
+  " Skip buffers with 'buftype' set to nofile, nowrite, quickfix or help
+  if &buftype != ''
+    return
+  endif
   " If we are entering the buffer from one of the taglist functions, then
   " no need to refresh the taglist window again.
   if s:tlist_skip_refresh
@@ -187,12 +193,9 @@ function! taglist#Refresh()
   endif
   " If part of the winmanager plugin and not configured to process
   " tags always and not configured to display the tags menu, then return
-  if (s:tlist_app_name == 'winmanager') && !g:tlist_process_file_always
-        \ && !g:tlist_show_menu
-    return
-  endif
-  " Skip buffers with 'buftype' set to nofile, nowrite, quickfix or help
-  if &buftype != ''
+  if (s:tlist_app_name == 'winmanager') &&
+        \ !g:tlist_process_file_always &&
+        \ !g:tlist_show_menu
     return
   endif
   let filename = fnamemodify(bufname('%'), ':p')
@@ -604,8 +607,8 @@ function! taglist#SessionLoad(...)
   while i < new_file_count
     let ftype = g:tlist_{i}_filetype
     unlet! g:tlist_{i}_filetype
-    if !exists('s:tlist_' . ftype . '_count')
-      if s:FileTypeInit(ftype) == 0
+    if !exists('s:tlist_session_settings[ftype]')
+      if s:InitFileTypeSettings(ftype) == 0
         let i += 1
         continue
       endif
@@ -644,9 +647,7 @@ function! taglist#SessionLoad(...)
       unlet! g:tlist_{i}_{j}_ttype_idx
       let j = j + 1
     endwhile
-    let j = 1
-    while j <= s:tlist_{ftype}_count
-      let ttype = s:tlist_{ftype}_{j}_name
+    for ttype in keys(s:tlist_session_settings[ftype]['flags'])
       if exists('g:tlist_' . i . '_' . ttype)
         let s:tlist_{fidx}_{ttype} = g:tlist_{i}_{ttype}
         unlet! g:tlist_{i}_{ttype}
@@ -664,8 +665,7 @@ function! taglist#SessionLoad(...)
         let s:tlist_{fidx}_{ttype}_offset = 0
         let s:tlist_{fidx}_{ttype}_count = 0
       endif
-      let j = j + 1
-    endwhile
+    endfor
     let i = i + 1
   endwhile
   " If the taglist window is open, then update it
@@ -733,9 +733,7 @@ function! taglist#SessionSave(...)
     endwhile
     " Store information about all the tags grouped by their type
     let ftype = s:tlist_{i}_filetype
-    let j = 1
-    while j <= s:tlist_{ftype}_count
-      let ttype = s:tlist_{ftype}_{j}_name
+    for ttype in keys(s:tlist_session_settings[ftype]['flags'])
       if s:tlist_{i}_{ttype}_count != 0
         let txt = escape(s:tlist_{i}_{ttype}, '"\')
         let txt = substitute(txt, "\n", "\\\\n", 'g')
@@ -750,8 +748,7 @@ function! taglist#SessionSave(...)
           let k = k + 1
         endwhile
       endif
-      let j = j + 1
-    endwhile
+    endfor
     silent! echo
     let i = i + 1
   endwhile
@@ -915,104 +912,9 @@ function! s:UpdateRemovedFileList(filename, add)
   endif
 endfunction
 
-" Initialize the ctags arguments and tag variable for the specified
-" file type
-function! s:FileTypeInit(ftype)
-  call s:LogMsg('FileTypeInit(' . a:ftype . ')')
-  " If the user didn't specify any settings, then use the default
-  " ctags args. Otherwise, use the settings specified by the user
-  if exists('g:tlist_' . a:ftype . '_settings')
-    " User specified ctags arguments
-    let settings = g:tlist_{a:ftype}_settings
-  elseif has_key(s:tlist_def_settings, a:ftype)
-    " Default ctags arguments
-    let settings = s:tlist_def_settings[a:ftype]
-  else
-    " No default settings for this file type. This filetype is
-    " not supported
-    return 0
-  endif
-  " Format of the option that specifies the filetype and ctags arugments:
-  "
-  "       <language_name>;flag1:name1;flag2:name2;flag3:name3
-  "
-  " Extract the file type to pass to ctags. This may be different from the
-  " file type detected by Vim
-  let pos = stridx(settings, ';')
-  let msg = 'Invalid ctags option setting - ' . settings
-  if pos == -1
-    call s:WarningMsg(msg)
-    return 0
-  endif
-  let ctags_ftype = strpart(settings, 0, pos)
-  if ctags_ftype == ''
-    call s:WarningMsg(msg)
-    return 0
-  endif
-  " Make sure a valid filetype is supplied. If the user didn't specify a
-  " valid filetype, then the ctags option settings may be treated as the
-  " filetype
-  if ctags_ftype =~ ':'
-    call s:WarningMsg(msg)
-    return 0
-  endif
-  " Remove the file type from settings
-  let settings = strpart(settings, pos + 1)
-  if settings == ''
-    call s:WarningMsg(msg)
-    return 0
-  endif
-  " Process all the specified ctags flags. The format is
-  " flag1:name1;flag2:name2;flag3:name3
-  let ctags_flags = ''
-  let cnt = 0
-  while settings != ''
-    " Extract the flag
-    let pos = stridx(settings, ':')
-    if pos == -1
-      call s:WarningMsg(msg)
-      return 0
-    endif
-    let flag = strpart(settings, 0, pos)
-    if flag == ''
-      call s:WarningMsg(msg)
-      return 0
-    endif
-    " Remove the flag from settings
-    let settings = strpart(settings, pos + 1)
-    " Extract the tag type name
-    let pos = stridx(settings, ';')
-    if pos == -1
-      call s:WarningMsg(msg)
-      return 0
-    endif
-    let name = strpart(settings, 0, pos)
-    if name == ''
-      call s:WarningMsg(msg)
-      return 0
-    endif
-    let settings = strpart(settings, pos + 1)
-    let cnt = cnt + 1
-
-    let s:tlist_{a:ftype}_{cnt}_name = flag
-    let s:tlist_{a:ftype}_{cnt}_fullname = name
-    let ctags_flags = ctags_flags . flag
-  endwhile
-
-  let s:tlist_{a:ftype}_ctags_args = '--language-force=' . ctags_ftype .
-        \ ' --' . ctags_ftype . '-types=' . ctags_flags
-  let s:tlist_{a:ftype}_count = cnt
-  let s:tlist_{a:ftype}_ctags_flags = ctags_flags
-
-  " Save the filetype name
-  let s:tlist_ftype_{s:tlist_ftype_count}_name = a:ftype
-  let s:tlist_ftype_count = s:tlist_ftype_count + 1
-  return 1
-endfunction
-
 " Determine the filetype for the specified file using the filetypedetect
 " autocmd.
-function! s:DetectFileType(fname)
+function! s:GetFileType(fname)
   " Save the 'filetype', as this will be changed temporarily
   let old_filetype = &filetype
   " Ignore the filetype autocommands
@@ -1031,17 +933,18 @@ endfunction
 
 " Get the filetype for the specified buffer
 function! s:GetBufferFileType(bnum)
+  let bname = bufname(a:bnum)
   " Skip non-existent buffers
-  if !bufexists(a:bnum)
+  if !bufexists(bname)
     return ''
   endif
-  let buf_ft = getbufvar(a:bnum, '&filetype')
+  let buf_ft = getbufvar(bname, '&filetype')
   " Check whether 'filetype' contains multiple file types separated by '.'
   " If it is, then use the first file type
   if buf_ft =~ '\.'
     let buf_ft = matchstr(buf_ft, '[^.]\+')
   endif
-  if bufloaded(a:bnum)
+  if bufloaded(bname)
     " For loaded buffers, the 'filetype' is already determined
     return buf_ft
   endif
@@ -1051,8 +954,129 @@ function! s:GetBufferFileType(bnum)
   endif
   " For buffers whose filetype is not yet determined, try to determine
   " the filetype
-  let bname = bufname(a:bnum)
-  return s:DetectFileType(bname)
+  return s:GetFileType(bname)
+endfunction
+
+" Return the index of the specified filename
+function! s:GetFileIndex(fname)
+  if s:tlist_file_count == 0 || a:fname == ''
+    return -1
+  endif
+  " If the new filename is same as the last accessed filename, then
+  " return that index
+  if s:tlist_file_name_idx_cache != -1 &&
+        \ s:tlist_file_name_idx_cache < s:tlist_file_count
+    if s:tlist_{s:tlist_file_name_idx_cache}_filename == a:fname
+      " Same as the last accessed file
+      return s:tlist_file_name_idx_cache
+    endif
+  endif
+  " First, check whether the filename is present
+  let s_fname = a:fname . "\n"
+  let i = stridx(s:tlist_file_names, s_fname)
+  if i == -1
+    let s:tlist_file_name_idx_cache = -1
+    return -1
+  endif
+  " Second, compute the file name index
+  let nl_txt = substitute(strpart(s:tlist_file_names, 0, i), "[^\n]", '', 'g')
+  let s:tlist_file_name_idx_cache = strlen(nl_txt)
+  return s:tlist_file_name_idx_cache
+endfunction
+
+function! s:ParseRawSettingStrings(settings)
+  " Format of the string that specifies the filetype and ctags arugments:
+  "
+  "       <ctags_ftype>;<flag>:<name>;<flag>:<name>;...
+  "
+  " Note: The file type passed to ctags may be different from the
+  " file type detected by Vim
+  let msg = 'Invalid ctags option setting - ' . a:settings
+  let pos = stridx(a:settings, ';')
+  if pos == -1
+    call s:WarningMsg(msg)
+    return {}
+  endif
+  let ftype = strpart(a:settings, 0, pos)
+  " Make sure a valid filetype is supplied. If the user didn't specify a
+  " valid filetype, then the ctags option settings may be treated as the
+  " filetype
+  if ftype == '' || ftype =~ ':'
+    call s:WarningMsg(msg)
+    return {}
+  endif
+  let parsed_settings = { 'ftype': ftype, 'flags': {} }
+  " Remove the file type from settings
+  let settings = strpart(a:settings, pos + 1)
+  if settings == ''
+    call s:WarningMsg(msg)
+    return {}
+  endif
+  " Process all the specified ctags flags.
+  while settings != ''
+    " Extract the flag
+    let pos = stridx(settings, ':')
+    if pos == -1
+      call s:WarningMsg(msg)
+      return {}
+    endif
+    let flag = strpart(settings, 0, pos)
+    if flag == ''
+      call s:WarningMsg(msg)
+      return {}
+    endif
+    " Remove the flag from settings
+    let settings = strpart(settings, pos + 1)
+    " Extract the tag type name
+    let pos = stridx(settings, ';')
+    if pos == -1
+      call s:WarningMsg(msg)
+      return {}
+    endif
+    let name = strpart(settings, 0, pos)
+    if name == ''
+      call s:WarningMsg(msg)
+      return {}
+    endif
+    let settings = strpart(settings, pos + 1)
+    let parsed_settings['flags'][flag] = name
+  endwhile
+  return parsed_settings
+endfunction
+
+" Initialize the ctags settings for the session
+" with respect to the specified file type
+function! s:InitFileTypeSettings(ftype)
+  call s:LogMsg('InitFileTypeSettings(' . a:ftype . ')')
+  if !exists('s:tlist_session_settings')
+    let s:tlist_session_settings = {}
+  endif
+  " No need to do anything if session file type
+  " settings already exist
+  if has_key(s:tlist_session_settings, a:ftype)
+    return 1
+  endif
+  " If the user didn't specify any settings, use the default
+  " ctags settings. Otherwise, use the settings specified by the user.
+  " This allows the user settings to overwrite the default settings.
+  if exists('g:tlist_' . a:ftype . '_settings')
+    " User specified ctags settings
+    let settings = s:ParseRawSettingStrings(eval(
+          \ 'g:tlist_' . a:ftype . '_settings'))
+    if empty(settings)
+      return 0
+    endif
+  elseif has_key(s:tlist_def_settings, a:ftype)
+    " Default ctags settings
+    let settings = s:ParseRawSettingStrings(s:tlist_def_settings[a:ftype])
+  else
+    " No default settings for this file type. This filetype is
+    " not supported
+    return 0
+  endif
+  " Store ctags settings for the session
+  let s:tlist_session_settings[a:ftype] = settings
+  return 1
 endfunction
 
 " Extract the tag type from the tag text
@@ -1061,7 +1085,7 @@ function! s:ExtractTagType(tag_line)
   " ends with the /;"\t string. We add 4 at the end to skip the characters
   " in this special string..
   let start = strridx(a:tag_line, '/;"' . "\t") + 4
-  let end = strridx(a:tag_line, 'line:') - 1
+  let end   = strridx(a:tag_line, 'line:') - 1
   let ttype = strpart(a:tag_line, start, end - start)
   return ttype
 endfunction
@@ -1069,7 +1093,7 @@ endfunction
 " Extract the tag scope from the tag text
 function! s:ExtractTagScope(tag_line)
   let start = strridx(a:tag_line, 'line:')
-  let end = strridx(a:tag_line, "\t")
+  let end   = strridx(a:tag_line, "\t")
   if end <= start
     return ''
   endif
@@ -1240,6 +1264,18 @@ endfunction
 " Initialize the variables for a new file
 function! s:InitFile(filename, ftype)
   call s:LogMsg('InitFile(' . a:filename . ')')
+"   if !has_key(s:tlist_file_dict, a:filename)
+"     let s:tlist_file_dict[a:filename] = {
+"           \ 'file_type' : a:ftype,
+"           \ 'sort_type' : g:tlist_sort_type,
+"           \ 'mtime'     : -1,
+"           \ 'start'     : 0,
+"           \ 'end'       : 0,
+"           \ 'valid'     : 0,
+"           \ 'tag_count' : 0,
+"           \ 'menu_cmd'  : '',
+"           \ }
+"   endif
   " Add new files at the end of the list
   let fidx = s:tlist_file_count
   let s:tlist_file_count = s:tlist_file_count + 1
@@ -1257,14 +1293,11 @@ function! s:InitFile(filename, ftype)
   let s:tlist_{fidx}_tag_count = 0
   let s:tlist_{fidx}_menu_cmd = ''
   " Initialize the tag type variables
-  let i = 1
-  while i <= s:tlist_{a:ftype}_count
-    let ttype = s:tlist_{a:ftype}_{i}_name
+  for ttype in keys(s:tlist_session_settings[a:ftype]['flags'])
     let s:tlist_{fidx}_{ttype} = ''
     let s:tlist_{fidx}_{ttype}_offset = 0
     let s:tlist_{fidx}_{ttype}_count = 0
-    let i = i + 1
-  endwhile
+  endfor
   return fidx
 endfunction
 
@@ -1278,9 +1311,8 @@ function! s:ProcessFile(filename, ftype)
   endif
   " If the tag types for this filetype are not yet created, then create
   " them now
-  let var = 's:tlist_' . a:ftype . '_count'
-  if !exists(var)
-    if s:FileTypeInit(a:ftype) == 0
+  if !exists('s:tlist_session_settings[a:ftype]')
+    if s:InitFileTypeSettings(a:ftype) == 0
       return -1
     endif
   endif
@@ -1309,7 +1341,9 @@ function! s:ProcessFile(filename, ftype)
         \ '--sort=yes' :
         \ '--sort=no')
   " Add the filetype specific arguments
-  let ctags_args .= ' ' . s:tlist_{a:ftype}_ctags_args
+  let ctags_args .= ' --language-force=' . s:tlist_session_settings[a:ftype]['ftype'] .
+        \ ' --' . s:tlist_session_settings[a:ftype]['ftype'] . '-types=' .
+        \ join(keys(s:tlist_session_settings[a:ftype]['flags']), '')
   " Ctags command to produce output with regexp for locating the tags
   let ctags_cmd = g:tlist_ctags_cmd . ' ' . ctags_args . ' "' . a:filename . '"'
 
@@ -1337,13 +1371,7 @@ function! s:ProcessFile(filename, ftype)
     " Contributed by: David Fishburn.
     let s:taglist_tempfile = fnamemodify(tempname(), ':h') .
           \ '\taglist.cmd'
-    if v:version >= 700
-      call writefile([ctags_cmd], s:taglist_tempfile, "b")
-    else
-      exe 'redir! > ' . s:taglist_tempfile
-      silent echo ctags_cmd
-      redir END
-    endif
+    call writefile([ctags_cmd], s:taglist_tempfile, 'b')
     call s:LogMsg('Cmd inside batch file: ' . ctags_cmd)
     let ctags_cmd = '"' . s:taglist_tempfile . '"'
   endif
@@ -1376,87 +1404,22 @@ function! s:ProcessFile(filename, ftype)
     return fidx
   endif
   call s:LogMsg('Generated tags information for ' . a:filename)
-  if v:version > 601
-    " The following script local variables are used by the
-    " ParseTagLine() function.
-    let s:ctags_flags = s:tlist_{a:ftype}_ctags_flags
-    let s:fidx = fidx
-    let s:tidx = 0
-    " Process the ctags output one line at a time.  The substitute()
-    " command is used to parse the tag lines instead of using the
-    " matchstr()/stridx()/strpart() functions for performance reason
-    call substitute(cmd_output, "\\([^\n]\\+\\)\n",
-          \ '\=s:ParseTagLine(submatch(1))', 'g')
-    " Save the number of tags for this file
-    let s:tlist_{fidx}_tag_count = s:tidx
-    " The following script local variables are no longer needed
-    unlet! s:ctags_flags
-    unlet! s:tidx
-    unlet! s:fidx
-  else
-    " Due to a bug in Vim earlier than version 6.1,
-    " we cannot use substitute() to parse the ctags output.
-    " Instead the slow str*() functions are used
-    let ctags_flags = s:tlist_{a:ftype}_ctags_flags
-    let tidx = 0
-    while cmd_output != ''
-      " Extract one line at a time
-      let idx = stridx(cmd_output, "\n")
-      let one_line = strpart(cmd_output, 0, idx)
-      " Remove the line from the tags output
-      let cmd_output = strpart(cmd_output, idx + 1)
-      if one_line == ''
-        " Line is not in proper tags format
-        continue
-      endif
-      " Extract the tag type
-      let ttype = s:Tlist_Extract_Tagtype(one_line)
-      " Make sure the tag type is a valid and supported one
-      if ttype == '' || stridx(ctags_flags, ttype) == -1
-        " Line is not in proper tags format or Tag type is not
-        " supported
-        continue
-      endif
-      " Update the total tag count
-      let tidx = tidx + 1
-      " The following variables are used to optimize this code.  Vim is
-      " slow in using curly brace names. To reduce the amount of
-      " processing needed, the curly brace variables are pre-processed
-      " here
-      let fidx_tidx = 's:tlist_' . fidx . '_' . tidx
-      let fidx_ttype = 's:tlist_' . fidx . '_' . ttype
-      " Update the count of this tag type
-      let ttype_idx = {fidx_ttype}_count + 1
-      let {fidx_ttype}_count = ttype_idx
-      " Store the ctags output for this tag
-      let {fidx_tidx}_tag = one_line
-      " Store the tag index and the tag type index (back pointers)
-      let {fidx_ttype}_{ttype_idx} = tidx
-      let {fidx_tidx}_ttype_idx = ttype_idx
-      " Extract the tag name
-      let tag_name = strpart(one_line, 0, stridx(one_line, "\t"))
-      " Extract the tag scope/prototype
-      if g:tlist_display_prototype
-        let ttxt = '    ' . s:Tlist_Get_Tag_Prototype(fidx, tidx)
-      else
-        let ttxt = '    ' . tag_name
-        " Add the tag scope, if it is available and is configured. Tag
-        " scope is the last field after the 'line:<num>\t' field
-        if g:tlist_display_tag_scope
-          let tag_scope = s:Tlist_Get_Tag_Scope(fidx, tidx)
-          if tag_scope != ''
-            let ttxt = ttxt . ' [' . tag_scope . ']'
-          endif
-        endif
-      endif
-      " Add this tag to the tag type variable
-      let {fidx_ttype} = {fidx_ttype} . ttxt . "\n"
-      " Save the tag name
-      let {fidx_tidx}_tag_name = tag_name
-    endwhile
-    " Save the number of tags for this file
-    let s:tlist_{fidx}_tag_count = tidx
-  endif
+  " The following script local variables are used by the
+  " ParseTagLine() function.
+  let s:ctags_flags = join(keys(s:tlist_session_settings[a:ftype]['flags']), '')
+  let s:fidx = fidx
+  let s:tidx = 0
+  " Process the ctags output one line at a time.  The substitute()
+  " command is used to parse the tag lines instead of using the
+  " matchstr()/stridx()/strpart() functions for performance reason
+  call substitute(cmd_output, "\\([^\n]\\+\\)\n",
+        \ '\=s:ParseTagLine(submatch(1))', 'g')
+  " Save the number of tags for this file
+  let s:tlist_{fidx}_tag_count = s:tidx
+  " The following script local variables are no longer needed
+  unlet! s:ctags_flags
+  unlet! s:tidx
+  unlet! s:fidx
   call s:LogMsg('Processed ' . s:tlist_{fidx}_tag_count .
         \ ' tags in ' . a:filename)
   return fidx
@@ -1550,9 +1513,7 @@ function! s:DiscardTagInfo(fidx)
   endwhile
   let s:tlist_{a:fidx}_tag_count = 0
   " Discard information about tag type groups
-  let i = 1
-  while i <= s:tlist_{ftype}_count
-    let ttype = s:tlist_{ftype}_{i}_name
+  for ttype in keys(s:tlist_session_settings[ftype]['flags'])
     if s:tlist_{a:fidx}_{ttype} != ''
       let fidx_ttype = 's:tlist_' . a:fidx . '_' . ttype
       let {fidx_ttype} = ''
@@ -1565,8 +1526,7 @@ function! s:DiscardTagInfo(fidx)
         let j = j + 1
       endwhile
     endif
-    let i = i + 1
-  endwhile
+  endfor
   " Discard the stored menu command also
   let s:tlist_{a:fidx}_menu_cmd = ''
 endfunction
@@ -1576,14 +1536,11 @@ function! s:DiscardFileInfo(fidx)
   call s:LogMsg('DiscardFileInfo(' . s:tlist_{a:fidx}_filename . ')')
   call s:DiscardTagInfo(a:fidx)
   let ftype = s:tlist_{a:fidx}_filetype
-  let i = 1
-  while i <= s:tlist_{ftype}_count
-    let ttype = s:tlist_{ftype}_{i}_name
+  for ttype in keys(s:tlist_session_settings[ftype]['flags'])
     unlet! s:tlist_{a:fidx}_{ttype}
     unlet! s:tlist_{a:fidx}_{ttype}_offset
     unlet! s:tlist_{a:fidx}_{ttype}_count
-    let i = i + 1
-  endwhile
+  endfor
   unlet! s:tlist_{a:fidx}_filename
   unlet! s:tlist_{a:fidx}_sort_type
   unlet! s:tlist_{a:fidx}_filetype
@@ -1661,9 +1618,7 @@ function! s:RemoveFile(fidx, user_request)
       let k = k + 1
     endwhile
     let ftype = s:tlist_{i}_filetype
-    let k = 1
-    while k <= s:tlist_{ftype}_count
-      let ttype = s:tlist_{ftype}_{k}_name
+    for ttype in keys(s:tlist_session_settings[ftype]['flags'])
       let s:tlist_{j}_{ttype} = s:tlist_{i}_{ttype}
       let s:tlist_{j}_{ttype}_offset = s:tlist_{i}_{ttype}_offset
       let s:tlist_{j}_{ttype}_count = s:tlist_{i}_{ttype}_count
@@ -1674,8 +1629,7 @@ function! s:RemoveFile(fidx, user_request)
           let l = l + 1
         endwhile
       endif
-      let k = k + 1
-    endwhile
+    endfor
     " As the file and tag information is copied to the new index,
     " discard the previous information
     call s:DiscardFileInfo(i)
@@ -1756,33 +1710,6 @@ function! s:ProcessDir(dir_name, pat)
   return fcnt
 endfunction
 
-" Return the index of the specified filename
-function! s:GetFileIndex(fname)
-  if s:tlist_file_count == 0 || a:fname == ''
-    return -1
-  endif
-  " If the new filename is same as the last accessed filename, then
-  " return that index
-  if s:tlist_file_name_idx_cache != -1 &&
-        \ s:tlist_file_name_idx_cache < s:tlist_file_count
-    if s:tlist_{s:tlist_file_name_idx_cache}_filename == a:fname
-      " Same as the last accessed file
-      return s:tlist_file_name_idx_cache
-    endif
-  endif
-  " First, check whether the filename is present
-  let s_fname = a:fname . "\n"
-  let i = stridx(s:tlist_file_names, s_fname)
-  if i == -1
-    let s:tlist_file_name_idx_cache = -1
-    return -1
-  endif
-  " Second, compute the file name index
-  let nl_txt = substitute(strpart(s:tlist_file_names, 0, i), "[^\n]", '', 'g')
-  let s:tlist_file_name_idx_cache = strlen(nl_txt)
-  return s:tlist_file_name_idx_cache
-endfunction
-
 " Return the index of the filename present in the specified line number
 " Line number refers to the line number in the taglist window
 function! s:WindowGetFileIndexByLinenum(lnum)
@@ -1837,22 +1764,15 @@ function! s:WindowGetTagTypeByLinenum(fidx, lnum)
   let ftype = s:tlist_{a:fidx}_filetype
   " Determine to which tag type the current line number belongs to using the
   " tag type start line number and the number of tags in a tag type
-  let i = 1
-  while i <= s:tlist_{ftype}_count
-    let ttype = s:tlist_{ftype}_{i}_name
+  for ttype in keys(s:tlist_session_settings[ftype]['flags'])
     let start_lnum =
           \ s:tlist_{a:fidx}_start + s:tlist_{a:fidx}_{ttype}_offset
     let end =  start_lnum + s:tlist_{a:fidx}_{ttype}_count
     if a:lnum >= start_lnum && a:lnum <= end
-      break
+      return ttype
     endif
-    let i = i + 1
-  endwhile
-  " Current line doesn't belong to any of the displayed tag types
-  if i > s:tlist_{ftype}_count
-    return ''
-  endif
-  return ttype
+  endfor
+  return ''
 endfunction
 
 " Return the tag index for the specified line in the taglist window
@@ -2463,15 +2383,12 @@ function! s:WindowRefreshFile(filename, ftype)
   endif
   let file_start = s:tlist_{fidx}_start
   " Add the tag names grouped by tag type to the buffer with a title
-  let i = 1
-  let ttype_cnt = s:tlist_{a:ftype}_count
-  while i <= ttype_cnt
-    let ttype = s:tlist_{a:ftype}_{i}_name
+  for ttype in keys(s:tlist_session_settings[a:ftype]['flags'])
     " Add the tag type only if there are tags for that type
     let fidx_ttype = 's:tlist_' . fidx . '_' . ttype
     let ttype_txt = {fidx_ttype}
     if ttype_txt != ''
-      let txt = '  ' . s:tlist_{a:ftype}_{i}_fullname
+      let txt = '  ' . s:tlist_session_settings[a:ftype]['flags'][ttype]
       if g:tlist_compact_format == 0
         let ttype_start_lnum = line('.') + 1
         silent! put =txt
@@ -2492,8 +2409,7 @@ function! s:WindowRefreshFile(filename, ftype)
         silent! put =''
       endif
     endif
-    let i = i + 1
-  endwhile
+  endfor
   if s:tlist_{fidx}_tag_count == 0
     if g:tlist_compact_format == 0
       silent! put =''
@@ -2929,14 +2845,12 @@ function! s:WindowShowInfo()
     endif
     let ttype_name = ''
     let ftype = s:tlist_{fidx}_filetype
-    let i = 1
-    while i <= s:tlist_{ftype}_count
-      if ttype == s:tlist_{ftype}_{i}_name
-        let ttype_name = s:tlist_{ftype}_{i}_fullname
+    for flag in keys(s:tlist_session_settings[ftype]['flags'])
+      if ttype == flag
+        let ttype_name = s:tlist_session_settings[ftype]['flags'][flag]
         break
       endif
-      let i += 1
-    endwhile
+    endfor
     echo 'Tag Type: ' . ttype_name .
           \ ', Tag Count: ' . s:tlist_{fidx}_{ttype}_count
     return
@@ -3218,16 +3132,13 @@ endfunction
 function! s:CreateFoldsForFile(fidx)
   let ftype = s:tlist_{a:fidx}_filetype
   " Create the folds for each tag type in a file
-  let j = 1
-  while j <= s:tlist_{ftype}_count
-    let ttype = s:tlist_{ftype}_{j}_name
+  for ttype in keys(s:tlist_session_settings[ftype]['flags'])
     if s:tlist_{a:fidx}_{ttype}_count
       let s = s:tlist_{a:fidx}_start + s:tlist_{a:fidx}_{ttype}_offset
       let e = s + s:tlist_{a:fidx}_{ttype}_count
       exe s . ',' . e . 'fold'
     endif
-    let j = j + 1
-  endwhile
+  endfor
   exe s:tlist_{a:fidx}_start . ',' . s:tlist_{a:fidx}_end . 'fold'
   exe 'silent! ' . s:tlist_{a:fidx}_start . ',' .
         \ s:tlist_{a:fidx}_end . 'foldopen!'
@@ -3281,21 +3192,15 @@ function! s:MenuAddBaseMenu()
 endfunction
 
 " Get the menu command for the specified tag type
-" fidx - File type index
-" ftype - File Type
-" add_ttype_name - To add or not to add the tag type name to the menu entries
-" ttype_idx - Tag type index
-function! s:MenuGetTagTypeCmd(fidx, ftype, add_ttype_name, ttype_idx)
+" fidx  - File type index
+" ftype - File type
+" flag  - Tag flag
+function! s:MenuGetTagTypeCmd(fidx, ftype, flag)
+  " If the tag type name contains space characters, escape it. This
+  " will be used to create the menu entries.
+  let ttype_fullname = escape(s:tlist_session_settings[a:ftype]['flags'][a:flag], ' ')
   " Curly brace variable name optimization
-  let ftype_ttype_idx = a:ftype . '_' . a:ttype_idx
-  let ttype = s:tlist_{ftype_ttype_idx}_name
-  if a:add_ttype_name
-    " If the tag type name contains space characters, escape it. This
-    " will be used to create the menu entries.
-    let ttype_fullname = escape(s:tlist_{ftype_ttype_idx}_fullname, ' ')
-  endif
-  " Curly brace variable name optimization
-  let fidx_ttype = a:fidx . '_' . ttype
+  let fidx_ttype = a:fidx . '_' . a:flag
   " Number of tag entries for this tag type
   let tcnt = s:tlist_{fidx_ttype}_count
   if tcnt == 0 " No entries for this tag type
@@ -3323,10 +3228,7 @@ function! s:MenuGetTagTypeCmd(fidx, ftype, add_ttype_name, ttype_idx)
       let first_tag = strpart(first_tag, 0, g:tlist_max_tag_length)
       let last_tag = strpart(last_tag, 0, g:tlist_max_tag_length)
       " Form the menu command prefix
-      let m_prefix = 'anoremenu <silent> T\&ags.'
-      if a:add_ttype_name
-        let m_prefix = m_prefix . ttype_fullname . '.'
-      endif
+      let m_prefix = 'anoremenu <silent> T\&ags.' . ttype_fullname . '.'
       let m_prefix = m_prefix . first_tag . '\.\.\.' . last_tag . '.'
       " Character prefix used to number the menu items (hotkey)
       let m_prefix_idx = 0
@@ -3344,10 +3246,7 @@ function! s:MenuGetTagTypeCmd(fidx, ftype, add_ttype_name, ttype_idx)
   else
     " Character prefix used to number the menu items (hotkey)
     let m_prefix_idx = 0
-    let m_prefix = 'anoremenu <silent> T\&ags.'
-    if a:add_ttype_name
-      let m_prefix = m_prefix . ttype_fullname . '.'
-    endif
+    let m_prefix = 'anoremenu <silent> T\&ags.' . ttype_fullname . '.'
     let j = 1
     while j <= tcnt
       let tidx = s:tlist_{fidx_ttype}_{j}
@@ -3431,24 +3330,14 @@ function! s:MenuUpdateFile(clear_menu)
   " Determine whether the tag type name needs to be added to the menu
   " If more than one tag type is present in the taglisting for a file,
   " then the tag type name needs to be present
-  let add_ttype_name = -1
-  let i = 1
-  while i <= s:tlist_{ftype}_count && add_ttype_name < 1
-    let ttype = s:tlist_{ftype}_{i}_name
+  for ttype in keys(s:tlist_session_settings[ftype]['flags'])
     if s:tlist_{fidx}_{ttype}_count
-      let add_ttype_name = add_ttype_name + 1
+      let mcmd = s:MenuGetTagTypeCmd(fidx, ftype, ttype)
+      if mcmd != ''
+        let cmd = cmd . mcmd
+      endif
     endif
-    let i = i + 1
-  endwhile
-  " Process the tags by the tag type and get the menu command
-  let i = 1
-  while i <= s:tlist_{ftype}_count
-    let mcmd = s:MenuGetTagTypeCmd(fidx, ftype, add_ttype_name, i)
-    if mcmd != ''
-      let cmd = cmd . mcmd
-    endif
-    let i = i + 1
-  endwhile
+  endfor
   " Cache the menu command for reuse
   let s:tlist_{fidx}_menu_cmd = cmd
   " Update the menu
