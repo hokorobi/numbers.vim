@@ -897,7 +897,7 @@ endfunction
 
 " Returns 1 if a file is removed by a user from the taglist
 function! s:IsRemovedFile(filename)
-  return match(s:tlist_removed_flist, '^' . a:filename . '$') != -1
+  return index(s:tlist_removed_flist, a:filename) != -1
 endfunction
 
 " Update the list of user removed files from the taglist
@@ -907,7 +907,7 @@ function! s:UpdateRemovedFileList(filename, add)
   if a:add
     call add(s:tlist_removed_flist, a:filename)
   elseif s:IsRemovedFile(a:filename)
-    let idx = match(s:tlist_removed_flist, '^' . a:filename . '$')
+    let idx = index(s:tlist_removed_flist, a:filename)
     call remove(s:tlist_removed_flist, idx)
   endif
 endfunction
