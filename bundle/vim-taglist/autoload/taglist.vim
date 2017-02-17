@@ -151,8 +151,8 @@ let s:tlist_lnum_file_cache = ''
 let s:tlist_lnum_flag_cache = ''
 " Is taglist part of other plugins like winmanager or cream?
 let s:tlist_app_name = 'none'
-
-let s:menu_char_prefix =
+" Menu prefix characters for menu items
+let s:tlist_menu_prefix_chars =
       \ '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 " }}}1
 
@@ -2397,7 +2397,7 @@ function! s:WindowCreate()
   if tlist_winnr != -1
     " Jump to the existing window
     if winnr() != tlist_winnr
-      exe tlist_winnr . 'wincmd w'
+      call s:ExeCmdWithoutAcmds(tlist_winnr . 'wincmd w')
     endif
     return
   endif
@@ -2450,9 +2450,11 @@ function! s:WindowCreate()
     let wcmd = '+buffer' . bufnum
   endif
   " Create the taglist window
-  " Preserve the alternate file
-  let cmd_mod = (v:version >= 700) ? 'keepalt ' : ''
-  exe 'silent! ' . cmd_mod . win_dir . ' ' . win_size . 'split ' . wcmd
+  exe 'silent! keepalt ' . win_dir . ' ' . win_size . 'split ' . wcmd
+  " Overcome a weird behavor when Vim GUI window is maximized
+  if !g:tlist_use_horiz_window && winwidth(0) != win_size
+    exe 'silent! vertical resize ' . win_size
+  endif
   " Save the new window position
   let s:tlist_winx = getwinposx()
   let s:tlist_winy = getwinposy()
@@ -2520,7 +2522,7 @@ function! s:MenuGetTagTypeCmd(fname, ftype, flag)
               \ escape(s:tlist_file_cache[a:fname].flags[a:flag].tags[tidx].tag_name, ' .')
         let tname = substitute(tname, '&', '&&', 'g')
         let mcmd = mcmd . m_prefix . '\&' .
-              \ s:menu_char_prefix[m_prefix_idx] . '\.\ ' .
+              \ s:tlist_menu_prefix_chars[m_prefix_idx] . '\.\ ' .
               \ tname . ' :call <SID>MenuJumpToTag(' .
               \ "'" . a:flag . "', " . tidx . ')<CR>|'
         let m_prefix_idx += 1
@@ -2537,7 +2539,7 @@ function! s:MenuGetTagTypeCmd(fname, ftype, flag)
             \ escape(s:tlist_file_cache[a:fname].flags[a:flag].tags[tidx].tag_name, ' .')
       let tname = substitute(tname, '&', '&&', 'g')
       let mcmd = mcmd . m_prefix . '\&' .
-            \ s:menu_char_prefix[m_prefix_idx] . '\.\ ' .
+            \ s:tlist_menu_prefix_chars[m_prefix_idx] . '\.\ ' .
             \ tname . ' :call <SID>MenuJumpToTag(' .
             \ "'" . a:flag . "', " . tidx . ')<CR>|'
       let m_prefix_idx += 1
