@@ -157,112 +157,6 @@ let s:menu_char_prefix =
 " }}}1
 
 " GLOBAL FUNCTIONS: {{{1
-" Initialize the taglist menu
-function! taglist#MenuInit()
-  call s:MenuAddBaseMenu()
-  " Automatically add the tags defined in the current file to the menu
-  augroup TagListMenuCmds
-    autocmd!
-    if !g:tlist_process_file_always
-      autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#Refresh()
-    endif
-    autocmd BufLeave * call s:MenuRemoveFile()
-  augroup END
-  call s:MenuUpdateFile(0)
-endfunction
-
-" Refresh the taglist
-function! taglist#Refresh()
-  call s:LogMsg('Refresh(tlist_skip_refresh = ' .
-        \ s:tlist_skip_refresh . ', ' . bufname('%') . ')')
-  " Skip buffers with 'buftype' set to nofile, nowrite, quickfix or help
-  if &buftype != ''
-    return
-  endif
-  " If we are entering the buffer from one of the taglist functions, then
-  " no need to refresh the taglist window again.
-  if s:tlist_skip_refresh
-    " We still need to update the taglist menu
-    if g:tlist_show_menu
-      call s:MenuUpdateFile(0)
-    endif
-    return
-  endif
-  " If part of the winmanager plugin and not configured to process
-  " tags always and not configured to display the tags menu, then return
-  if (s:tlist_app_name == 'winmanager') &&
-        \ !g:tlist_process_file_always &&
-        \ !g:tlist_show_menu
-    return
-  endif
-  let fname = fnamemodify(bufname('%'), ':p')
-  let ftype = s:GetBufferFileType(bufname('%'))
-  " If the file doesn't support tag listing, skip it
-  if s:SkipFile(fname, ftype)
-    return
-  endif
-  let tlist_winnr = bufwinnr(g:TagList_title)
-  " If the taglist window is not opened and not configured to process
-  " tags always and not displaying the tags menu, then return
-  if tlist_winnr == -1 && !g:tlist_process_file_always && !g:tlist_show_menu
-    return
-  endif
-  if !has_key(s:tlist_file_cache, fname)
-    " Check whether this file is removed based on user request
-    " If it is, then don't display the tags for this file
-    if s:IsRemovedFile(fname)
-      return
-    endif
-    " If the taglist should not be auto updated, then return
-    if !g:tlist_auto_update
-      return
-    endif
-  endif
-  let cur_lnum = line('.')
-  if !has_key(s:tlist_file_cache, fname)
-    " Update the tags for the file
-    call s:ProcessFile(fname, ftype)
-  else
-    let ftime = getftime(fname)
-    if s:tlist_file_cache[fname].ftime != ftime
-      " Invalidate the tags listed for this file
-      let s:tlist_file_cache[fname].valid = 0
-      " Update the taglist and the window
-      call s:UpdateFile(fname, ftype)
-      " Store the new file modification time
-      let s:tlist_file_cache[fname].ftime = ftime
-    endif
-  endif
-  " Update the taglist window
-  if tlist_winnr != -1
-    " Disable screen updates
-    let old_lazyredraw = &lazyredraw
-    set nolazyredraw
-    " Save the current window number
-    let save_winnr = winnr()
-    " Goto the taglist window
-    call s:GotoTagListWindow()
-    " Save the cursor position
-    let save_pos = getpos('.')[1: 2]
-    " Update the taglist window
-    call s:WindowRefreshFileInDisplay(fname, ftype)
-    " Open the fold for the file
-    exe 'silent! ' . s:tlist_file_cache[fname].str . ',' .
-          \ s:tlist_file_cache[fname].end . 'foldopen!'
-    " Restore the cursor position
-    call cursor(save_pos)
-    " Jump back to the original window
-    if save_winnr != winnr()
-      call s:ExeCmdWithoutAcmds(save_winnr . 'wincmd w')
-    endif
-    " Restore screen updates
-    let &lazyredraw = old_lazyredraw
-  endif
-  " Update the taglist menu
-  if g:tlist_show_menu
-    call s:MenuUpdateFile(0)
-  endif
-endfunction
 
 " A buffer is removed from the Vim buffer list. Remove the tags defined
 " for that file
@@ -272,23 +166,14 @@ function! taglist#BufferRemoved(fname)
   if a:fname == ''
     return
   endif
+  let fname = fnamemodify(a:fname, ':p')
   " Get tag list index of the specified file
-  if !has_key(s:tlist_file_cache, a:fname)
+  if !has_key(s:tlist_file_cache, fname)
     " File not present in the taglist
     return
   endif
   " Remove the file from the list
-  call s:RemoveFile(a:fname, 0)
-endfunction
-
-" Initialize the taglist window/buffer, which is created when loading
-" a Vim session file.
-function! taglist#VimSessionLoad()
-  call s:LogMsg('VimSessionLoad')
-  " Initialize the taglist window
-  call s:WindowInit()
-  " Refresh the taglist window
-  call s:WindowRefresh()
+  call s:RemoveFile(fname, 0)
 endfunction
 
 " Open and refresh the taglist window
@@ -386,28 +271,6 @@ function! taglist#WindowToggle()
   endif
 endfunction
 
-" Open the taglist window automatically on Vim startup.
-" Open the window only when files present in any of the Vim windows support
-" tags.
-function! taglist#WindowCheckAutoOpen()
-  let open_window = 0
-  let winnum = 1
-  let bufnum = winbufnr(winnum)
-  while bufnum != -1
-    let fname = fnamemodify(bufname(bufnum), ':p')
-    let ftype = s:GetBufferFileType(bufnum)
-    if !s:SkipFile(fname, ftype)
-      let open_window = 1
-      break
-    endif
-    let winnum += 1
-    let bufnum = winbufnr(i)
-  endwhile
-  if open_window
-    call taglist#WindowOpen()
-  endif
-endfunction
-
 " Add the specified list of files to the taglist
 function! taglist#AddFiles(...)
   let flist = []
@@ -415,7 +278,7 @@ function! taglist#AddFiles(...)
   " Get all the files matching the file patterns supplied as argument
   while i <= a:0
     let flist += glob(a:{i}, 0, 1)
-    let i = i + 1
+    let i += 1
   endwhile
   if empty(flist)
     call s:WarningMsg('Error: No matching files are found')
@@ -614,6 +477,143 @@ function! taglist#BalloonExpr()
   if tidx == -1 | return '' | endif
   " Get the tag search pattern and display it
   return s:tlist_file_cache[fname].flags[flag].tags[tidx].tag_proto
+endfunction
+
+" Initialize the taglist menu
+function! taglist#MenuInit()
+  call s:MenuAddBaseMenu()
+  " Automatically add the tags defined in the current file to the menu
+  augroup TagListMenuCmds
+    autocmd!
+    if !g:tlist_process_file_always
+      autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#Refresh()
+    endif
+    autocmd BufLeave * call s:MenuRemoveFile()
+  augroup END
+  call s:MenuUpdateFile(0)
+endfunction
+
+" Open the taglist window automatically on Vim startup.
+" Open the window only when files present in any of the Vim windows support
+" tags.
+function! taglist#WindowCheckAutoOpen()
+  let open_window = 0
+  let winnum = 1
+  let bufnum = winbufnr(winnum)
+  while bufnum != -1
+    let fname = fnamemodify(bufname(bufnum), ':p')
+    let ftype = s:GetBufferFileType(bufnum)
+    if !s:SkipFile(fname, ftype)
+      let open_window = 1
+      break
+    endif
+    let winnum += 1
+    let bufnum = winbufnr(i)
+  endwhile
+  if open_window
+    call taglist#WindowOpen()
+  endif
+endfunction
+
+" Refresh the taglist
+function! taglist#Refresh()
+  call s:LogMsg('Refresh(tlist_skip_refresh = ' .
+        \ s:tlist_skip_refresh . ', ' . bufname('%') . ')')
+  " Skip buffers with 'buftype' set to nofile, nowrite, quickfix or help
+  if &buftype != ''
+    return
+  endif
+  " If we are entering the buffer from one of the taglist functions, then
+  " no need to refresh the taglist window again.
+  if s:tlist_skip_refresh
+    " We still need to update the taglist menu
+    if g:tlist_show_menu
+      call s:MenuUpdateFile(0)
+    endif
+    return
+  endif
+  " If part of the winmanager plugin and not configured to process
+  " tags always and not configured to display the tags menu, then return
+  if (s:tlist_app_name == 'winmanager') &&
+        \ !g:tlist_process_file_always &&
+        \ !g:tlist_show_menu
+    return
+  endif
+  let fname = fnamemodify(bufname('%'), ':p')
+  let ftype = s:GetBufferFileType(bufname('%'))
+  " If the file doesn't support tag listing, skip it
+  if s:SkipFile(fname, ftype)
+    return
+  endif
+  let tlist_winnr = bufwinnr(g:TagList_title)
+  " If the taglist window is not opened and not configured to process
+  " tags always and not displaying the tags menu, then return
+  if tlist_winnr == -1 && !g:tlist_process_file_always && !g:tlist_show_menu
+    return
+  endif
+  if !has_key(s:tlist_file_cache, fname)
+    " Check whether this file is removed based on user request
+    " If it is, then don't display the tags for this file
+    if s:IsRemovedFile(fname)
+      return
+    endif
+    " If the taglist should not be auto updated, then return
+    if !g:tlist_auto_update
+      return
+    endif
+  endif
+  let cur_lnum = line('.')
+  if !has_key(s:tlist_file_cache, fname)
+    " Initialize the tags for the file
+    call s:ProcessFile(fname, ftype)
+  else
+    " Update the tags for the file
+    let ftime = getftime(fname)
+    if s:tlist_file_cache[fname].ftime != ftime
+      " Invalidate the tags listed for this file
+      let s:tlist_file_cache[fname].valid = 0
+      " Update the taglist and the window
+      call s:UpdateFile(fname, ftype)
+      " Store the new file modification time
+      let s:tlist_file_cache[fname].ftime = ftime
+    endif
+  endif
+  " Update the taglist window
+  if tlist_winnr != -1
+    " Disable screen updates
+    let old_lazyredraw = &lazyredraw
+    set nolazyredraw
+    " Save the current window number
+    let save_winnr = winnr()
+    " Goto the taglist window
+    call s:GotoTagListWindow()
+    " Save the cursor position
+    let save_pos = getpos('.')[1: 2]
+    " Update the taglist window
+    call s:WindowRefreshFileInDisplay(fname, ftype)
+    " Restore the cursor position
+    call cursor(save_pos)
+    " Jump back to the original window
+    if save_winnr != winnr()
+      call s:ExeCmdWithoutAcmds(save_winnr . 'wincmd w')
+    endif
+    " Restore screen updates
+    let &lazyredraw = old_lazyredraw
+  endif
+  " Update the taglist menu
+  if g:tlist_show_menu
+    call s:MenuUpdateFile(0)
+  endif
+endfunction
+
+" Initialize the taglist window/buffer, which is created when loading
+" a Vim session file.
+function! taglist#VimSessionLoad()
+  call s:LogMsg('VimSessionLoad')
+  " Initialize the taglist window
+  call s:WindowInit()
+  " Refresh the taglist window
+  call s:WindowRefresh()
 endfunction
 
 " Set the name of the external plugin/application to which taglist
@@ -1126,7 +1126,7 @@ function! s:UpdateFile(fname, ftype)
     call s:UpdateRemovedFileList(a:fname, 0)
   endif
   " If the taglist window is not present, update the taglist
-  " and return, otherwise update the taglist window
+  " of the file and return, otherwise update the taglist window
   if bufwinnr(g:TagList_title) == -1
     call s:ProcessFile(a:fname, a:ftype)
   else
@@ -1139,6 +1139,9 @@ function! s:UpdateFile(fname, ftype)
         return
       endif
     endif
+    " Disable screen updates
+    let old_lazyredraw = &lazyredraw
+    set nolazyredraw
     " Save the current window number
     let save_winnr = winnr()
     " Goto the taglist window
@@ -1149,10 +1152,12 @@ function! s:UpdateFile(fname, ftype)
     call s:WindowRefreshFileInDisplay(a:fname, a:ftype)
     " Restore the cursor position
     call cursor(save_pos)
-    if winnr() != save_winnr
-      " Go back to the original window
+    " Jump back to the original window
+    if save_winnr != winnr()
       call s:ExeCmdWithoutAcmds(save_winnr . 'wincmd w')
     endif
+    " Restore screen updates
+    let &lazyredraw = old_lazyredraw
   endif
   " Update the taglist menu
   if g:tlist_show_menu
@@ -1637,8 +1642,6 @@ function! s:WindowUpdateFile()
   let s:tlist_file_cache[fname].valid = 0
   " Update the taglist window
   call s:WindowRefreshFileInDisplay(fname, s:tlist_file_cache[fname]['ftype'])
-  exe s:tlist_file_cache[fname].str . ',' .
-        \ s:tlist_file_cache[fname].end . 'foldopen!'
   " Go back to the tag line before the list is updated
   call search(curline, 'w')
   if g:tlist_show_menu
