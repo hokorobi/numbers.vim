@@ -14,7 +14,8 @@
 "            software.
 
 " LOAD GUARD: {{{1
-if exists('g:loaded_autoload_taglist') || !exists('*system')
+if exists('g:loaded_autoload_taglist') ||
+      \ v:version < 800 || !exists('*system')
   finish
 endif
 let g:loaded_autoload_taglist = 1
@@ -241,28 +242,15 @@ function! taglist#Refresh()
     let save_winnr = winnr()
     " Goto the taglist window
     call s:WindowGotoTagListWindow()
-    if !g:tlist_auto_highlight_tag || !g:tlist_highlight_tag_on_bufenter
-      " Save the cursor position
-      let save_pos = getpos('.')[1: 2]
-    endif
+    " Save the cursor position
+    let save_pos = getpos('.')[1: 2]
     " Update the taglist window
     call s:WindowRefreshFile(fname, ftype)
     " Open the fold for the file
     exe 'silent! ' . s:tlist_file_cache[fname].start . ',' .
           \ s:tlist_file_cache[fname].end . 'foldopen!'
-    if g:tlist_highlight_tag_on_bufenter && g:tlist_auto_highlight_tag
-      if g:tlist_show_one_file && s:tlist_cur_file !=# fname
-        " If displaying tags for only one file in the taglist
-        " window and about to display the tags for a new file,
-        " then center the current tag line for the new file
-        let center_tag_line = 1
-      else
-        let center_tag_line = 0
-      endif
-    else
-      " Restore the cursor position
-      call cursor(save_pos)
-    endif
+    " Restore the cursor position
+    call cursor(save_pos)
     " Jump back to the original window
     if save_winnr != winnr()
       call s:ExeCmdWithoutAcmds(save_winnr . 'wincmd w')
