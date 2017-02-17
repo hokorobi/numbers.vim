@@ -1100,7 +1100,7 @@ function! s:UpdateFile(fname, ftype)
   " updating the tags for that file, then there is no need to
   " refresh the taglist window. Update the taglist and return
   if g:tlist_show_one_file && s:tlist_cur_file != '' &&
-    s:tlist_cur_file !=# a:fname
+        \ s:tlist_cur_file !=# a:fname
     call s:ProcessFile(a:fname, a:ftype)
     return
   endif

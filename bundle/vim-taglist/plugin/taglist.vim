@@ -159,7 +159,7 @@ let g:tlist_max_tag_length = get(g:, 'tlist_max_tag_length', 10)
 " Do not change the name of the taglist title variable. The winmanager
 " plugin relies on this name to determine the title for the taglist
 " plugin.
-let TagList_title = "__Tag_List__"
+let TagList_title = '__Tag_List__'
 
 " Commands to manage the taglist window
 command! -bar                         TlistLock              let tlist_auto_update = 0
