@@ -528,6 +528,7 @@ function! taglist#SessionLoad(...)
   endif
   if exists('g:tlist_file_cache')
     for fname in keys(g:tlist_file_cache)
+      call s:UpdateRemovedFileList(fname, 0)
       let g:tlist_file_cache[fname].ftime   = getftime(fname)
       let g:tlist_file_cache[fname].start   = 0
       let g:tlist_file_cache[fname].end     = 0
