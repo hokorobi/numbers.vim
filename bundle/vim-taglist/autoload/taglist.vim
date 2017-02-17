@@ -243,7 +243,7 @@ function! taglist#Refresh()
     call s:WindowGotoTagListWindow()
     if !g:tlist_auto_highlight_tag || !g:tlist_highlight_tag_on_bufenter
       " Save the cursor position
-      let save_pos = getpos('.')[1, 2]
+      let save_pos = getpos('.')[1: 2]
     endif
     " Update the taglist window
     call s:WindowRefreshFile(fname, ftype)
@@ -1221,7 +1221,7 @@ function! UpdateFile(filename, ftype)
     " Goto the taglist window
     call s:WindowGotoTagListWindow()
     " Save the cursor position
-    let save_pos = getpos('.')[1, 2]
+    let save_pos = getpos('.')[1: 2]
     " Update the taglist window
     call s:WindowRefreshFile(fname, a:ftype)
     " Restore the cursor position
