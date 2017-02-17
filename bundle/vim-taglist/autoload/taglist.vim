@@ -195,7 +195,6 @@ function! taglist#WindowOpen()
   " Get the filename and filetype for the specified buffer
   let fname = fnamemodify(bufname('%'), ':p')
   let ftype = s:GetBufferFileType(bufname('%'))
-  let cur_lnum = line('.')
   " Mark the current window as the desired window to open a file when a tag
   " is selected.
   call s:WindowMarkFileWindow()
@@ -520,6 +519,7 @@ function! taglist#Refresh()
   call s:LogMsg('Refresh(tlist_skip_refresh = ' .
         \ s:tlist_skip_refresh . ', ' . bufname('%') . ')')
   " Skip buffers with 'buftype' set to nofile, nowrite, quickfix or help
+  " This also includes taglist window itself
   if &buftype != ''
     return
   endif
@@ -539,16 +539,17 @@ function! taglist#Refresh()
         \ !g:tlist_show_menu
     return
   endif
+  " If the taglist window is not opened and not configured to process
+  " tags always and not displaying the tags menu, then return
+  if bufwinnr(g:TagList_title) == -1 &&
+        \ !g:tlist_process_file_always &&
+        \ !g:tlist_show_menu
+    return
+  endif
   let fname = fnamemodify(bufname('%'), ':p')
   let ftype = s:GetBufferFileType(bufname('%'))
   " If the file doesn't support tag listing, skip it
   if s:SkipFile(fname, ftype)
-    return
-  endif
-  let tlist_winnr = bufwinnr(g:TagList_title)
-  " If the taglist window is not opened and not configured to process
-  " tags always and not displaying the tags menu, then return
-  if tlist_winnr == -1 && !g:tlist_process_file_always && !g:tlist_show_menu
     return
   endif
   if !has_key(s:tlist_file_cache, fname)
@@ -562,44 +563,8 @@ function! taglist#Refresh()
       return
     endif
   endif
-  let cur_lnum = line('.')
-  if !has_key(s:tlist_file_cache, fname)
-    " Initialize the tags for the file
-    call s:ProcessFile(fname, ftype)
-  else
-    " Update the tags for the file
-    let ftime = getftime(fname)
-    if s:tlist_file_cache[fname].ftime != ftime
-      " Invalidate the tags listed for this file
-      let s:tlist_file_cache[fname].valid = 0
-      " Update the taglist and the window
-      call s:UpdateFile(fname, ftype)
-      " Store the new file modification time
-      let s:tlist_file_cache[fname].ftime = ftime
-    endif
-  endif
-  " Update the taglist window
-  if tlist_winnr != -1
-    " Disable screen updates
-    let old_lazyredraw = &lazyredraw
-    set nolazyredraw
-    " Save the current window number
-    let save_winnr = winnr()
-    " Goto the taglist window
-    call s:GotoTagListWindow()
-    " Save the cursor position
-    let save_pos = getpos('.')[1: 2]
-    " Update the taglist window
-    call s:WindowRefreshFileInDisplay(fname, ftype)
-    " Restore the cursor position
-    call cursor(save_pos)
-    " Jump back to the original window
-    if save_winnr != winnr()
-      call s:ExeCmdWithoutAcmds(save_winnr . 'wincmd w')
-    endif
-    " Restore screen updates
-    let &lazyredraw = old_lazyredraw
-  endif
+  " Initialize the tags for the file
+  call s:UpdateFile(fname, ftype)
   " Update the taglist menu
   if g:tlist_show_menu
     call s:MenuUpdateFile(0)
@@ -1115,8 +1080,8 @@ function! s:UpdateFile(fname, ftype)
         \ s:tlist_file_cache[a:fname].valid
     " File exists and the tags are valid
     " Check whether the file was modified after the last tags update
-    " If it is modified, then update the tags
-    if s:tlist_file_cache[a:fname]['ftime'] == getftime(a:fname)
+    " If it is not modified, no need to update the tags
+    if s:tlist_file_cache[a:fname].ftime == getftime(a:fname)
       return
     endif
   else
@@ -1129,36 +1094,36 @@ function! s:UpdateFile(fname, ftype)
   " of the file and return, otherwise update the taglist window
   if bufwinnr(g:TagList_title) == -1
     call s:ProcessFile(a:fname, a:ftype)
-  else
-    if g:tlist_show_one_file && s:tlist_cur_file != ''
-      " If tags for only one file are displayed and we are not
-      " updating the tags for that file, then there is no need to
-      " refresh the taglist window. Update the taglist and return
-      if s:tlist_cur_file !=# a:fname
-        call s:ProcessFile(a:fname, a:ftype)
-        return
-      endif
-    endif
-    " Disable screen updates
-    let old_lazyredraw = &lazyredraw
-    set nolazyredraw
-    " Save the current window number
-    let save_winnr = winnr()
-    " Goto the taglist window
-    call s:GotoTagListWindow()
-    " Save the cursor position
-    let save_pos = getpos('.')[1: 2]
-    " Update the taglist window
-    call s:WindowRefreshFileInDisplay(a:fname, a:ftype)
-    " Restore the cursor position
-    call cursor(save_pos)
-    " Jump back to the original window
-    if save_winnr != winnr()
-      call s:ExeCmdWithoutAcmds(save_winnr . 'wincmd w')
-    endif
-    " Restore screen updates
-    let &lazyredraw = old_lazyredraw
+    return
   endif
+  " If tags for only one file are displayed and we are not
+  " updating the tags for that file, then there is no need to
+  " refresh the taglist window. Update the taglist and return
+  if g:tlist_show_one_file && s:tlist_cur_file != '' &&
+    s:tlist_cur_file !=# a:fname
+    call s:ProcessFile(a:fname, a:ftype)
+    return
+  endif
+  " The taglist window is present so need to update both
+  " Disable screen updates
+  let old_lazyredraw = &lazyredraw
+  set nolazyredraw
+  " Save the current window number
+  let save_winnr = winnr()
+  " Goto the taglist window
+  call s:GotoTagListWindow()
+  " Save the cursor position
+  let save_pos = getpos('.')[1: 2]
+  " Update the taglist window and the file
+  call s:WindowRefreshFileInDisplay(a:fname, a:ftype)
+  " Restore the cursor position
+  call cursor(save_pos)
+  " Jump back to the original window
+  if save_winnr != winnr()
+    call s:ExeCmdWithoutAcmds(save_winnr . 'wincmd w')
+  endif
+  " Restore screen updates
+  let &lazyredraw = old_lazyredraw
   " Update the taglist menu
   if g:tlist_show_menu
     call s:MenuUpdateFile(1)
@@ -2689,7 +2654,7 @@ function! s:MenuRefresh()
     let s:tlist_file_cache[fname].mcmd = ''
   endif
   " Update the taglist, menu and window
-  call taglist#UpdateCurrentFile()
+  call taglist#Refresh()
 endfunction
 
 " Change the sort order of the tag listing
