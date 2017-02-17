@@ -463,6 +463,36 @@ function! taglist#UpdateCurrentFile()
   endif
 endfunction
 
+" Save a taglist session (information about all the displayed files
+" and the tags) into the specified file
+function! taglist#SessionSave(...)
+  if a:0 == 0 || a:1 == ''
+    call s:WarningMsg('Usage: SessionSave <filename>')
+    return
+  endif
+  let sessionfile = a:1
+  if empty(s:tlist_file_cache)
+    call s:WarningMsg('Empty file cache. Nothing to save.')
+    return
+  endif
+  if filereadable(sessionfile)
+    let ans = input('Do you want to overwrite ' . sessionfile . ' (Y/N)?')
+    if ans !=? 'y'
+      return
+    endif
+  endif
+  let old_verbose = &verbose
+  set verbose&vim
+  exe 'redir! > ' . sessionfile
+  silent! echo '" TagList session file. This file is auto-generated.'
+  silent! echo '" System time: ' . strftime('%c')
+  silent! echo '" Session information:'
+  silent! echo 'let tlist_file_cache = ' . string(s:tlist_file_cache)
+  silent! echo 'let tlist_filetype_settings =' . string(s:tlist_filetype_settings)
+  redir END
+  let &verbose = old_verbose
+endfunction
+
 " Load a taglist session (information about all the displayed files
 " and the tags) from the specified file
 function! taglist#SessionLoad(...)
@@ -472,80 +502,54 @@ function! taglist#SessionLoad(...)
   endif
   let sessionfile = a:1
   if !filereadable(sessionfile)
-    call s:WarningMsg('Error - Unable to open file ' . sessionfile)
+    call s:WarningMsg('Unable to open file ' . sessionfile)
     return
   endif
   " Mark the current window as the file window
   call s:WindowMarkFileWindow()
   " Source the session file
   exe 'source ' . sessionfile
-  let new_file_count = g:tlist_file_count
-  unlet! g:tlist_file_count
-  let i = 0
-  while i < new_file_count
-    let ftype = g:tlist_{i}_filetype
-    unlet! g:tlist_{i}_filetype
-    if !exists('s:tlist_filetype_settings[ftype]')
-      if s:InitFileTypeSettings(ftype) == 0
-        let i += 1
-        continue
-      endif
-    endif
-    let fname = g:tlist_{i}_filename
-    unlet! g:tlist_{i}_filename
-    let fidx = s:GetFileIndex(fname)
-    if fidx != -1
-      let s:tlist_{fidx}_visible = 0
-      let i = i + 1
-      continue
+  if !exists('g:tlist_filetype_settings') ||
+        \ !exists('g:tlist_file_cache')
+    call s:WarningMsg('No session information found in ' . sessionfile)
+    return
+  endif
+  if exists('g:tlist_filetype_settings')
+    if empty(s:tlist_filetype_settings)
+      let s:tlist_filetype_settings = copy(g:tlist_filetype_settings)
     else
-      " As we are loading the tags from the session file, if this
-      " file was previously deleted by the user, now we need to
-      " add it back. So remove the file from the deleted list.
-      call s:UpdateRemovedFileList(fname, 0)
+      for key in keys(g:tlist_filetype_settings)
+        if !has_key(s:tlist_filetype_settings, key)
+          let s:tlist_filetype_settings[key] = copy(g:tlist_filetype_settings[key])
+        endif
+      endfor
     endif
-    let fidx = s:InitFile(fname, ftype)
-    let s:tlist_{fidx}_filename = fname
-    let s:tlist_{fidx}_sort_type = g:tlist_{i}_sort_type
-    unlet! g:tlist_{i}_sort_type
-    let s:tlist_{fidx}_filetype = ftype
-    let s:tlist_{fidx}_mtime = getftime(fname)
-    let s:tlist_{fidx}_start = 0
-    let s:tlist_{fidx}_end = 0
-    let s:tlist_{fidx}_valid = 1
-    let s:tlist_{fidx}_tag_count = g:tlist_{i}_tag_count
-    unlet! g:tlist_{i}_tag_count
-    let j = 1
-    while j <= s:tlist_{fidx}_tag_count
-      let s:tlist_{fidx}_{j}_tag = g:tlist_{i}_{j}_tag
-      let s:tlist_{fidx}_{j}_tag_name = g:tlist_{i}_{j}_tag_name
-      let s:tlist_{fidx}_{j}_ttype_idx = g:tlist_{i}_{j}_ttype_idx
-      unlet! g:tlist_{i}_{j}_tag
-      unlet! g:tlist_{i}_{j}_tag_name
-      unlet! g:tlist_{i}_{j}_ttype_idx
-      let j = j + 1
-    endwhile
-    for ttype in keys(s:tlist_filetype_settings[ftype].flags)
-      if exists('g:tlist_' . i . '_' . ttype)
-        let s:tlist_{fidx}_{ttype} = g:tlist_{i}_{ttype}
-        unlet! g:tlist_{i}_{ttype}
-        let s:tlist_{fidx}_{ttype}_offset = 0
-        let s:tlist_{fidx}_{ttype}_count = g:tlist_{i}_{ttype}_count
-        unlet! g:tlist_{i}_{ttype}_count
-        let k = 1
-        while k <= s:tlist_{fidx}_{ttype}_count
-          let s:tlist_{fidx}_{ttype}_{k} = g:tlist_{i}_{ttype}_{k}
-          unlet! g:tlist_{i}_{ttype}_{k}
-          let k = k + 1
-        endwhile
-      else
-        let s:tlist_{fidx}_{ttype} = ''
-        let s:tlist_{fidx}_{ttype}_offset = 0
-        let s:tlist_{fidx}_{ttype}_count = 0
+    unlet! g:tlist_filetype_settings
+  endif
+  if exists('g:tlist_file_cache')
+    for fname in keys(g:tlist_file_cache)
+      g:tlist_file_cache[fname].ftime   = getftime(fname)
+      g:tlist_file_cache[fname].start   = 0
+      g:tlist_file_cache[fname].end     = 0
+      g:tlist_file_cache[fname].valid   = 1
+      g:tlist_file_cache[fname].visible = 0
+      if !empty(g:tlist_file_cache[fname].flags)
+        for flag in keys(g:tlist_file_cache[fname].flags)
+          g:tlist_file_cache[fname].flags[flag].offset = 0
+        endfor
       endif
     endfor
-    let i = i + 1
-  endwhile
+    if empty(s:tlist_file_cache)
+      let s:tlist_file_cache = copy(g:tlist_file_cache)
+    else
+      for key in keys(g:tlist_file_cache)
+        if !has_key(s:tlist_file_cache, key)
+          let s:tlist_file_cache[key] = copy(g:tlist_file_cache[key])
+        endif
+      endfor
+    endif
+    unlet! g:tlist_file_cache
+  endif
   " If the taglist window is open, then update it
   let tlist_winnr = bufwinnr(g:TagList_title)
   if tlist_winnr != -1
@@ -559,79 +563,6 @@ function! taglist#SessionLoad(...)
       call s:ExeCmdWithoutAcmds('wincmd p')
     endif
   endif
-endfunction
-
-" Save a taglist session (information about all the displayed files
-" and the tags) into the specified file
-function! taglist#SessionSave(...)
-  if a:0 == 0 || a:1 == ''
-    call s:WarningMsg('Usage: SessionSave <filename>')
-    return
-  endif
-  let sessionfile = a:1
-  if s:tlist_file_count == 0
-    " There is nothing to save
-    call s:WarningMsg('Taglist is empty. Nothing to save.')
-    return
-  endif
-  if filereadable(sessionfile)
-    let ans = input('Do you want to overwrite ' . sessionfile . ' (Y/N)?')
-    if ans !=? 'y'
-      return
-    endif
-    echo "\n"
-  endif
-  let old_verbose = &verbose
-  set verbose&vim
-  exe 'redir! > ' . sessionfile
-  silent! echo '" Taglist session file. This file is auto-generated.'
-  silent! echo '" File information'
-  silent! echo 'let tlist_file_count = ' . s:tlist_file_count
-  let i = 0
-  while i < s:tlist_file_count
-    " Store information about the file
-    silent! echo 'let tlist_' . i . "_filename = '" .
-          \ s:tlist_{i}_filename . "'"
-    silent! echo 'let tlist_' . i . '_sort_type = "' .
-          \ s:tlist_{i}_sort_type . '"'
-    silent! echo 'let tlist_' . i . '_filetype = "' .
-          \ s:tlist_{i}_filetype . '"'
-    silent! echo 'let tlist_' . i . '_tag_count = ' .
-          \ s:tlist_{i}_tag_count
-    " Store information about all the tags
-    let j = 1
-    while j <= s:tlist_{i}_tag_count
-      let txt = escape(s:tlist_{i}_{j}_tag, '"\\')
-      silent! echo 'let tlist_' . i . '_' . j . '_tag = "' . txt . '"'
-      silent! echo 'let tlist_' . i . '_' . j . '_tag_name = "' .
-            \ s:tlist_{i}_{j}_tag_name . '"'
-      silent! echo 'let tlist_' . i . '_' . j . '_ttype_idx' . ' = ' .
-            \ s:tlist_{i}_{j}_ttype_idx
-      let j = j + 1
-    endwhile
-    " Store information about all the tags grouped by their type
-    let ftype = s:tlist_{i}_filetype
-    for ttype in keys(s:tlist_filetype_settings[ftype].flags)
-      if s:tlist_{i}_{ttype}_count != 0
-        let txt = escape(s:tlist_{i}_{ttype}, '"\')
-        let txt = substitute(txt, "\n", "\\\\n", 'g')
-        silent! echo 'let tlist_' . i . '_' . ttype . ' = "' .
-              \ txt . '"'
-        silent! echo 'let tlist_' . i . '_' . ttype . '_count = ' .
-              \ s:tlist_{i}_{ttype}_count
-        let k = 1
-        while k <= s:tlist_{i}_{ttype}_count
-          silent! echo 'let tlist_' . i . '_' . ttype . '_' . k .
-                \ ' = ' . s:tlist_{i}_{ttype}_{k}
-          let k = k + 1
-        endwhile
-      endif
-    endfor
-    silent! echo
-    let i = i + 1
-  endwhile
-  redir END
-  let &verbose = old_verbose
 endfunction
 
 " Enable logging of taglist debug messages.
@@ -740,7 +671,7 @@ endfunction
 " Display a message using WarningMsg highlight group
 function! s:WarningMsg(msg)
   echohl WarningMsg
-  echomsg 'TagList: ' . a:msg
+  echomsg (a:msg !~ '^\w\+:') ? 'TagList: ' . a:msg : a:msg
   echohl None
 endfunction
 
