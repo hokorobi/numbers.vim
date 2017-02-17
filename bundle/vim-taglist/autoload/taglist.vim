@@ -485,7 +485,7 @@ function! taglist#MenuInit()
   augroup TagListMenuCmds
     autocmd!
     if !g:tlist_process_file_always
-      autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#Refresh()
+      autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#RefreshCurrentBuffer()
     endif
     autocmd BufLeave * call s:MenuRemoveFile()
   augroup END
@@ -515,7 +515,7 @@ function! taglist#WindowCheckAutoOpen()
 endfunction
 
 " Refresh the taglist
-function! taglist#Refresh()
+function! taglist#RefreshCurrentBuffer()
   call s:LogMsg('Refresh(tlist_skip_refresh = ' .
         \ s:tlist_skip_refresh . ', ' . bufname('%') . ')')
   " Skip buffers with 'buftype' set to nofile, nowrite, quickfix or help
@@ -1083,6 +1083,10 @@ function! s:UpdateFile(fname, ftype)
     " If it is not modified, no need to update the tags
     if s:tlist_file_cache[a:fname].ftime == getftime(a:fname)
       return
+    else
+      " Need to invalidate the file otherwise the taglist window
+      " will not update
+      let s:tlist_file_cache[a:fname].valid = 0
     endif
   else
     " If the tags were removed previously based on a user request,
@@ -1263,12 +1267,14 @@ function! s:WindowRefreshFileInDisplay(fname, ftype)
     " Check whether this file is removed based on user request
     " If it is, then no need to display the tags for this file
     if s:IsRemovedFile(a:fname)
+      call s:LogMsg('File not listed. User removed file.')
       return
     endif
   endif
   if file_listed && s:tlist_file_cache[a:fname].visible
     " Check whether the file tags are currently valid
     if s:tlist_file_cache[a:fname].valid
+      call s:LogMsg('File listed and valid. Only unfold.')
       " Goto the first line in the file
       exe s:tlist_file_cache[a:fname].str
       " If the line is inside a fold, open the fold
@@ -2377,7 +2383,7 @@ function! s:WindowInit()
           \ !g:tlist_process_file_always &&
           \ (!has('gui_running') || !g:tlist_show_menu)
       " Auto refresh the taglist window
-      autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#Refresh()
+      autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#RefreshCurrentBuffer()
     endif
     autocmd TabEnter * silent call s:WindowRefreshFolds()
   augroup END
@@ -2654,7 +2660,7 @@ function! s:MenuRefresh()
     let s:tlist_file_cache[fname].mcmd = ''
   endif
   " Update the taglist, menu and window
-  call taglist#Refresh()
+  call taglist#RefreshCurrentBuffer()
 endfunction
 
 " Change the sort order of the tag listing
@@ -2678,7 +2684,7 @@ function! s:MenuChangeSort(action, sort_type)
   " Invalidate the tags listed for this file
   let s:tlist_file_cache[fname].valid = 0
   call s:MenuRemoveFile()
-  call taglist#Refresh()
+  call taglist#RefreshCurrentBuffer()
 endfunction
 
 " Jump to the selected tag

@@ -164,7 +164,7 @@ let TagList_title = '__Tag_List__'
 " Commands to manage the taglist window
 command! -bar                         TlistLock              let tlist_auto_update = 0
 command! -bar                         TlistUnlock            let tlist_auto_update = 1
-command! -nargs=0 -bar                TlistRefresh           call taglist#Refresh()
+command! -nargs=0 -bar                TlistRefresh           call taglist#RefreshCurrentBuffer()
 command! -nargs=0 -bar                TlistOpen              call taglist#WindowOpen()
 command! -nargs=0 -bar                TlistClose             call taglist#WindowClose()
 command! -nargs=0 -bar                TlistToggle            call taglist#WindowToggle()
