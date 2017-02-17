@@ -60,6 +60,10 @@
 " LOAD GUARD: {{{1
 if exists('g:loaded_taglist')
   finish
+elseif v:version < 800
+  echomsg 'TagList: Vim version >= 8.0 is required. ' .
+        \ 'Plugin is not loaded.'
+  finish
 elseif !exists('*system')
   " The taglist plugin requires the built-in Vim system() function. If this
   " function is not available, then don't load the plugin.
@@ -143,10 +147,6 @@ let g:tlist_file_fold_auto_close = get(g:, 'tlist_file_fold_auto_close', 0)
 let g:tlist_close_on_select = get(g:, 'tlist_close_on_select', 0)
 " Automatically update the taglist window to display tags
 let g:tlist_auto_update = get(g:, 'tlist_auto_update', 0)
-" Automatically highlight the current tag
-let g:tlist_auto_highlight_tag = get(g:, 'tlist_auto_highlight_tag', 1)
-" Automatically highlight the current tag on entering a buffer
-let g:tlist_highlight_tag_on_bufenter = get(g:, 'tlist_highlight_tag_on_bufenter', 1)
 " Enable fold column to display the folding for the tag tree
 let g:tlist_enable_fold_column = get(g:, 'tlist_enable_fold_column', 1)
 " Display the tags for only one file in the taglist window
@@ -172,8 +172,6 @@ command! -nargs=0 -bar                Tlist                  TlistToggle
 command! -nargs=+ -complete=file      TlistAddFiles          call taglist#AddFiles(<f-args>)
 command! -nargs=+ -complete=dir       TlistAddFilesRecursive call taglist#AddFilesRecursive(<f-args>)
 command! -nargs=0 -bar                TlistUpdate            call taglist#UpdateCurrentFile()
-command! -nargs=* -complete=buffer    TlistShowPrototype     echo taglist#GetTagPrototypeByLine(<f-args>)
-command! -nargs=* -complete=buffer    TlistShowTag           echo taglist#GetTagnameByLine(<f-args>)
 command! -nargs=* -complete=file      TlistSessionLoad       call taglist#SessionLoad(<q-args>)
 command! -nargs=* -complete=file      TlistSessionSave       call taglist#SessionSave(<q-args>)
 " Commands for enabling/disabling debug and to display debug messages
