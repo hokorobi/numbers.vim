@@ -228,7 +228,7 @@ function! taglist#Refresh()
       " Invalidate the tags listed for this file
       let s:tlist_file_cache[fname].valid = 0
       " Update the taglist and the window
-      call UpdateFile(fname, ftype)
+      call s:UpdateFile(fname, ftype)
       " Store the new file modification time
       let s:tlist_file_cache[fname].ftime = ftime
     endif
@@ -410,19 +410,19 @@ endfunction
 
 " Add the specified list of files to the taglist
 function! taglist#AddFiles(...)
-  let flist = ''
+  let flist = []
   let i = 1
   " Get all the files matching the file patterns supplied as argument
   while i <= a:0
-    let flist = flist . glob(a:{i}) . "\n"
+    let flist += glob(a:{i}, 0, 1)
     let i = i + 1
   endwhile
-  if flist == ''
+  if empty(flist)
     call s:WarningMsg('Error: No matching files are found')
     return
   endif
   let fcnt = s:BatchProcessFileList(flist)
-  echon "\rAdded " . fcnt . " files to the taglist"
+  echon "Added " . fcnt . " files to the taglist"
 endfunction
 
 " Add files recursively from a directory
@@ -432,17 +432,11 @@ function! taglist#AddFilesRecursive(dir, ...)
     call s:WarningMsg('Error: ' . dir_name . ' is not a directory')
     return
   endif
-  if a:0 == 1
-    " User specified file pattern
-    let pat = a:1
-  else
-    " Default file pattern
-    let pat = '*'
-  endif
-  echon "\r                                                              "
-  echon "\rProcessing files in directory " . fnamemodify(dir_name, ':t')
+  " User specified file pattern if available
+  let pat = a:0 == 1 ? a:1 : '*'
+  echo 'Processing files in directory ' . fnamemodify(dir_name, ':t')
   let fcnt = s:BatchProcessDir(dir_name, pat)
-  echon "\rAdded " . fcnt . " files to the taglist"
+  echo 'Added ' . fcnt . ' files to the taglist'
 endfunction
 
 " Update taglist for the current buffer by regenerating the tag list
@@ -455,11 +449,11 @@ function! taglist#UpdateCurrentFile()
   else
     " Not in the taglist window. Update the current buffer
     let fname = fnamemodify(bufname('%'), ':p')
+    let ftype = s:GetBufferFileType(bufname('%'))
     if has_key(s:tlist_file_cache, fname)
       let s:tlist_file_cache[fname].valid = 0
     endif
-    let ftype = s:GetBufferFileType(bufname('%'))
-    call UpdateFile(fname, ftype)
+    call s:UpdateFile(fname, ftype)
   endif
 endfunction
 
@@ -1111,38 +1105,37 @@ function! s:ProcessFile(fname, ftype)
 endfunction
 
 " Update the tags for a file (if needed)
-function! UpdateFile(filename, ftype)
+function! s:UpdateFile(fname, ftype)
   call s:LogMsg('UpdateFile(' . a:filename . ')')
   " If the file doesn't support tag listing, skip it
-  if s:SkipFile(a:filename, a:ftype)
+  if s:SkipFile(a:fname, a:ftype)
     return
   endif
-  let fname = fnamemodify(a:filename, ':p')
-  if has_key(s:tlist_file_cache, fname) &&
-        \ s:tlist_file_cache[fname].valid
+  if has_key(s:tlist_file_cache, a:fname) &&
+        \ s:tlist_file_cache[a:fname].valid
     " File exists and the tags are valid
     " Check whether the file was modified after the last tags update
     " If it is modified, then update the tags
-    if s:tlist_file_cache[fname]['ftime'] == getftime(fname)
+    if s:tlist_file_cache[a:fname]['ftime'] == getftime(a:fname)
       return
     endif
   else
     " If the tags were removed previously based on a user request,
     " as we are going to update the tags (based on the user request),
     " remove the filename from the deleted list
-    call s:UpdateRemovedFileList(fname, 0)
+    call s:UpdateRemovedFileList(a:fname, 0)
   endif
   " If the taglist window is not present, update the taglist
   " and return, otherwise update the taglist window
   if bufwinnr(g:TagList_title) == -1
-    call s:ProcessFile(fname, a:ftype)
+    call s:ProcessFile(a:fname, a:ftype)
   else
     if g:tlist_show_one_file && s:tlist_cur_file != ''
       " If tags for only one file are displayed and we are not
       " updating the tags for that file, then there is no need to
       " refresh the taglist window. Update the taglist and return
-      if s:tlist_cur_file !=# fname
-        call s:ProcessFile(fname, a:ftype)
+      if s:tlist_cur_file !=# a:fname
+        call s:ProcessFile(a:fname, a:ftype)
         return
       endif
     endif
@@ -1153,7 +1146,7 @@ function! UpdateFile(filename, ftype)
     " Save the cursor position
     let save_pos = getpos('.')[1: 2]
     " Update the taglist window
-    call s:WindowRefreshFileInDisplay(fname, a:ftype)
+    call s:WindowRefreshFileInDisplay(a:fname, a:ftype)
     " Restore the cursor position
     call cursor(save_pos)
     if winnr() != save_winnr
@@ -1177,17 +1170,17 @@ function! s:RemoveFile(fname)
     if save_winnr != tlist_winnr
       call s:ExeCmdWithoutAcmds(tlist_winnr . 'wincmd w')
     endif
-    call s:WindowRemoveFileFromDisplay(fname)
+    call s:WindowRemoveFileFromDisplay(a:fname)
     if save_winnr != tlist_winnr
       call s:ExeCmdWithoutAcmds('wincmd p')
     endif
   endif
   " Discard the file from the file cache
-  call s:DiscardFileInfo(fname)
+  call s:DiscardFileInfo(a:fname)
   " If the tags for only one file is displayed and if we just
   " now removed that file, then invalidate the current file variable
   if g:tlist_show_one_file
-    if s:tlist_cur_file ==# fname
+    if s:tlist_cur_file ==# a:fname
       let s:tlist_cur_file = ''
     endif
   endif
@@ -1197,29 +1190,25 @@ endfunction
 " Returns the number of processed files
 function! s:BatchProcessFileList(flist)
   let flist = a:flist
+  if empty(flist)
+    return 0
+  endif
   " Enable lazy screen updates
   let old_lazyredraw = &lazyredraw
   set lazyredraw
   " Keep track of the number of processed files
   let fcnt = 0
   " Process one file at a time
-  while flist != ''
-    let nl_idx = stridx(flist, "\n")
-    let one_file = strpart(flist, 0, nl_idx)
-    " Remove the filename from the list
-    let flist = strpart(flist, nl_idx + 1)
-    if one_file == ''
+  for fname in flist
+    if fname == '' || isdirectory(fname)
       continue
     endif
-    " Skip directories
-    if isdirectory(one_file)
-      continue
-    endif
-    let ftype = s:GetFileType(one_file)
-    call s:LogMsg('Processing tags for ' . fnamemodify(one_file, ':p:t'))
-    let fcnt = fcnt + 1
-    call UpdateFile(one_file, ftype)
-  endwhile
+    let fname = fnamemodify(fname, ':p')
+    let ftype = s:GetFileType(fname)
+    call s:LogMsg('Processing tags for ' . fnamemodify(fname, ':p:t'))
+    call s:UpdateFile(fname, ftype)
+    let fcnt += 1
+  endfor
   " Restore the previous state
   let &lazyredraw = old_lazyredraw
   return fcnt
@@ -1227,29 +1216,21 @@ endfunction
 
 " Process the files in a directory matching the specified pattern
 function! s:BatchProcessDir(dir_name, pat)
-  let flist = glob(a:dir_name . '/' . a:pat) . "\n"
-  let fcnt = s:BatchProcessFileList(flist)
   let len = strlen(a:dir_name)
-  if a:dir_name[len - 1] == '\' || a:dir_name[len - 1] == '/'
-    let glob_expr = a:dir_name . '*'
-  else
-    let glob_expr = a:dir_name . '/*'
-  endif
-  let all_files = glob(glob_expr) . "\n"
-  while all_files != ''
-    let nl_idx = stridx(all_files, "\n")
-    let one_file = strpart(all_files, 0, nl_idx)
-    let all_files = strpart(all_files, nl_idx + 1)
-    if one_file == ''
-      continue
-    endif
+  let top_dir =
+        \ (a:dir_name[len - 1] == '\' || a:dir_name[len - 1] == '/') ?
+        \ a:dirname : a:dirname . '/'
+  let flist = glob(top_dir . a:pat, 0, 1)
+  let fcnt = s:BatchProcessFileList(flist)
+  let all_files = glob(top_dir . '*', 0, 1)
+  for dir_name in all_files
     " Skip non-directory names
-    if !isdirectory(one_file)
+    if dir_name == '' || !isdirectory(dir_name)
       continue
     endif
-    call s:LogMsg('Processing files in directory ' . fnamemodify(one_file, ':t'))
-    let fcnt += s:BatchProcessDir(one_file, a:pat)
-  endwhile
+    call s:LogMsg('Processing files in directory ' . fnamemodify(dir_name, ':t'))
+    let fcnt += s:BatchProcessDir(dir_name, a:pat)
+  endfor
   return fcnt
 endfunction
 
