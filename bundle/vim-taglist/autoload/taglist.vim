@@ -2543,14 +2543,14 @@ function! s:MenuGetTagTypeCmd(fname, ftype, flag)
   " Depending on the number of tags of this type, split the menu into
   " multiple sub-menus, if needed.
   if tcnt > g:tlist_max_submenu_items
-    let j = 0
-    while j < tcnt
-      let f_tidx = j + g:tlist_max_submenu_items - 1
-      if f_tidx > tcnt - 1
+    let tidx = 0
+    while tidx < tcnt
+      let f_tidx = tidx + g:tlist_max_submenu_items - 1
+      if f_tidx >= tcnt
         let f_tidx = tcnt - 1
       endif
       " Extract the first and last tag names
-      let first_tag = s:tlist_file_cache[a:fname].flags[a:flag].tags[j].tag_name
+      let first_tag = s:tlist_file_cache[a:fname].flags[a:flag].tags[tidx].tag_name
       let last_tag = s:tlist_file_cache[a:fname].flags[a:flag].tags[f_tidx].tag_name
       " Truncate the names if they are greater than the max length
       let first_tag = strpart(first_tag, 0, g:tlist_max_tag_length)
@@ -2560,33 +2560,33 @@ function! s:MenuGetTagTypeCmd(fname, ftype, flag)
             \ '.' . first_tag . '\ \.\.\.\ ' . last_tag . '.'
       " Character prefix used to number the menu items (hotkey)
       let m_prefix_idx = 0
-      while j <= f_tidx
+      while tidx <= f_tidx
         let tname =
-              \ escape(s:tlist_file_cache[a:fname].flags[a:flag].tags[j].tag_name, ' .')
+              \ escape(s:tlist_file_cache[a:fname].flags[a:flag].tags[tidx].tag_name, ' .')
         let tname = substitute(tname, '&', '&&', 'g')
         let mcmd = mcmd . m_prefix . '\&' .
               \ s:menu_char_prefix[m_prefix_idx] . '\.\ ' .
               \ tname . ' :call <SID>MenuJumpToTag(' .
-              \ "'" . a:flag . "', " . j . ')<CR>|'
+              \ "'" . a:flag . "', " . tidx . ')<CR>|'
         let m_prefix_idx += 1
-        let j = j + 1
+        let tidx += 1
       endwhile
     endwhile
   else
     " Character prefix used to number the menu items (hotkey)
     let m_prefix_idx = 0
     let m_prefix = 'anoremenu <silent> T\&ags.' . flag_fullname . '.'
-    let j = 1
-    while j < tcnt
+    let tidx = 0
+    while tidx < tcnt
       let tname =
-            \ escape(s:tlist_file_cache[a:fname].flags[a:flag].tags[j].tag_name, ' .')
+            \ escape(s:tlist_file_cache[a:fname].flags[a:flag].tags[tidx].tag_name, ' .')
       let tname = substitute(tname, '&', '&&', 'g')
       let mcmd = mcmd . m_prefix . '\&' .
             \ s:menu_char_prefix[m_prefix_idx] . '\.\ ' .
             \ tname . ' :call <SID>MenuJumpToTag(' .
-            \ "'" . a:flag . "', " . j . ')<CR>|'
+            \ "'" . a:flag . "', " . tidx . ')<CR>|'
       let m_prefix_idx += 1
-      let j += 1
+      let tidx += 1
     endwhile
   endif
   return mcmd
