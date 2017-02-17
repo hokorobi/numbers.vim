@@ -528,14 +528,14 @@ function! taglist#SessionLoad(...)
   endif
   if exists('g:tlist_file_cache')
     for fname in keys(g:tlist_file_cache)
-      g:tlist_file_cache[fname].ftime   = getftime(fname)
-      g:tlist_file_cache[fname].start   = 0
-      g:tlist_file_cache[fname].end     = 0
-      g:tlist_file_cache[fname].valid   = 1
-      g:tlist_file_cache[fname].visible = 0
+      let g:tlist_file_cache[fname].ftime   = getftime(fname)
+      let g:tlist_file_cache[fname].start   = 0
+      let g:tlist_file_cache[fname].end     = 0
+      let g:tlist_file_cache[fname].valid   = 1
+      let g:tlist_file_cache[fname].visible = 0
       if !empty(g:tlist_file_cache[fname].flags)
         for flag in keys(g:tlist_file_cache[fname].flags)
-          g:tlist_file_cache[fname].flags[flag].offset = 0
+          let g:tlist_file_cache[fname].flags[flag].offset = 0
         endfor
       endif
     endfor
