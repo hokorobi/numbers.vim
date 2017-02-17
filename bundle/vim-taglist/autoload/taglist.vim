@@ -525,7 +525,7 @@ function! taglist#SessionLoad(...)
       unlet! g:tlist_{i}_{j}_ttype_idx
       let j = j + 1
     endwhile
-    for ttype in keys(s:tlist_filetype_settings[ftype]['flags'])
+    for ttype in keys(s:tlist_filetype_settings[ftype].flags)
       if exists('g:tlist_' . i . '_' . ttype)
         let s:tlist_{fidx}_{ttype} = g:tlist_{i}_{ttype}
         unlet! g:tlist_{i}_{ttype}
@@ -611,7 +611,7 @@ function! taglist#SessionSave(...)
     endwhile
     " Store information about all the tags grouped by their type
     let ftype = s:tlist_{i}_filetype
-    for ttype in keys(s:tlist_filetype_settings[ftype]['flags'])
+    for ttype in keys(s:tlist_filetype_settings[ftype].flags)
       if s:tlist_{i}_{ttype}_count != 0
         let txt = escape(s:tlist_{i}_{ttype}, '"\')
         let txt = substitute(txt, "\n", "\\\\n", 'g')
@@ -710,7 +710,7 @@ function! taglist#Start()
   " Get the current filename from the winmanager plugin
   let bufnum = WinManagerGetLastEditedFile()
   if bufnum != -1
-    let filename = fnamemodify(bufname(bufnum), ':p')
+    let fname = fnamemodify(bufname(bufnum), ':p')
     let ftype = s:GetBufferFileType(bufnum)
   endif
   " Initialize the taglist window, if it is not already initialized
@@ -721,8 +721,8 @@ function! taglist#Start()
   endif
   " Update the taglist window
   if bufnum != -1
-    if !s:SkipFile(filename, ftype) && g:tlist_auto_update
-      call s:WindowRefreshFile(filename, ftype)
+    if !s:SkipFile(fname, ftype) && g:tlist_auto_update
+      call s:WindowRefreshFile(fname, ftype)
     endif
   endif
 endfunction
@@ -889,7 +889,7 @@ function! s:ParseRawSettingStrings(settings)
       return {}
     endif
     let settings = strpart(settings, pos + 1)
-    let parsed_settings['flags'][flag] = name
+    let parsed_settings.flags[flag] = name
   endwhile
   return parsed_settings
 endfunction
@@ -1006,7 +1006,7 @@ function! s:ParseTagLine(tag_line, fname, ftype)
   let tag_flag = s:ExtractTagFlag(a:tag_line)
   " Make sure the tag flag is a valid and supported one
   if tag_flag == '' ||
-        \ !has_key(s:tlist_filetype_settings[a:ftype]['flags'], tag_flag)
+        \ !has_key(s:tlist_filetype_settings[a:ftype].flags, tag_flag)
     return ''
   endif
   " Extract tag specific information
@@ -1018,21 +1018,21 @@ function! s:ParseTagLine(tag_line, fname, ftype)
         \ 'tag_lnum'   : s:ExtractTagLineNr(a:tag_line),
         \ }
   " Store flag information if it is not already available
-  if !has_key(s:tlist_file_cache[a:fname]['flags'], tag_flag)
-    let s:tlist_file_cache[a:fname]['flags'][tag_flag] = {
+  if !has_key(s:tlist_file_cache[a:fname].flags, tag_flag)
+    let s:tlist_file_cache[a:fname].flags[tag_flag] = {
           \ 'offset': 0,
           \ 'tags'  : [],
           \ }
   endif
   " Store tag specific information
-  call add(s:tlist_file_cache[a:fname]['flags'][tag_flag]['tags'], cur_tag)
+  call add(s:tlist_file_cache[a:fname].flags[tag_flag].tags, cur_tag)
   return tag_flag . ': ' . cur_tag.tag_name . "\n"
 endfunction
 
 " Check whether tag listing is supported for the specified file
-function! s:SkipFile(filename, ftype)
+function! s:SkipFile(fname, ftype)
   " Skip buffers with no names and buffers with filetype not set
-  if a:filename == '' || a:ftype == ''
+  if a:fname == '' || a:ftype == ''
     return 1
   endif
   " Skip files which are not supported by exuberant ctags
@@ -1041,12 +1041,12 @@ function! s:SkipFile(filename, ftype)
   " available. If both are not available, then don't list the tags for this
   " filetype
   if !has_key(s:tlist_def_settings, a:ftype) &&
-        \ !exists('g:tlist_' . a:ftype . '_settings') 
+        \ !exists('g:tlist_' . a:ftype . '_settings')
     return 1
   endif
   " Skip files which are not readable or files which are not yet stored
   " to the disk
-  if !filereadable(a:filename)
+  if !filereadable(a:fname)
     return 1
   endif
   return 0
@@ -1084,9 +1084,9 @@ function! s:DiscardFileTagInfo(fname)
     return 0
   endif
   " Discard information about the tags defined in the file
-  let s:tlist_file_cache[a:fname]['flags'] = {}
+  let s:tlist_file_cache[a:fname].flags = {}
   " Discard the stored menu command
-  let s:tlist_file_cache[a:fname]['mcmd'] = ''
+  let s:tlist_file_cache[a:fname].mcmd = ''
   return 1
 endfunction
 
@@ -1119,7 +1119,7 @@ function! s:ProcessFile(fname, ftype)
   else
     call s:DiscardFileTagInfo(a:fname)
   endif
-  let s:tlist_file_cache[a:fname]['valid'] = 1
+  let s:tlist_file_cache[a:fname].valid = 1
   " Create ctags arguments
   let ctags_args = ''
   " Read contents of ctags configuration file
@@ -1130,13 +1130,13 @@ function! s:ProcessFile(fname, ftype)
   let ctags_args .= '-f - --format=2 --excmd=pattern --fields=nks '
   " Add sort type to ctags arguments
   let ctags_args .= '--sort=' . (
-        \ s:tlist_file_cache[a:fname]['sortby'] == 'name' ?
+        \ s:tlist_file_cache[a:fname].sortby == 'name' ?
         \ 'yes' : 'no') . ' '
   " Add the filetype specific arguments
   let ctags_args .= '--language-force=' .
-        \ s:tlist_filetype_settings[a:ftype]['ftype'] .
-        \ ' --' . s:tlist_filetype_settings[a:ftype]['ftype'] . '-types=' .
-        \ join(keys(s:tlist_filetype_settings[a:ftype]['flags']), '')
+        \ s:tlist_filetype_settings[a:ftype].ftype .
+        \ ' --' . s:tlist_filetype_settings[a:ftype].ftype . '-types=' .
+        \ join(keys(s:tlist_filetype_settings[a:ftype].flags), '')
   " Ctags command to produce output with regexp for locating the tags
   let ctags_cmd = g:tlist_ctags_cmd . ' ' .
         \ ctags_args . ' ' . shellescape(a:fname)
@@ -1152,7 +1152,7 @@ function! s:ProcessFile(fname, ftype)
     return 1
   endif
   " Store the modification time for the file
-  let s:tlist_file_cache[a:fname]['ftime'] = getftime(a:fname)
+  let s:tlist_file_cache[a:fname].ftime = getftime(a:fname)
   " No tags for current file
   if cmd_output == ''
     call s:LogMsg('No tags defined in ' . a:fname)
@@ -1177,7 +1177,7 @@ function! UpdateFile(filename, ftype)
   endif
   let fname = fnamemodify(a:filename, ':p')
   if has_key(s:tlist_file_cache, fname) &&
-        \ s:tlist_file_cache[fname]['valid']
+        \ s:tlist_file_cache[fname].valid
     " File exists and the tags are valid
     " Check whether the file was modified after the last tags update
     " If it is modified, then update the tags
@@ -1343,22 +1343,22 @@ function! s:WindowUpdateLineOffsets(fname, increment, offset)
       continue
     endif
     " Update the line offsets only if the file is visible
-    if !s:tlist_file_cache[fname]['visible']
+    if !s:tlist_file_cache[fname].visible
       continue
     endif
     " No need to update for files displayed before the reference file
     if a:fname != ''
-      if s:tlist_file_cache[fname]['end'] <
-            \ s:tlist_file_cache[a:fname]['start']
+      if s:tlist_file_cache[fname].end <
+            \ s:tlist_file_cache[a:fname].start
         continue
       endif
     endif
     if a:increment
-      let s:tlist_file_cache[fname]['start'] += a:offset
-      let s:tlist_file_cache[fname]['end'] += a:offset
+      let s:tlist_file_cache[fname].start += a:offset
+      let s:tlist_file_cache[fname].end += a:offset
     else
-      let s:tlist_file_cache[fname]['start'] -= a:offset
-      let s:tlist_file_cache[fname]['end'] -= a:offset
+      let s:tlist_file_cache[fname].start -= a:offset
+      let s:tlist_file_cache[fname].end -= a:offset
     endif
   endfor
 endfunction
@@ -1367,15 +1367,15 @@ endfunction
 function! s:WindowRemoveFileFromDisplay(fname)
   call s:LogMsg('WindowRemoveFileFromDisplay (' . a:fname . ')')
   " If the file is not visible then no need to remove it
-  if !s:tlist_file_cache[a:fname]['visible']
+  if !s:tlist_file_cache[a:fname].visible
     return
   endif
   " Remove the tags displayed for the specified file from the window
-  let start = s:tlist_file_cache[a:fname]['start']
+  let start = s:tlist_file_cache[a:fname].start
   " Include the empty line after the last line also
   let end = g:tlist_compact_format ?
-        \ s:tlist_file_cache[a:fname]['end'] :
-        \ s:tlist_file_cache[a:fname]['end'] + 1
+        \ s:tlist_file_cache[a:fname].end :
+        \ s:tlist_file_cache[a:fname].end + 1
   setlocal modifiable
   exe 'silent! ' . start . ',' . end . 'delete _'
   setlocal nomodifiable
@@ -1396,15 +1396,15 @@ function! s:WindowRefreshFile(fname, ftype)
       return
     endif
   endif
-  if file_listed && s:tlist_file_cache[a:fname]['visible']
+  if file_listed && s:tlist_file_cache[a:fname].visible
     " Check whether the file tags are currently valid
-    if s:tlist_file_cache[a:fname]['valid']
+    if s:tlist_file_cache[a:fname].valid
       " Goto the first line in the file
-      exe s:tlist_file_cache[a:fname]['start']
+      exe s:tlist_file_cache[a:fname].start
       " If the line is inside a fold, open the fold
       if foldclosed('.') != -1
-        exe 'silent! ' . s:tlist_file_cache[a:fname]['start'] . ',' .
-              \ s:tlist_file_cache[a:fname]['end'] . 'foldopen!'
+        exe 'silent! ' . s:tlist_file_cache[a:fname].start . ',' .
+              \ s:tlist_file_cache[a:fname].end . 'foldopen!'
       endif
       return
     endif
@@ -1413,7 +1413,7 @@ function! s:WindowRefreshFile(fname, ftype)
     call s:WindowRemoveFileFromDisplay(a:fname)
   endif
   " Process and generate a list of tags defined in the file
-  if !file_listed || !s:tlist_file_cache[a:fname]['valid']
+  if !file_listed || !s:tlist_file_cache[a:fname].valid
     call s:ProcessFile(a:fname, a:ftype)
     if !has_key(s:tlist_file_cache, a:fname)
       return
@@ -1427,9 +1427,9 @@ function! s:WindowRefreshFile(fname, ftype)
     " Remove the previous file
     if s:tlist_cur_file != ''
       call s:WindowRemoveFileFromDisplay(s:tlist_cur_file)
-      let s:tlist_file_cache[s:tlist_cur_file]['visible'] = 0
-      let s:tlist_file_cache[s:tlist_cur_file]['start'] = 0
-      let s:tlist_file_cache[s:tlist_cur_file]['end'] = 0
+      let s:tlist_file_cache[s:tlist_cur_file].visible = 0
+      let s:tlist_file_cache[s:tlist_cur_file].start = 0
+      let s:tlist_file_cache[s:tlist_cur_file].end = 0
     endif
     let s:tlist_cur_file_idx = a:fname
   endif
@@ -1438,25 +1438,25 @@ function! s:WindowRefreshFile(fname, ftype)
   " Add new files to the end of the window. For existing files, add them at
   " the same line where they were previously present. If the file is not
   " visible, then add it at the end
-  if s:tlist_file_cache[a:fname]['start'] == 0 ||
-        \ !s:tlist_file_cache[a:fname]['visible']
-    let s:tlist_file_cache[a:fname]['start'] = line('$') + 1
+  if s:tlist_file_cache[a:fname].start == 0 ||
+        \ !s:tlist_file_cache[a:fname].visible
+    let s:tlist_file_cache[a:fname].start = line('$') + 1
   endif
-  let s:tlist_file_cache[a:fname]['visible'] = 1
+  let s:tlist_file_cache[a:fname].visible = 1
   " Add the file name to the buffer
-  exe s:tlist_file_cache[a:fname]['start'] - 1
+  exe s:tlist_file_cache[a:fname].start - 1
   let fname_txt = fnamemodify(a:fname, ':t') . ' (' .
         \ fnamemodify(a:fname, ':p:h') . ')'
   let file_start_lnum = line('.') + 1
   silent! put =fname_txt
   " Add tag names grouped by the flags to the buffer
-  for flag in keys(s:tlist_file_cache[a:fname]['flags'])
+  for flag in keys(s:tlist_file_cache[a:fname].flags)
     " Add flag full names to the buffer
-    let flag_txt = '  ' . s:tlist_filetype_settings[a:ftype]['flags'][flag]
+    let flag_txt = '  ' . s:tlist_filetype_settings[a:ftype].flags[flag]
     let flag_start_lnum = line('.') + 1
     silent! put =flag_txt
     " Add tag names to the buffer
-    for taglet in s:tlist_file_cache[a:fname]['flags'][flag]['tags']
+    for taglet in s:tlist_file_cache[a:fname].flags[flag].tags
       if g:tlist_display_prototype
         let tag_txt = '    ' . taglet['tag_proto']
       else
@@ -1472,20 +1472,20 @@ function! s:WindowRefreshFile(fname, ftype)
       silent! put =''
     endif
     " Store flag text offset
-    let s:tlist_file_cache[a:fname]['flags'][flag]['offset'] =
+    let s:tlist_file_cache[a:fname].flags[flag]['offset'] =
           \ flag_start_lnum - file_start_lnum
   endfor
   " Still need to add an empty line after the file name text
   " if no flag is found for the file
-  if empty(s:tlist_file_cache[a:fname]['flags'])
+  if empty(s:tlist_file_cache[a:fname].flags)
     if g:tlist_compact_format == 0
       silent! put =''
     endif
   endif
-  let s:tlist_file_cache[a:fname]['end'] = line('.') - 1
+  let s:tlist_file_cache[a:fname].end = line('.') - 1
   call s:WindowCreateFoldsForFile(a:fname)
   " Goto the starting line for this file,
-  exe s:tlist_file_cache[a:fname]['start']
+  exe s:tlist_file_cache[a:fname].start
   " Due to a bug in the winmanager plugin, add a space at the last line
   if s:tlist_app_name == 'winmanager'
     call setline('$', ' ')
@@ -1495,10 +1495,10 @@ function! s:WindowRefreshFile(fname, ftype)
   " Restore the report option
   let &report = old_report
   " Update the start & end line offsets for all the files following this file
-  let start = s:tlist_file_cache[a:fname]['start']
+  let start = s:tlist_file_cache[a:fname].start
   let end = g:tlist_compact_format ?
-        \ s:tlist_file_cache[a:fname]['end'] :
-        \ s:tlist_file_cache[a:fname]['end'] + 1
+        \ s:tlist_file_cache[a:fname].end :
+        \ s:tlist_file_cache[a:fname].end + 1
   call s:WindowUpdateLineOffsets(a:fname, 1, end - start + 1)
   " Update the tags menu (if present)
   if g:tlist_show_menu
@@ -1520,7 +1520,7 @@ function! s:WindowRefresh()
   " As we have cleared the taglist window, mark all the files
   " as not visible
   for fname in keys(s:tlist_file_cache)
-    let s:tlist_file_cache[fname]['visible'] = 0
+    let s:tlist_file_cache[fname].visible = 0
   endfor
   if g:tlist_compact_format == 0
     " Display help in non-compact mode
@@ -1770,7 +1770,7 @@ function! s:WindowPostCloseCleanup()
   call s:LogMsg('WindowPostCloseCleanup()')
   " Mark all the files as not visible
   for fname in keys(s:tlist_file_cache)
-    let s:tlist_file_cache[fname]['visible'] = 0
+    let s:tlist_file_cache[fname].visible = 0
   endfor
   " Remove the taglist autocommands
   silent! autocmd! TagListAutoCmds
@@ -1852,24 +1852,24 @@ function! s:WindowChangeSort(action, sort_type)
   " Remove the previous highlighting
   match none
   if a:action == 'toggle'
-    let sort_type = s:tlist_file_cache[fname]['sortby']
+    let sort_type = s:tlist_file_cache[fname].sortby
     " Toggle the sort order from 'name' to 'order' and vice versa
     if sort_type == 'name'
-      let s:tlist_file_cache[fname]['sortby'] = 'order'
+      let s:tlist_file_cache[fname].sortby = 'order'
     else
-      let s:tlist_file_cache[fname]['sortby'] = 'name'
+      let s:tlist_file_cache[fname].sortby = 'name'
     endif
   else
-    let s:tlist_file_cache[fname]['sortby'] = a:sort_type
+    let s:tlist_file_cache[fname].sortby = a:sort_type
   endif
   " Save the current line for later restoration
   let curline = '\V\^' . escape(getline('.'), "\\") . '\$'
   " Invalidate the tags listed for this file
-  let s:tlist_file_cache[fname]['valid'] = 0
+  let s:tlist_file_cache[fname].valid = 0
   " Update the taglist window
   call s:WindowRefreshFile(fname, s:tlist_file_cache[fname]['ftype'])
-  exe s:tlist_file_cache[fname]['start'] . ',' .
-        \ s:tlist_file_cache[fname]['end'] . 'foldopen!'
+  exe s:tlist_file_cache[fname].start . ',' .
+        \ s:tlist_file_cache[fname].end . 'foldopen!'
   " Go back to the cursor line before the tag list is sorted
   call search(curline, 'w')
   if g:tlist_show_menu
@@ -1889,11 +1889,11 @@ function! s:WindowUpdateFile()
   " Save the current line for later restoration
   let curline = '\V\^' . escape(getline('.'), "\\") . '\$'
   " Invalidate the tags listed for this file
-  let s:tlist_file_cache[fname]['valid'] = 0
+  let s:tlist_file_cache[fname].valid = 0
   " Update the taglist window
   call s:WindowRefreshFile(fname, s:tlist_file_cache[fname]['ftype'])
-  exe s:tlist_file_cache[fname]['start'] . ',' .
-        \ s:tlist_file_cache[fname]['end'] . 'foldopen!'
+  exe s:tlist_file_cache[fname].start . ',' .
+        \ s:tlist_file_cache[fname].end . 'foldopen!'
   " Go back to the tag line before the list is updated
   call search(curline, 'w')
   if g:tlist_show_menu
@@ -2133,7 +2133,7 @@ function! s:WindowJumpToTag(win_ctrl)
   endif
   let tidx = s:WindowGetTagIndex(fname, flag, lnum)
   if tidx != -1
-    let tagpat = s:tlist_file_cache[fname]['flags'][flag]['tags'][tidx]['tag_pattern']
+    let tagpat = s:tlist_file_cache[fname].flags[flag].tags[tidx]['tag_pattern']
     " Highlight the tagline
     call s:WindowHighlightLine()
   else
@@ -2168,7 +2168,7 @@ function! s:WindowShowInfo()
   if strlen(info) > 50
     let info = fnamemodify(fname, ':t')
   endif
-  if lnum == s:tlist_file_cache[fname]['start']
+  if lnum == s:tlist_file_cache[fname].start
     " Cursor is on a file name
     echo info . ', File Type: ' . s:tlist_file_cache[fname]['ftype']
     return
@@ -2183,11 +2183,11 @@ function! s:WindowShowInfo()
   let tidx = s:WindowGetTagIndex(fname, flag, lnum)
   if tidx == -1
     echo info . ', Flag: ' . flag . ', Tag Count: ' .
-        \ len(s:tlist_file_cache[fname]['flags'][flag]['tags'])
+          \ len(s:tlist_file_cache[fname].flags[flag].tags)
     return
   endif
   echo info . ', Tag Prototype: ' .
-        \ s:tlist_file_cache[fname]['flags'][flag]['tags'][tidx]['tag_proto']
+        \ s:tlist_file_cache[fname].flags[flag].tags[tidx]['tag_proto']
   return
 endfunction
 
@@ -2203,7 +2203,7 @@ function! s:WindowMoveToFile()
     return
   endif
   " Move to the beginning of the current file
-  exe s:tlist_file_cache[fname]['start']
+  exe s:tlist_file_cache[fname].start
   return
 endfunction
 
@@ -2239,8 +2239,8 @@ function! s:WindowOpenFileFold(acmd_bufnr)
   if filereadable(fname)
     if has_key(s:tlist_file_cache, fname)
       " Open the fold for the file
-      exe "silent! " . s:tlist_file_cache[fname]['start'] . "," .
-            \ s:tlist_file_cache[fname]['end'] . "foldopen"
+      exe "silent! " . s:tlist_file_cache[fname].start . "," .
+            \ s:tlist_file_cache[fname].end . "foldopen"
     endif
   endif
   " Go back to the original window
@@ -2562,7 +2562,7 @@ function! s:MenuGetTagTypeCmd(fname, ftype, flag)
   if !has_key(s:tlist_file_cache[a:fname].flags, a:flag)
     return ''
   endif
-  let tcnt = len(s:tlist_file_cache[a:fname].flags[a:flag].tags)  
+  let tcnt = len(s:tlist_file_cache[a:fname].flags[a:flag].tags)
   let mcmd = ''
   " Create the menu items for the tags.
   " Depending on the number of tags of this type, split the menu into
@@ -2581,7 +2581,7 @@ function! s:MenuGetTagTypeCmd(fname, ftype, flag)
       let first_tag = strpart(first_tag, 0, g:tlist_max_tag_length)
       let last_tag = strpart(last_tag, 0, g:tlist_max_tag_length)
       " Form the menu command prefix
-      let m_prefix = 'anoremenu <silent> T\&ags.' . flag_fullname . 
+      let m_prefix = 'anoremenu <silent> T\&ags.' . flag_fullname .
             \ '.' . first_tag . '\ \.\.\.\ ' . last_tag . '.'
       " Character prefix used to number the menu items (hotkey)
       let m_prefix_idx = 0
@@ -2624,7 +2624,7 @@ function! s:MenuRefreshFile(fname)
   exe s:tlist_file_cache[a:fname]['mcmd']
   " Update the popup menu (if enabled)
   if &mousemodel =~ 'popup'
-    anoremenu PopUp.T&ags.-SEP1- :    
+    anoremenu PopUp.T&ags.-SEP1- :
     let cmd = substitute(s:tlist_file_cache[a:fname]['mcmd'], ' T\\&ags\.',
           \ ' PopUp.T\\\&ags.', 'g')
     exe cmd
@@ -2687,7 +2687,7 @@ function! s:MenuUpdateFile(clear_menu)
   " Determine whether the tag type name needs to be added to the menu
   " If more than one tag type is present in the taglisting for a file,
   " then the tag type name needs to be present
-  for flag in keys(s:tlist_filetype_settings[ftype]['flags'])
+  for flag in keys(s:tlist_filetype_settings[ftype].flags)
     if has_key(s:tlist_file_cache[fname].flags, flag)
       let mcmd .= s:MenuGetTagTypeCmd(fname, ftype, flag)
     endif
@@ -2743,19 +2743,16 @@ function! s:MenuChangeSort(action, sort_type)
   if fname == ''
     return
   endif
-  if a:action == 'toggle'
-    let sort_type = s:tlist_file_cache[fname]['sortby']
+  if a:action ==# 'toggle'
+    let sort_type = s:tlist_file_cache[fname].sortby
     " Toggle the sort order from 'name' to 'order' and vice versa
-    if sort_type == 'name'
-      let s:tlist_file_cache[fname]['sortby'] = 'order'
-    else
-      let s:tlist_file_cache[fname]['sortby'] = 'name'
-    endif
+    let s:tlist_file_cache[fname].sortby =
+          \ (sort_type ==# 'name') ? 'order' : 'name'
   else
-    let s:tlist_file_cache[fname]['sortby'] = a:sort_type
+    let s:tlist_file_cache[fname].sortby = a:sort_type
   endif
   " Invalidate the tags listed for this file
-  let s:tlist_file_cache[fname]['valid'] = 0
+  let s:tlist_file_cache[fname].valid = 0
   call s:MenuRemoveFile()
   call taglist#Refresh()
 endfunction
@@ -2781,7 +2778,6 @@ function! s:MenuJumpToTag(flag, tidx)
     .foldopen
   endif
 endfunction
-
 " }}}1
 
 " Restore cpotions.
