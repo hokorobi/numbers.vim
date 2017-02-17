@@ -1106,7 +1106,7 @@ endfunction
 
 " Update the tags for a file (if needed)
 function! s:UpdateFile(fname, ftype)
-  call s:LogMsg('UpdateFile(' . a:filename . ')')
+  call s:LogMsg('UpdateFile(' . a:fname . ')')
   " If the file doesn't support tag listing, skip it
   if s:SkipFile(a:fname, a:ftype)
     return
