@@ -1638,44 +1638,6 @@ function! s:WindowGetTagIndex(fname, flag, lnum)
   return tidx
 endfunction
 
-" Change the sort order of the tag listing
-" action == 'toggle', toggle sort from name to order and vice versa
-" action == 'set', set the sort order to sort_type
-function! s:WindowChangeSort(action, sort_type)
-  call s:LogMsg('WindowChangeSort(action = ' . a:action .
-        \ ', sort_type = ' . a:sort_type . ')')
-  let fname = s:WindowGetFileByLineNr(line('.'))
-  if fname == ''
-    return
-  endif
-  " Remove the previous highlighting
-  match none
-  if a:action == 'toggle'
-    let sort_type = s:tlist_file_cache[fname].sortby
-    " Toggle the sort order from 'name' to 'order' and vice versa
-    if sort_type == 'name'
-      let s:tlist_file_cache[fname].sortby = 'order'
-    else
-      let s:tlist_file_cache[fname].sortby = 'name'
-    endif
-  else
-    let s:tlist_file_cache[fname].sortby = a:sort_type
-  endif
-  " Save the current line for later restoration
-  let curline = '\V\^' . escape(getline('.'), "\\") . '\$'
-  " Invalidate the tags listed for this file
-  let s:tlist_file_cache[fname].valid = 0
-  " Update the taglist window
-  call s:WindowRefreshFileInDisplay(fname, s:tlist_file_cache[fname]['ftype'])
-  exe s:tlist_file_cache[fname].str . ',' .
-        \ s:tlist_file_cache[fname].end . 'foldopen!'
-  " Go back to the cursor line before the tag list is sorted
-  call search(curline, 'w')
-  if g:tlist_show_menu
-    call s:MenuUpdateFile(1)
-  endif
-endfunction
-
 " Update the tags displayed in the taglist window
 function! s:WindowUpdateFile()
   call s:LogMsg('WindowUpdateFile()')
@@ -2138,6 +2100,44 @@ function! s:WindowShowInfo()
   return
 endfunction
 
+" Change the sort order of the tag listing
+" action == 'toggle', toggle sort from name to order and vice versa
+" action == 'set', set the sort order to sort_type
+function! s:WindowChangeSort(action, sort_type)
+  call s:LogMsg('WindowChangeSort(action = ' . a:action .
+        \ ', sort_type = ' . a:sort_type . ')')
+  let fname = s:WindowGetFileByLineNr(line('.'))
+  if fname == ''
+    return
+  endif
+  " Remove the previous highlighting
+  match none
+  if a:action == 'toggle'
+    let sort_type = s:tlist_file_cache[fname].sortby
+    " Toggle the sort order from 'name' to 'order' and vice versa
+    if sort_type == 'name'
+      let s:tlist_file_cache[fname].sortby = 'order'
+    else
+      let s:tlist_file_cache[fname].sortby = 'name'
+    endif
+  else
+    let s:tlist_file_cache[fname].sortby = a:sort_type
+  endif
+  " Save the current line for later restoration
+  let curline = '\V\^' . escape(getline('.'), "\\") . '\$'
+  " Invalidate the tags listed for this file
+  let s:tlist_file_cache[fname].valid = 0
+  " Update the taglist window
+  call s:WindowRefreshFileInDisplay(fname, s:tlist_file_cache[fname]['ftype'])
+  exe s:tlist_file_cache[fname].str . ',' .
+        \ s:tlist_file_cache[fname].end . 'foldopen!'
+  " Go back to the cursor line before the tag list is sorted
+  call search(curline, 'w')
+  if g:tlist_show_menu
+    call s:MenuUpdateFile(1)
+  endif
+endfunction
+
 " Move the cursor to the beginning of the current/previous file in the taglist window
 " or to the beginning of the next file in the taglist window
 " dir == -1 - Move the cursor to the beginning of the current/previous file
@@ -2146,15 +2146,40 @@ function! s:WindowMoveToFile(dir)
   if foldlevel('.') == 0
     " Cursor is on a non-folded line (it is not in any of the files)
     " Move it to a folded line
-    normal! zk
+    if a:dir == -1
+      normal! zk
+    else
+      " While moving down to the start of the next fold,
+      " no need to do go to the start of the next file.
+      normal! zj
+      return
+    endif
   endif
   let fname = s:WindowGetFileByLineNr(line('.'))
   if fname == ''
     return
   endif
-  " Move to the beginning of the current file
-  exe s:tlist_file_cache[fname].str
-  return
+  if a:dir == -1
+    if s:tlist_file_cache[fname].str < line('.')
+      " Move to the beginning of the current file
+      exe s:tlist_file_cache[fname].str
+      return
+    else
+      exe s:tlist_file_cache[fname].str - 1
+      call s:WindowMoveToFile(-1)
+    endif
+  else
+    let offset = g:tlist_compact_format ? 0 : 1
+    if s:tlist_file_cache[fname].end + offset == line('$')
+      " Move the cursor to the start of the file
+      " if the end of the file is the bottom of the taglist window
+      exe s:tlist_file_cache[fname].str
+      return
+    else
+      exe s:tlist_file_cache[fname].end + offset + 1 
+      return
+    endif
+  endif
 endfunction
 
 " Open the fold for the specified file and close the fold for all the
