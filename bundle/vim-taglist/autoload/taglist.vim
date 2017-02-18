@@ -301,6 +301,34 @@ function! taglist#UpdateCurrentFile()
   endif
 endfunction
 
+" Get the tag name on or before the specified line number in the
+" current buffer
+function! taglist#GetTagNameByLine()
+  let tag = s:GetTagByLine()
+  if empty(tag)
+    return ''
+  endif
+  let name = tag.tag_name
+  if g:tlist_display_tag_scope
+    " Add the scope of the tag
+    let tag_scope = tag.tag_scope
+    if tag_scope != ''
+      let name .= ' [' . tag_scope . ']'
+    endif
+  endif
+  return name
+endfunction
+
+" Get the prototype for the tag on or before the specified line number in the
+" current buffer
+function! taglist#GetTagPrototypeByLine()
+  let tag = s:GetTagByLine()
+  if empty(tag)
+    return ''
+  endif
+  return tag.tag_proto
+endfunction
+
 " Save a taglist session (information about all the displayed files
 " and the tags) into the specified file
 function! taglist#SessionSave(...)
@@ -631,13 +659,13 @@ function! s:IsRemovedFile(filename)
 endfunction
 
 " Update the list of user removed files from the taglist
-" add == 1, add the file to the removed list
-" add == 0, delete the file from the removed list
+" add == 1, Add the file to the removed list
+" add == 0, Delete the file from the removed list
 function! s:UpdateRemovedFileList(filename, add)
-  if a:add
+  let idx = index(s:tlist_removed_flist, a:filename)
+  if a:add && idx == -1
     call add(s:tlist_removed_flist, a:filename)
-  elseif s:IsRemovedFile(a:filename)
-    let idx = index(s:tlist_removed_flist, a:filename)
+  elseif idx != -1
     call remove(s:tlist_removed_flist, idx)
   endif
 endfunction
@@ -671,8 +699,9 @@ function! s:GetBufferFileType(bnum)
   let buf_ft = getbufvar(bname, '&filetype')
   " Check whether 'filetype' contains multiple file types separated by '.'
   " If it is, then use the first file type
-  if buf_ft =~ '\.'
-    let buf_ft = matchstr(buf_ft, '[^.]\+')
+  let pos = stridx(buf_ft, '.')
+  if pos != -1
+    let buf_ft = strpart(buf_ft, 0, pos)
   endif
   if bufloaded(bname)
     " For loaded buffers, the 'filetype' is already determined
@@ -696,7 +725,7 @@ function! s:ParseRawSettingStrings(settings)
   " file type detected by Vim
   let msg = 'Invalid ctags option setting - ' . a:settings
   let pos = stridx(a:settings, ';')
-  if pos == -1
+  if pos <= 0
     call s:WarningMsg(msg)
     return {}
   endif
@@ -704,10 +733,11 @@ function! s:ParseRawSettingStrings(settings)
   " Make sure a valid filetype is supplied. If the user didn't specify a
   " valid filetype, then the ctags option settings may be treated as the
   " filetype
-  if ftype == '' || ftype =~ ':'
+  if stridx(ftype, ':') != -1
     call s:WarningMsg(msg)
     return {}
   endif
+  " Parse file type settings to a dictionary
   let parsed_settings = { 'ftype': ftype, 'flags': {} }
   " Remove the file type from settings
   let settings = strpart(a:settings, pos + 1)
@@ -881,6 +911,105 @@ function! s:ParseTagLine(tag_line, fname, ftype)
   " Store tag specific information
   call add(s:tlist_file_cache[a:fname].flags[tag_flag].tags, cur_tag)
   return tag_flag . ': ' . cur_tag.tag_name
+endfunction
+
+" Simply return the line number of the specified tag
+function! s:GetTagLineNr(fname, flag, tidx)
+  return s:tlist_file_cache[a:fname].flags[a:flag].tags[a:tidx].tag_lnum
+endfunction
+
+" Search the closest tag to the supplied line number
+" Returns [ flag, tidx ] for the flag and index of that tag
+" Returns [], if no tag can be found for the specified line number
+function! s:SearchClosestTagIndex(fname, lnum)
+  let sort_type = s:tlist_file_cache[a:fname].sortby
+  let closest_tag = []
+  for flag in keys(s:tlist_file_cache[a:fname].flags)
+    let left = 0
+    let right = len(s:tlist_file_cache[a:fname].flags[flag].tags) - 1
+    if sort_type == 'order'
+      " Tags sorted by order, use a binary search.
+      " The idea behind this function is taken from the ctags.vim script (by
+      " Alexey Marinichev) available at the Vim online website.
+      " If the current line is the less than the first tag, then no need to
+      " search
+      let first_lnum = s:GetTagLineNr(a:fname, flag, 0)
+      if a:lnum < first_lnum
+        continue
+      endif
+      while left < right
+        let middle = (left + right + 1) / 2
+        let middle_lnum = s:GetTagLineNr(a:fname, flag, middle)
+        if middle_lnum == a:lnum
+          let left = middle
+          let closest_tag = [flag, middle]
+          break
+        elseif middle_lnum > a:lnum
+          let right = middle - 1
+        else
+          let left = middle
+        endif
+      endwhile
+    else
+      " Tags sorted by name, use a linear search. (by Dave Eggum)
+      " Look for a tag with a line number less than or equal to the supplied
+      " line number. If multiple tags are found, then use the tag with the
+      " line number closest to the supplied line number. IOW, use the tag
+      " with the highest line number.
+      let closest_lnum = 0
+      let final_left = 0
+      while left <= right
+        let lnum = s:GetTagLineNr(a:fname, flag, left)
+        if lnum < a:lnum && lnum > closest_lnum
+          let closest_lnum = lnum
+          let final_left = left
+        elseif lnum == a:lnum
+          let closest_lnum = lnum
+          let final_left = left
+          let closest_tag = [flag, left]
+          break
+        else
+          let left += 1
+        endif
+      endwhile
+      if closest_lnum == 0
+        continue
+      endif
+      if left >= right
+        let left = final_left
+      endif
+    endif
+    " Compare tags of other flags
+    if empty(closest_tag) ||
+          \ left > s:GetTagLineNr(a:fname, closest_tag[0], closest_tag[1])
+      let closest_tag = [flag, left]
+    endif
+  endfor
+  return closest_tag
+endfunction
+
+" Get the tag on or before the specified line number in the
+" current buffer
+function! s:GetTagByLine()
+  " Arguments are not supplied. Use the current buffer name
+  " and line number
+  let fname = fnamemodify(bufname('%'), ':p')
+  let lnum = line('.')
+  " Verify the file name
+  if !has_key(s:tlist_file_cache, fname)
+    return {}
+  endif
+  " If there are no tags for this file, then no need to proceed further
+  if empty(s:tlist_file_cache[fname].flags)
+    return {}
+  endif
+  " Get the tag text using the line number
+  let closest_tag = s:SearchClosestTagIndex(fname, lnum)
+  if empty(closest_tag)
+    return {}
+  endif
+  let [ flag, tidx ] = closest_tag
+  return s:tlist_file_cache[fname].flags[flag].tags[tidx]
 endfunction
 
 " Check whether tag listing is supported for the specified file

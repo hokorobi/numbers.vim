@@ -78,7 +78,7 @@ let g:loaded_taglist = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
-" SETTINGS: {{{1
+" GLOBAL SETTINGS: {{{1
 " Location of the exuberant ctags tool
 if !exists('g:tlist_ctags_cmd')
   if has('win32') && len(globpath(&runtimepath, 'tools/ctags.exe', 0, 1)) > 0
@@ -176,6 +176,8 @@ command! -nargs=0 -bar                Tlist                  TlistToggle
 command! -nargs=+ -complete=file      TlistAddFiles          call taglist#AddFiles(<f-args>)
 command! -nargs=+ -complete=dir       TlistAddFilesRecursive call taglist#AddFilesRecursive(<f-args>)
 command! -nargs=0 -bar                TlistUpdate            call taglist#UpdateCurrentFile()
+command! -nargs=0 -bar                TlistShowTag           echo taglist#GetTagNameByLine()
+command! -nargs=0 -bar                TlistShowPrototype     echo taglist#GetTagPrototypeByLine()
 command! -nargs=* -complete=file      TlistSessionLoad       call taglist#SessionLoad(<q-args>)
 command! -nargs=* -complete=file      TlistSessionSave       call taglist#SessionSave(<q-args>)
 " Commands for enabling/disabling debug and to display debug messages
