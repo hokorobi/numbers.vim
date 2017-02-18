@@ -864,7 +864,7 @@ function! s:ParseTagLine(tag_line, fname, ftype)
   endif
   " Extract tag specific information
   let cur_tag = {
-        \ 'tag_flag'   : tag_flag
+        \ 'tag_flag'   : tag_flag,
         \ 'tag_name'   : s:ExtractTagName(a:tag_line),
         \ 'tag_proto'  : s:ExtractTagPrototype(a:tag_line),
         \ 'tag_pattern': s:ExtractTagSearchPattern(a:tag_line),
