@@ -110,6 +110,8 @@ endif
 
 " Automatically open the taglist window on Vim startup
 let g:tlist_auto_open = get(g:, 'tlist_auto_open', 0)
+" Key mapped to toggle open taglist window
+let g:tlist_toggleopen_key = get(g:, 'tlist_toggleopen_key', '<C-j>')
 " When the taglist window is toggle opened, move the cursor to the taglist window
 let g:tlist_gain_focus_on_toggleopen = get(g:, 'tlist_gain_focus_on_toggleopen', 0)
 " Process files even when the taglist window is not open
@@ -180,6 +182,8 @@ command! -nargs=* -complete=file      TlistSessionSave       call taglist#Sessio
 command! -nargs=? -complete=file -bar TlistDebug             call taglist#DebugEnable(<q-args>)
 command! -nargs=0 -bar                TlistUndebug           call taglist#DebugDisable()
 command! -nargs=0 -bar                TlistMessages          call taglist#DebugShow()
+" Set key mapping
+execute 'nnoremap <silent>' g:tlist_toggleopen_key ':TlistToggle<CR>'
 " }}}
 
 " AUTOCOMMANDS: {{{1
