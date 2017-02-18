@@ -194,9 +194,9 @@ augroup TagListInitCmds
   " When a buffer is deleted, remove the file from the taglist
   autocmd BufDelete * silent call taglist#BufferRemoved(expand('<afile>:p'))
   " When the taglist buffer is created when loading a Vim session file,
-  " the taglist buffer needs to be initialized. The BufFilePost event
+  " the taglist buffer needs to be initialized. The SessionLoadPost event
   " is used to handle this case.
-  autocmd BufFilePost __Tag_List__ call taglist#VimSessionLoad()
+  autocmd SessionLoadPost __Tag_List__ call taglist#VimSessionLoad()
 augroup END
 
 " Restore cpotions.
