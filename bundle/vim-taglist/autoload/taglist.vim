@@ -158,24 +158,6 @@ let s:tlist_menu_prefix_chars =
 
 " GLOBAL FUNCTIONS: {{{1
 
-" A buffer is removed from the Vim buffer list. Remove the tags defined
-" for that file
-function! taglist#BufferRemoved(fname)
-  call s:LogMsg('BufferRemoved(' . a:fname .  ')')
-  " Make sure a valid filename is supplied
-  if a:fname == ''
-    return
-  endif
-  let fname = fnamemodify(a:fname, ':p')
-  " Get tag list index of the specified file
-  if !has_key(s:tlist_file_cache, fname)
-    " File not present in the taglist
-    return
-  endif
-  " Remove the file from the list
-  call s:RemoveFile(fname, 0)
-endfunction
-
 " Open and refresh the taglist window
 function! taglist#WindowOpen()
   call s:LogMsg('WindowOpen()')
@@ -565,6 +547,24 @@ function! taglist#RefreshCurrentBuffer()
   if g:tlist_show_menu
     call s:MenuUpdateFile(0)
   endif
+endfunction
+
+" A buffer is removed from the Vim buffer list. Remove the tags defined
+" for that file
+function! taglist#BufferRemoved(fname)
+  call s:LogMsg('BufferRemoved(' . a:fname .  ')')
+  " Make sure a valid filename is supplied
+  if a:fname == ''
+    return
+  endif
+  let fname = fnamemodify(a:fname, ':p')
+  " Get tag list index of the specified file
+  if !has_key(s:tlist_file_cache, fname)
+    " File not present in the taglist
+    return
+  endif
+  " Remove the file from the list
+  call s:RemoveFile(fname, 0)
 endfunction
 
 " Initialize the taglist window/buffer, which is created when loading
