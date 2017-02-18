@@ -1347,44 +1347,6 @@ function! s:WindowDisplayHelp()
   endif
 endfunction
 
-" Toggle taglist plugin help text between the full version
-" and the brief version
-function! s:WindowToggleHelpText()
-  if g:tlist_compact_format
-    " In compact display mode, do not display help
-    return
-  endif
-  setlocal modifiable
-  " Include the empty line displayed after the help text
-  let brief_help_size = 1
-  let full_help_size = 16
-  " Set report option to a huge value to prevent informational messages
-  " while deleting the lines
-  let old_report = &report
-  set report=99999
-  " Remove the currently highlighted tag. Otherwise, the help text
-  " might be highlighted by mistake
-  match none
-  " Toggle between brief and full help text
-  if s:tlist_brief_help
-    let s:tlist_brief_help = 0
-    " Remove the previous help
-    exe '1,' . brief_help_size . ' delete _'
-    " Adjust the start/end line numbers for all files being displayed
-    call s:WindowUpdateLineOffsets('', 1, full_help_size - brief_help_size)
-  else
-    let s:tlist_brief_help = 1
-    " Remove the previous help
-    exe '1,' . full_help_size . ' delete _'
-    " Adjust the start/end line numbers for all files being displayed
-    call s:WindowUpdateLineOffsets('', 0, full_help_size - brief_help_size)
-  endif
-  call s:WindowDisplayHelp()
-  " Restore the report option
-  let &report = old_report
-  setlocal nomodifiable
-endfunction
-
 " Display the tags for all the files in the taglist window
 function! s:WindowRefresh()
   call s:LogMsg('WindowRefresh()')
@@ -1575,111 +1537,6 @@ function! s:WindowRemoveFile()
   if g:tlist_show_one_file
     if s:tlist_cur_file ==# fname
       let s:tlist_cur_file = ''
-    endif
-  endif
-endfunction
-
-" Zoom (maximize/minimize) the taglist window
-function! s:WindowZoom()
-  if s:tlist_win_maximized
-    " Restore the window back to the previous size
-    if g:tlist_use_horiz_window
-      exe 'resize ' . g:tlist_win_height
-    else
-      exe 'vert resize ' . g:tlist_win_width
-    endif
-    let s:tlist_win_maximized = 0
-  else
-    " Set the window size to the maximum possible without closing other
-    " windows
-    if g:tlist_use_horiz_window
-      resize
-    else
-      vert resize
-    endif
-    let s:tlist_win_maximized = 1
-  endif
-endfunction
-
-" Check the width of the taglist window. For horizontally split windows, the
-" 'winfixheight' option is used to fix the height of the window. For
-" vertically split windows, Vim doesn't support the 'winfixwidth' option. So
-" need to handle window width changes from this function.
-function! s:WindowCheckWidth()
-  let tlist_winnr = bufwinnr(g:TagList_title)
-  if tlist_winnr == -1
-    return
-  endif
-  let width = winwidth(tlist_winnr)
-  if width != g:tlist_win_width
-    call s:LogMsg('WindowCheckWidth: Changing window width from ' .
-          \ width . ' to ' . g:tlist_win_width)
-    let save_winnr = winnr()
-    if save_winnr != tlist_winnr
-      call s:ExeCmdWithoutAcmds(tlist_winnr . 'wincmd w')
-    endif
-    exe 'vert resize ' . g:tlist_win_width
-    if save_winnr != tlist_winnr
-      call s:ExeCmdWithoutAcmds('wincmd p')
-    endif
-  endif
-endfunction
-
-" Close the taglist window and adjust the Vim window width
-function! s:WindowPostCloseCleanup()
-  call s:LogMsg('WindowPostCloseCleanup()')
-  " Mark all the files as not visible
-  for fname in keys(s:tlist_file_cache)
-    let s:tlist_file_cache[fname].visible = 0
-  endfor
-  " Remove the taglist autocommands
-  silent! autocmd! TagListAutoCmds
-  " Remove the left mouse click mapping if it was setup initially
-  if g:tlist_use_single_click
-    if hasmapto('<LeftMouse>')
-      nunmap <LeftMouse>
-    endif
-  endif
-  if g:tlist_use_horiz_window || g:tlist_inc_win_width == 0 ||
-        \ s:tlist_winsize_chgd != 1 ||
-        \ &columns < (80 + g:tlist_win_width)
-    " No need to adjust window width if using horizontally split taglist
-    " window or if columns is less than 101 or if the user chose not to
-    " adjust the window width
-  else
-    " If the user didn't manually move the window, then restore the window
-    " position to the pre-taglist position
-    if s:tlist_pre_winx != -1 && s:tlist_pre_winy != -1 &&
-          \ getwinposx() == s:tlist_winx &&
-          \ getwinposy() == s:tlist_winy
-      exe 'winpos ' . s:tlist_pre_winx . ' ' . s:tlist_pre_winy
-    endif
-    " Adjust the Vim window width
-    let &columns -= g:tlist_win_width + 1
-  endif
-  let s:tlist_winsize_chgd = -1
-  let s:tlist_window_initialized = 0
-endfunction
-
-" If the 'tlist_exit_onlywindow' option is set, then exit Vim if only the
-" taglist window is present.
-function! s:WindowExitOnlyWindow()
-  " Before quitting Vim, delete the taglist buffer so that
-  " the '0 mark is correctly set to the previous buffer.
-  if winbufnr(2) == -1
-    if tabpagenr('$') == 1
-      " Only one tag page is present
-      "
-      " When deleting the taglist buffer, autocommands cannot be
-      " disabled. If autocommands are disabled, then on exiting Vim,
-      " the window size will not be restored back to the original
-      " size.
-      bdelete
-      quit
-    else
-      " More than one tab page is present. Close only the current
-      " tab page
-      close
     endif
   endif
 endfunction
@@ -2060,6 +1917,44 @@ function! s:WindowMoveToFile(dir)
   endif
 endfunction
 
+" Toggle taglist plugin help text between the full version
+" and the brief version
+function! s:WindowToggleHelpText()
+  if g:tlist_compact_format
+    " In compact display mode, do not display help
+    return
+  endif
+  setlocal modifiable
+  " Include the empty line displayed after the help text
+  let brief_help_size = 1
+  let full_help_size = 16
+  " Set report option to a huge value to prevent informational messages
+  " while deleting the lines
+  let old_report = &report
+  set report=99999
+  " Remove the currently highlighted tag. Otherwise, the help text
+  " might be highlighted by mistake
+  match none
+  " Toggle between brief and full help text
+  if s:tlist_brief_help
+    let s:tlist_brief_help = 0
+    " Remove the previous help
+    exe '1,' . brief_help_size . ' delete _'
+    " Adjust the start/end line numbers for all files being displayed
+    call s:WindowUpdateLineOffsets('', 1, full_help_size - brief_help_size)
+  else
+    let s:tlist_brief_help = 1
+    " Remove the previous help
+    exe '1,' . full_help_size . ' delete _'
+    " Adjust the start/end line numbers for all files being displayed
+    call s:WindowUpdateLineOffsets('', 0, full_help_size - brief_help_size)
+  endif
+  call s:WindowDisplayHelp()
+  " Restore the report option
+  let &report = old_report
+  setlocal nomodifiable
+endfunction
+
 " Open the fold for the specified file and close the fold for all the
 " other files
 function! s:WindowOpenFileFold(acmd_bufnr)
@@ -2140,6 +2035,51 @@ function! s:WindowRefreshFolds()
     endfor
   endif
   exe save_wnum . 'wincmd w'
+endfunction
+
+" Zoom (maximize/minimize) the taglist window
+function! s:WindowZoom()
+  if s:tlist_win_maximized
+    " Restore the window back to the previous size
+    if g:tlist_use_horiz_window
+      exe 'resize ' . g:tlist_win_height
+    else
+      exe 'vert resize ' . g:tlist_win_width
+    endif
+    let s:tlist_win_maximized = 0
+  else
+    " Set the window size to the maximum possible without closing other
+    " windows
+    if g:tlist_use_horiz_window
+      resize
+    else
+      vert resize
+    endif
+    let s:tlist_win_maximized = 1
+  endif
+endfunction
+
+" If the 'tlist_exit_onlywindow' option is set, then exit Vim if only the
+" taglist window is present.
+function! s:WindowExitOnlyWindow()
+  " Before quitting Vim, delete the taglist buffer so that
+  " the '0 mark is correctly set to the previous buffer.
+  if winbufnr(2) == -1
+    if tabpagenr('$') == 1
+      " Only one tag page is present
+      "
+      " When deleting the taglist buffer, autocommands cannot be
+      " disabled. If autocommands are disabled, then on exiting Vim,
+      " the window size will not be restored back to the original
+      " size.
+      bdelete
+      quit
+    else
+      " More than one tab page is present. Close only the current
+      " tab page
+      close
+    endif
+  endif
 endfunction
 
 " Set the default options for the taglist window
@@ -2373,6 +2313,42 @@ function! s:WindowCreate()
   let s:tlist_winy = getwinposy()
   " Initialize the taglist window
   call s:WindowInit()
+endfunction
+
+" Close the taglist window and adjust the Vim window width
+function! s:WindowPostCloseCleanup()
+  call s:LogMsg('WindowPostCloseCleanup()')
+  " Mark all the files as not visible
+  for fname in keys(s:tlist_file_cache)
+    let s:tlist_file_cache[fname].visible = 0
+  endfor
+  " Remove the taglist autocommands
+  silent! autocmd! TagListAutoCmds
+  " Remove the left mouse click mapping if it was setup initially
+  if g:tlist_use_single_click
+    if hasmapto('<LeftMouse>')
+      nunmap <LeftMouse>
+    endif
+  endif
+  if g:tlist_use_horiz_window || g:tlist_inc_win_width == 0 ||
+        \ s:tlist_winsize_chgd != 1 ||
+        \ &columns < (80 + g:tlist_win_width)
+    " No need to adjust window width if using horizontally split taglist
+    " window or if columns is less than 101 or if the user chose not to
+    " adjust the window width
+  else
+    " If the user didn't manually move the window, then restore the window
+    " position to the pre-taglist position
+    if s:tlist_pre_winx != -1 && s:tlist_pre_winy != -1 &&
+          \ getwinposx() == s:tlist_winx &&
+          \ getwinposy() == s:tlist_winy
+      exe 'winpos ' . s:tlist_pre_winx . ' ' . s:tlist_pre_winy
+    endif
+    " Adjust the Vim window width
+    let &columns -= g:tlist_win_width + 1
+  endif
+  let s:tlist_winsize_chgd = -1
+  let s:tlist_window_initialized = 0
 endfunction
 
 " Add base menu
