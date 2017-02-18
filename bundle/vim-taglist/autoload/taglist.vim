@@ -864,6 +864,7 @@ function! s:ParseTagLine(tag_line, fname, ftype)
   endif
   " Extract tag specific information
   let cur_tag = {
+        \ 'tag_flag'   : tag_flag
         \ 'tag_name'   : s:ExtractTagName(a:tag_line),
         \ 'tag_proto'  : s:ExtractTagPrototype(a:tag_line),
         \ 'tag_pattern': s:ExtractTagSearchPattern(a:tag_line),
@@ -879,7 +880,7 @@ function! s:ParseTagLine(tag_line, fname, ftype)
   endif
   " Store tag specific information
   call add(s:tlist_file_cache[a:fname].flags[tag_flag].tags, cur_tag)
-  return tag_flag . ': ' . cur_tag.tag_name . "\n"
+  return tag_flag . ': ' . cur_tag.tag_name
 endfunction
 
 " Check whether tag listing is supported for the specified file
