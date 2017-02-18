@@ -501,7 +501,7 @@ endfunction
 
 " Refresh the taglist
 function! taglist#RefreshCurrentBuffer()
-  call s:LogMsg('Refresh(tlist_skip_refresh = ' .
+  call s:LogMsg('RefreshCurrentBuffer(tlist_skip_refresh = ' .
         \ s:tlist_skip_refresh . ', ' . bufname('%') . ')')
   " Skip buffers with 'buftype' set to nofile, nowrite, quickfix or help
   " This also includes taglist window itself
@@ -590,10 +590,10 @@ endfunction
 " Log the supplied debug message along with the time
 function! s:LogMsg(msg)
   if s:tlist_debug
-    let msg = strftime('%H:%M:%S') . ': ' . a:msg . "\n"
+    let msg = strftime('%H:%M:%S') . ': ' . a:msg
     if s:tlist_debug_file != ''
       exe 'redir >> ' . s:tlist_debug_file
-      silent echon msg
+      silent echo msg
       redir END
     else
       " Log the message into a variable
@@ -1012,12 +1012,9 @@ function! s:ProcessFile(fname, ftype)
     return 1
   endif
   call s:LogMsg('Generated tags for ' . a:fname)
-  " Process the ctags output one line at a time.
-  " The substitute() is used to parse the tag lines instead of using the
-  " matchstr()/stridx()/strpart() functions for performance reason
-  call substitute(cmd_output, '\([^\n]\+\)\n',
-        \ '\=s:ParseTagLine(submatch(1), ' .
-        \ "'" . a:fname . "', '" . a:ftype . "')", 'g')
+  call s:LogMsg(">>>\n" . cmd_output . "\n<<<")
+  " Parse the ctags output
+  call map(split(cmd_output, '\n'), 's:ParseTagLine(v:val, a:fname, a:ftype)')
   return 1
 endfunction
 
