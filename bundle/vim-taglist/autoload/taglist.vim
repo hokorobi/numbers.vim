@@ -1278,6 +1278,16 @@ function! s:UpdateFile(fname, ftype)
   if save_winnr != winnr()
     call s:ExeCmdWithoutAcmds(save_winnr . 'wincmd w')
   endif
+  " Highlight the current tag
+  if g:tlist_show_one_file && s:tlist_cur_file != a:fname
+    " If displaying tags for only one file in the taglist
+    " window and about to display the tags for a new file,
+    " then center the current tag line for the new file
+    let center_tag_line = 1
+  else
+    let center_tag_line = 0
+  endif
+  call s:HighlightTag(1, center_tag_line)
   " Restore screen updates
   let &lazyredraw = old_lazyredraw
   " Update the taglist menu
