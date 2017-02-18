@@ -485,7 +485,10 @@ function! taglist#MenuInit()
   augroup TagListMenuCmds
     autocmd!
     if !g:tlist_process_file_always
+      " Auto refresh the taglist window
       autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#RefreshCurrentBuffer()
+      " When a buffer is deleted, remove the file from the taglist
+      autocmd BufDelete * silent call taglist#BufferRemoved(expand('<afile>:p'))
     endif
     autocmd BufLeave * call s:MenuRemoveFile()
   augroup END
@@ -1917,7 +1920,7 @@ function! s:WindowMoveToFile(dir)
       exe s:tlist_file_cache[fname].str
       return
     else
-      exe s:tlist_file_cache[fname].end + offset + 1 
+      exe s:tlist_file_cache[fname].end + offset + 1
       return
     endif
   endif
@@ -2248,6 +2251,8 @@ function! s:WindowInit()
           \ (!has('gui_running') || !g:tlist_show_menu)
       " Auto refresh the taglist window
       autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#RefreshCurrentBuffer()
+      " When a buffer is deleted, remove the file from the taglist
+      autocmd BufDelete * silent call taglist#BufferRemoved(expand('<afile>:p'))
     endif
     autocmd TabEnter * silent call s:WindowRefreshFolds()
   augroup END

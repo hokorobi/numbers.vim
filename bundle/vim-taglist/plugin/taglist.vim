@@ -78,6 +78,7 @@ let g:loaded_taglist = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
+" SETTINGS: {{{1
 " Location of the exuberant ctags tool
 if !exists('g:tlist_ctags_cmd')
   if has('win32') && len(globpath(&runtimepath, 'tools/ctags.exe', 0, 1)) > 0
@@ -160,8 +161,9 @@ let g:tlist_max_tag_length = get(g:, 'tlist_max_tag_length', 10)
 " plugin relies on this name to determine the title for the taglist
 " plugin.
 let TagList_title = '__Tag_List__'
+" }}}1
 
-" Commands to manage the taglist window
+" COMMANDS: {{{1
 command! -bar                         TlistLock              let tlist_auto_update = 0
 command! -bar                         TlistUnlock            let tlist_auto_update = 1
 command! -nargs=0 -bar                TlistRefresh           call taglist#RefreshCurrentBuffer()
@@ -178,8 +180,9 @@ command! -nargs=* -complete=file      TlistSessionSave       call taglist#Sessio
 command! -nargs=? -complete=file -bar TlistDebug             call taglist#DebugEnable(<q-args>)
 command! -nargs=0 -bar                TlistUndebug           call taglist#DebugDisable()
 command! -nargs=0 -bar                TlistMessages          call taglist#DebugShow()
+" }}}
 
-" Autocommands
+" AUTOCOMMANDS: {{{1
 augroup TagListInitCmds
   autocmd!
   if g:tlist_show_menu
@@ -189,16 +192,20 @@ augroup TagListInitCmds
     autocmd VimEnter * nested call taglist#WindowCheckAutoOpen()
   endif
   if g:tlist_process_file_always
-    autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#Refresh()
+    " Auto refresh the taglist window
+    autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#RefreshCurrentBuffer()
+    " When a buffer is deleted, remove the file from the taglist
+    autocmd BufDelete * silent call taglist#BufferRemoved(expand('<afile>:p'))
   endif
-  " When a buffer is deleted, remove the file from the taglist
-  autocmd BufDelete * silent call taglist#BufferRemoved(expand('<afile>:p'))
   " When the taglist buffer is created when loading a Vim session file,
   " the taglist buffer needs to be initialized. The SessionLoadPost event
   " is used to handle this case.
   autocmd SessionLoadPost __Tag_List__ call taglist#VimSessionLoad()
 augroup END
+" }}}1
 
 " Restore cpotions.
 let &cpo = s:cpo_save
 unlet s:cpo_save
+
+" vim: set fdm=marker fdl=0:
