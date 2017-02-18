@@ -883,14 +883,13 @@ endfunction
 function! s:ParseTagLine(tag_line, fname, ftype)
   if a:tag_line == ''
     " Skip empty lines
-    return ''
+    return 0
   endif
   " Extract tag flag
   let tag_flag = s:ExtractTagFlag(a:tag_line)
   " Make sure the tag flag is a valid and supported one
-  if tag_flag == '' ||
-        \ !has_key(s:tlist_filetype_settings[a:ftype].flags, tag_flag)
-    return ''
+  if !has_key(s:tlist_filetype_settings[a:ftype].flags, tag_flag)
+    return 0
   endif
   " Extract tag specific information
   let cur_tag = {
@@ -910,7 +909,7 @@ function! s:ParseTagLine(tag_line, fname, ftype)
   endif
   " Store tag specific information
   call add(s:tlist_file_cache[a:fname].flags[tag_flag].tags, cur_tag)
-  return tag_flag . ': ' . cur_tag.tag_name
+  return 1
 endfunction
 
 " Simply return the line number of the specified tag
@@ -1144,7 +1143,9 @@ function! s:ProcessFile(fname, ftype)
   call s:LogMsg('Generated tags for ' . a:fname)
   call s:LogMsg(">>>\n" . cmd_output . "\n<<<")
   " Parse the ctags output
-  call map(split(cmd_output, '\n'), 's:ParseTagLine(v:val, a:fname, a:ftype)')
+  let nparsed = count(map(split(cmd_output, '\n'),
+        \ 's:ParseTagLine(v:val, a:fname, a:ftype)'), 1)
+  call s:LogMsg('A total of ' . nparsed . ' tags have been parsed')
   return 1
 endfunction
 
