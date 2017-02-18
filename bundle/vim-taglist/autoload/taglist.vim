@@ -149,8 +149,6 @@ let s:tlist_lnum_file_cache = ''
 " Last returned flag for flag lookup.
 " Used to speed up flag lookup
 let s:tlist_lnum_flag_cache = ''
-" Is taglist part of other plugins like winmanager or cream?
-let s:tlist_app_name = 'none'
 " Menu prefix characters for menu items
 let s:tlist_menu_prefix_chars =
       \ '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -187,10 +185,6 @@ function! taglist#WindowOpen()
       exe tlist_winnr . 'wincmd w'
     endif
     return
-  endif
-  if s:tlist_app_name == 'winmanager'
-    " Taglist plugin is no longer part of the winmanager app
-    let s:tlist_app_name = 'none'
   endif
   " Get the filename and filetype for the specified buffer
   let fname = fnamemodify(bufname('%'), ':p')
@@ -532,13 +526,6 @@ function! taglist#RefreshCurrentBuffer()
     endif
     return
   endif
-  " If part of the winmanager plugin and not configured to process
-  " tags always and not configured to display the tags menu, then return
-  if (s:tlist_app_name == 'winmanager') &&
-        \ !g:tlist_process_file_always &&
-        \ !g:tlist_show_menu
-    return
-  endif
   " If the taglist window is not opened and not configured to process
   " tags always and not displaying the tags menu, then return
   if bufwinnr(g:TagList_title) == -1 &&
@@ -581,50 +568,6 @@ function! taglist#VimSessionLoad()
   call s:WindowRefresh()
 endfunction
 
-" Set the name of the external plugin/application to which taglist
-" belongs.
-" Taglist plugin is part of another plugin like cream or winmanager.
-function! taglist#SetApp(name)
-  if a:name == ''
-    return
-  endif
-  let s:tlist_app_name = a:name
-endfunction
-
-" Initialization required for integration with winmanager
-function! taglist#Start()
-  " If current buffer is not taglist buffer, then don't proceed
-  if bufname('%') != '__Tag_List__'
-    return
-  endif
-  call taglist#SetApp('winmanager')
-  " Get the current filename from the winmanager plugin
-  let bufnum = WinManagerGetLastEditedFile()
-  if bufnum != -1
-    let fname = fnamemodify(bufname(bufnum), ':p')
-    let ftype = s:GetBufferFileType(bufnum)
-  endif
-  " Initialize the taglist window, if it is not already initialized
-  if !exists('s:tlist_window_initialized') || !s:tlist_window_initialized
-    call s:WindowInit()
-    call s:WindowRefresh()
-    let s:tlist_window_initialized = 1
-  endif
-  " Update the taglist window
-  if bufnum != -1
-    if !s:SkipFile(fname, ftype) && g:tlist_auto_update
-      call s:WindowRefreshFileInDisplay(fname, ftype)
-    endif
-  endif
-endfunction
-
-function! taglist#IsValid()
-  return 0
-endfunction
-
-function! taglist#WrapUp()
-  return 0
-endfunction
 " }}}1
 
 " INTERNAL FUNCTIONS: {{{1
@@ -1362,10 +1305,6 @@ function! s:WindowRefreshFileInDisplay(fname, ftype)
   call s:WindowCreateFoldsForFile(a:fname)
   " Goto the starting line for this file,
   exe s:tlist_file_cache[a:fname].str
-  " Due to a bug in the winmanager plugin, add a space at the last line
-  if s:tlist_app_name == 'winmanager'
-    call setline('$', ' ')
-  endif
   " Mark the buffer as not modifiable
   setlocal nomodifiable
   " Restore the report option
@@ -1384,11 +1323,6 @@ endfunction
 
 " Display help at the start of the buffer
 function! s:WindowDisplayHelp()
-  if s:tlist_app_name == "winmanager"
-    " To handle a bug in the winmanager plugin, add a space at the
-    " last line
-    call setline('$', ' ')
-  endif
   if s:tlist_brief_help
     " Add the brief help
     call append( 0, '" Press <F1> to display help text')
@@ -1706,30 +1640,24 @@ function! s:WindowPostCloseCleanup()
       nunmap <LeftMouse>
     endif
   endif
-  if s:tlist_app_name != 'winmanager'
-    if g:tlist_use_horiz_window || g:tlist_inc_win_width == 0 ||
-          \ s:tlist_winsize_chgd != 1 ||
-          \ &columns < (80 + g:tlist_win_width)
-      " No need to adjust window width if using horizontally split taglist
-      " window or if columns is less than 101 or if the user chose not to
-      " adjust the window width
-    else
-      " If the user didn't manually move the window, then restore the window
-      " position to the pre-taglist position
-      if s:tlist_pre_winx != -1 && s:tlist_pre_winy != -1 &&
-            \ getwinposx() == s:tlist_winx &&
-            \ getwinposy() == s:tlist_winy
-        exe 'winpos ' . s:tlist_pre_winx . ' ' . s:tlist_pre_winy
-      endif
-      " Adjust the Vim window width
-      let &columns -= g:tlist_win_width + 1
+  if g:tlist_use_horiz_window || g:tlist_inc_win_width == 0 ||
+        \ s:tlist_winsize_chgd != 1 ||
+        \ &columns < (80 + g:tlist_win_width)
+    " No need to adjust window width if using horizontally split taglist
+    " window or if columns is less than 101 or if the user chose not to
+    " adjust the window width
+  else
+    " If the user didn't manually move the window, then restore the window
+    " position to the pre-taglist position
+    if s:tlist_pre_winx != -1 && s:tlist_pre_winy != -1 &&
+          \ getwinposx() == s:tlist_winx &&
+          \ getwinposy() == s:tlist_winy
+      exe 'winpos ' . s:tlist_pre_winx . ' ' . s:tlist_pre_winy
     endif
+    " Adjust the Vim window width
+    let &columns -= g:tlist_win_width + 1
   endif
   let s:tlist_winsize_chgd = -1
-  " Reset taglist state variables
-  if s:tlist_app_name == 'winmanager'
-    let s:tlist_app_name = 'none'
-  endif
   let s:tlist_window_initialized = 0
 endfunction
 
@@ -1772,147 +1700,142 @@ function! s:WindowOpenFile(win_ctrl, fname, tagpat)
         \ a:win_ctrl . ')')
   let prev_tlist_skip_refresh = s:tlist_skip_refresh
   let s:tlist_skip_refresh = 1
-  if s:tlist_app_name == 'winmanager'
-    " Let the winmanager edit the file
-    call WinManagerFileEdit(a:fname, a:win_ctrl == 'newwin')
-  else
-    if a:win_ctrl == 'newtab'
-      " Create a new tab
-      exe 'tabnew ' . fnameescape(a:fname)
-      " Open the taglist window in the new tab
-      call taglist#WindowOpen()
-    endif
-    if a:win_ctrl == 'checktab'
-      " Check whether the file is present in any of the tabs.
-      " If the file is present in the current tab, then use the
-      " current tab.
-      if bufwinnr(a:fname) != -1
-        let file_present_in_tab = 1
-        let tnum = tabpagenr()
-      else
-        let tnum = 1
-        let bnum = bufnr(a:fname)
-        let file_present_in_tab = 0
-        while tnum <= tabpagenr('$')
-          if index(tabpagebuflist(tnum), bnum) != -1
-            let file_present_in_tab = 1
-            break
-          endif
-          let tnum += 1
-        endwhile
-      endif
-      if file_present_in_tab
-        " Goto the tab containing the file
-        exe 'tabnext ' . tnum
-      else
-        " Open a new tab
-        exe 'tabnew ' . fnameescape(a:fname)
-        " Open the taglist window
-        call taglist#WindowOpen()
-      endif
-    endif
-    let winnum = -1
-    if a:win_ctrl == 'prevwin'
-      " Open the file in the previous window, if it is usable
-      let save_win = winnr()
-      wincmd p
-      if &buftype == '' && !&previewwindow
-        exe "edit " . fnameescape(a:fname)
-        let winnum = winnr()
-      else
-        " Previous window is not usable
-        exe save_win . 'wincmd w'
-      endif
-    endif
-    " Goto the window containing the file.  If the window is not there, open a
-    " new window
-    if winnum == -1
-      let winnum = bufwinnr(a:fname)
-    endif
-    if winnum == -1
-      " Locate the previously used window for opening a file
-      let fwin_num = 0
-      let first_usable_win = 0
-      let i = 1
-      let bnum = winbufnr(i)
-      while bnum != -1
-        if getwinvar(i, 'tlist_file_window') == 'yes'
-          let fwin_num = i
+  if a:win_ctrl == 'newtab'
+    " Create a new tab
+    exe 'tabnew ' . fnameescape(a:fname)
+    " Open the taglist window in the new tab
+    call taglist#WindowOpen()
+  endif
+  if a:win_ctrl == 'checktab'
+    " Check whether the file is present in any of the tabs.
+    " If the file is present in the current tab, then use the
+    " current tab.
+    if bufwinnr(a:fname) != -1
+      let file_present_in_tab = 1
+      let tnum = tabpagenr()
+    else
+      let tnum = 1
+      let bnum = bufnr(a:fname)
+      let file_present_in_tab = 0
+      while tnum <= tabpagenr('$')
+        if index(tabpagebuflist(tnum), bnum) != -1
+          let file_present_in_tab = 1
           break
         endif
-        if first_usable_win == 0 &&
-              \ getbufvar(bnum, '&buftype') == '' &&
-              \ !getwinvar(i, '&previewwindow')
-          " First non-taglist, non-plugin and non-preview window
-          let first_usable_win = i
-        endif
-        let i += 1
-        let bnum = winbufnr(i)
+        let tnum += 1
       endwhile
-      " If a previously used window is not found, then use the first
-      " non-taglist window
-      if fwin_num == 0
-        let fwin_num = first_usable_win
-      endif
-      if fwin_num != 0
-        " Jump to the file window
-        exe fwin_num . "wincmd w"
-        " If the user asked to jump to the tag in a new window, then split
-        " the existing window into two.
-        if a:win_ctrl == 'newwin'
-          split
-        endif
-        exe "edit " . fnameescape(a:fname)
-      else
-        " Open a new window
-        let cmd_mod = (v:version >= 700) ? 'keepalt ' : ''
-        if g:tlist_use_horiz_window
-          exe cmd_mod . 'leftabove split ' . fnameescape(a:fname)
-        else
-          if winbufnr(2) == -1
-            " Only the taglist window is present
-            if g:tlist_use_right_window
-              exe cmd_mod . 'leftabove vertical split ' .
-                    \ fnameescape(a:fname)
-            else
-              exe cmd_mod . 'rightbelow vertical split ' .
-                    \ fnameescape(a:fname)
-            endif
-            " Go to the taglist window to change the window size to
-            " the user configured value
-            call s:ExeCmdWithoutAcmds('wincmd p')
-            if g:tlist_use_horiz_window
-              exe 'resize ' . g:tlist_win_height
-            else
-              exe 'vertical resize ' . g:tlist_win_width
-            endif
-            " Go back to the file window
-            call s:ExeCmdWithoutAcmds('wincmd p')
-          else
-            " A plugin or help window is also present
-            wincmd w
-            exe cmd_mod . 'leftabove split ' . fnameescape(a:fname)
-          endif
-        endif
-      endif
-      " Mark the window, so that it can be reused.
-      call s:WindowMarkFileWindow()
+    endif
+    if file_present_in_tab
+      " Goto the tab containing the file
+      exe 'tabnext ' . tnum
     else
-      if v:version >= 700
-        " If the file is opened in more than one window, then check
-        " whether the last accessed window has the selected file.
-        " If it does, then use that window.
-        let lastwin_bufnum = winbufnr(winnr('#'))
-        if bufnr(a:fname) == lastwin_bufnum
-          let winnum = winnr('#')
-        endif
+      " Open a new tab
+      exe 'tabnew ' . fnameescape(a:fname)
+      " Open the taglist window
+      call taglist#WindowOpen()
+    endif
+  endif
+  let winnum = -1
+  if a:win_ctrl == 'prevwin'
+    " Open the file in the previous window, if it is usable
+    let save_win = winnr()
+    wincmd p
+    if &buftype == '' && !&previewwindow
+      exe "edit " . fnameescape(a:fname)
+      let winnum = winnr()
+    else
+      " Previous window is not usable
+      exe save_win . 'wincmd w'
+    endif
+  endif
+  " Goto the window containing the file.  If the window is not there, open a
+  " new window
+  if winnum == -1
+    let winnum = bufwinnr(a:fname)
+  endif
+  if winnum == -1
+    " Locate the previously used window for opening a file
+    let fwin_num = 0
+    let first_usable_win = 0
+    let i = 1
+    let bnum = winbufnr(i)
+    while bnum != -1
+      if getwinvar(i, 'tlist_file_window') == 'yes'
+        let fwin_num = i
+        break
       endif
-      exe winnum . 'wincmd w'
-      " If the user asked to jump to the tag in a new window, then split the
-      " existing window into two.
+      if first_usable_win == 0 &&
+            \ getbufvar(bnum, '&buftype') == '' &&
+            \ !getwinvar(i, '&previewwindow')
+        " First non-taglist, non-plugin and non-preview window
+        let first_usable_win = i
+      endif
+      let i += 1
+      let bnum = winbufnr(i)
+    endwhile
+    " If a previously used window is not found, then use the first
+    " non-taglist window
+    if fwin_num == 0
+      let fwin_num = first_usable_win
+    endif
+    if fwin_num != 0
+      " Jump to the file window
+      exe fwin_num . "wincmd w"
+      " If the user asked to jump to the tag in a new window, then split
+      " the existing window into two.
       if a:win_ctrl == 'newwin'
         split
       endif
+      exe "edit " . fnameescape(a:fname)
+    else
+      " Open a new window
+      let cmd_mod = (v:version >= 700) ? 'keepalt ' : ''
+      if g:tlist_use_horiz_window
+        exe cmd_mod . 'leftabove split ' . fnameescape(a:fname)
+      else
+        if winbufnr(2) == -1
+          " Only the taglist window is present
+          if g:tlist_use_right_window
+            exe cmd_mod . 'leftabove vertical split ' .
+                  \ fnameescape(a:fname)
+          else
+            exe cmd_mod . 'rightbelow vertical split ' .
+                  \ fnameescape(a:fname)
+          endif
+          " Go to the taglist window to change the window size to
+          " the user configured value
+          call s:ExeCmdWithoutAcmds('wincmd p')
+          if g:tlist_use_horiz_window
+            exe 'resize ' . g:tlist_win_height
+          else
+            exe 'vertical resize ' . g:tlist_win_width
+          endif
+          " Go back to the file window
+          call s:ExeCmdWithoutAcmds('wincmd p')
+        else
+          " A plugin or help window is also present
+          wincmd w
+          exe cmd_mod . 'leftabove split ' . fnameescape(a:fname)
+        endif
+      endif
+    endif
+    " Mark the window, so that it can be reused.
+    call s:WindowMarkFileWindow()
+  else
+    if v:version >= 700
+      " If the file is opened in more than one window, then check
+      " whether the last accessed window has the selected file.
+      " If it does, then use that window.
+      let lastwin_bufnum = winbufnr(winnr('#'))
+      if bufnr(a:fname) == lastwin_bufnum
+        let winnum = winnr('#')
+      endif
+    endif
+    exe winnum . 'wincmd w'
+    " If the user asked to jump to the tag in a new window, then split the
+    " existing window into two.
+    if a:win_ctrl == 'newwin'
+      split
     endif
   endif
   " Jump to the tag
@@ -2242,19 +2165,15 @@ function! s:WindowInit()
   endif
   setlocal foldtext=v:folddashes.getline(v:foldstart)
 
-  if s:tlist_app_name != 'winmanager'
-    " Mark buffer as scratch
-    silent! setlocal buftype=nofile
-    if s:tlist_app_name == 'none'
-      silent! setlocal bufhidden=delete
-    endif
-    silent! setlocal noswapfile
-    " Due to a bug in Vim 6.0, the winbufnr() function fails for unlisted
-    " buffers. So if the taglist buffer is unlisted, multiple taglist
-    " windows will be opened. This bug is fixed in Vim 6.1 and above
-    if v:version >= 601
-      silent! setlocal nobuflisted
-    endif
+  " Mark buffer as scratch
+  silent! setlocal buftype=nofile
+  silent! setlocal bufhidden=delete
+  silent! setlocal noswapfile
+  " Due to a bug in Vim 6.0, the winbufnr() function fails for unlisted
+  " buffers. So if the taglist buffer is unlisted, multiple taglist
+  " windows will be opened. This bug is fixed in Vim 6.1 and above
+  if v:version >= 601
+    silent! setlocal nobuflisted
   endif
 
   silent! setlocal nowrap
@@ -2379,8 +2298,7 @@ function! s:WindowInit()
     if g:tlist_file_fold_auto_close
       autocmd BufEnter * silent call s:WindowOpenFileFold(expand('<abuf>'))
     endif
-    if s:tlist_app_name != 'winmanager' &&
-          \ !g:tlist_process_file_always &&
+    if !g:tlist_process_file_always &&
           \ (!has('gui_running') || !g:tlist_show_menu)
       " Auto refresh the taglist window
       autocmd BufEnter,BufWritePost,FileChangedShellPost * call taglist#RefreshCurrentBuffer()
@@ -2399,11 +2317,6 @@ function! s:WindowCreate()
     if winnr() != tlist_winnr
       call s:ExeCmdWithoutAcmds(tlist_winnr . 'wincmd w')
     endif
-    return
-  endif
-  " If used with winmanager don't open windows. Winmanager will handle
-  " the window/buffer management
-  if s:tlist_app_name == "winmanager"
     return
   endif
   " Create a new window. If user prefers a horizontal window, then open
