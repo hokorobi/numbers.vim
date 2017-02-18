@@ -123,6 +123,8 @@ let s:tlist_debug = 0
 let s:tlist_debug_file = ''
 " Vim window size is changed by the taglist plugin or not
 let s:tlist_winsize_chgd = -1
+" Vim window has been initialized or not
+let s:tlist_window_initialized = 0
 " Taglist window is maximized or not
 let s:tlist_win_maximized = 0
 " Are we displaying brief help text
@@ -179,28 +181,32 @@ function! taglist#WindowOpen()
   call s:LogMsg('WindowOpen()')
   " If the window is open, jump to it
   let tlist_winnr = bufwinnr(g:TagList_title)
-  if tlist_winnr != -1
+  if tlist_winnr != -1 && s:tlist_window_initialized == 1
     " Jump to the existing window
     if winnr() != tlist_winnr
-      exe tlist_winnr . 'wincmd w'
+      call s:GotoTagListWindow()
     endif
     return
   endif
-  " Get the filename and filetype for the specified buffer
-  let fname = fnamemodify(bufname('%'), ':p')
-  let ftype = s:GetBufferFileType(bufname('%'))
-  " Mark the current window as the desired window to open a file when a tag
-  " is selected.
+  " Mark the current window as the desired window to open a file
+  " when a tag is selected.
   call s:WindowMarkFileWindow()
   " Open the taglist window
   call s:WindowCreate()
-  call s:WindowRefresh()
+  " Get the filename and filetype for the specified buffer
+  let fname = fnamemodify(bufname('%'), ':p')
+  let ftype = s:GetBufferFileType(bufname('%'))
   if g:tlist_show_one_file
     " Add only the current buffer and file
     " If the file doesn't support tag listing, skip it
-    if !s:SkipFile(fname, ftype)
-      call s:WindowRefreshFileInDisplay(fname, ftype)
+    if s:SkipFile(fname, ftype)
+      return
     endif
+    " Refresh the current file in the taglist window
+    call s:WindowRefreshFileInDisplay(fname, ftype)
+  else
+    " Refresh all files in the taglist window
+    call s:WindowRefresh()
   endif
   if g:tlist_file_fold_auto_close
     " Open the fold for the current file, as all the folds in
@@ -2245,20 +2251,13 @@ function! s:WindowInit()
     endif
     autocmd TabEnter * silent call s:WindowRefreshFolds()
   augroup END
+
+  let s:tlist_window_initialized = 1
 endfunction
 
 " Create a new taglist window. If it is already open, jump to it
 function! s:WindowCreate()
   call s:LogMsg('WindowCreate()')
-  " If the window is open, jump to it
-  let tlist_winnr = bufwinnr(g:TagList_title)
-  if tlist_winnr != -1
-    " Jump to the existing window
-    if winnr() != tlist_winnr
-      call s:ExeCmdWithoutAcmds(tlist_winnr . 'wincmd w')
-    endif
-    return
-  endif
   " Create a new window. If user prefers a horizontal window, then open
   " a horizontally split window. Otherwise open a vertically split
   " window
