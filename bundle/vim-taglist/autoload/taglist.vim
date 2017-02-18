@@ -184,7 +184,7 @@ function! taglist#WindowOpen()
   if tlist_winnr != -1 && s:tlist_window_initialized == 1
     " Jump to the existing window
     if winnr() != tlist_winnr
-      call s:GotoTagListWindow()
+      call s:ExeCmdWithoutAcmds(tlist_winnr . 'wincmd w')
     endif
     return
   endif
