@@ -111,9 +111,9 @@ endif
 " Automatically open the taglist window on Vim startup
 let g:tlist_auto_open = get(g:, 'tlist_auto_open', 0)
 " Key mapped to toggle open taglist window
-let g:tlist_toggleopen_key = get(g:, 'tlist_toggleopen_key', '<C-j>')
-" When the taglist window is toggle opened, move the cursor to the taglist window
-let g:tlist_gain_focus_on_toggleopen = get(g:, 'tlist_gain_focus_on_toggleopen', 0)
+let g:tlist_toggle_key = get(g:, 'tlist_toggle_key', '<C-j>')
+" When the taglist window is opened, move the cursor to the taglist window
+let g:tlist_gain_focus_on_open = get(g:, 'tlist_gain_focus_on_open', 0)
 " Process files even when the taglist window is not open
 let g:tlist_process_file_always = get(g:, 'tlist_process_file_always', 0)
 " Show tags menu
@@ -144,12 +144,14 @@ let g:tlist_use_single_click = get(g:, 'tlist_use_single_click', 0)
 let g:tlist_compact_format = get(g:, 'tlist_compact_format', 0)
 " Exit Vim if the taglist window is the only window currently open.
 let g:tlist_exit_onlywindow = get(g:, 'tlist_exit_onlywindow', 0)
-" Automatically close the folds for the non-active files
-let g:tlist_file_fold_auto_close = get(g:, 'tlist_file_fold_auto_close', 0)
 " Close the taglist window when a tag is selected
 let g:tlist_close_on_select = get(g:, 'tlist_close_on_select', 0)
 " Automatically update the taglist window to display tags
 let g:tlist_auto_update = get(g:, 'tlist_auto_update', 0)
+" Automatically highlight the current tag
+let g:tlist_auto_highlight_tag = get(g:, 'tlist_auto_highlight_tag', 1)
+" Automatically close the folds for the non-active files
+let g:tlist_auto_close_file_fold = get(g:, 'tlist_auto_close_file_fold', 0)
 " Enable fold column to display the folding for the tag tree
 let g:tlist_enable_fold_column = get(g:, 'tlist_enable_fold_column', 1)
 " Display the tags for only one file in the taglist window
@@ -185,7 +187,7 @@ command! -nargs=? -complete=file -bar TlistDebug             call taglist#DebugE
 command! -nargs=0 -bar                TlistUndebug           call taglist#DebugDisable()
 command! -nargs=0 -bar                TlistMessages          call taglist#DebugShow()
 " Set key mapping
-execute 'nnoremap <silent>' g:tlist_toggleopen_key ':TlistToggle<CR>'
+execute 'nnoremap <silent>' g:tlist_toggle_key ':TlistToggle<CR>'
 " }}}
 
 " AUTOCOMMANDS: {{{1

@@ -190,13 +190,20 @@ function! taglist#WindowOpen()
     " Refresh all files in the taglist window
     call s:WindowRefresh()
   endif
-  if g:tlist_file_fold_auto_close
+  if g:tlist_auto_close_file_fold
     " Open the fold for the current file, as all the folds in
     " the taglist window are closed
     if has_key(s:tlist_file_cache, fname)
       exe 'silent! ' . s:tlist_file_cache[fname].str . ',' .
             \ s:tlist_file_cache[fname].end . 'foldopen!'
     endif
+  endif
+  " Highlight the current tag
+  call s:ExeCmdWithoutAcmds('wincmd p')
+  call s:HighlightTag(1, 1)
+  if !g:tlist_gain_focus_on_open
+    " Go back to the taglist window
+    call s:GotoTagListWindow()
   endif
 endfunction
 
@@ -241,11 +248,6 @@ function! taglist#WindowToggle()
     return
   endif
   call taglist#WindowOpen()
-  " Go back to the original window, if tlist_gain_focus_on_toggleopen is not
-  " set
-  if !g:tlist_gain_focus_on_toggleopen
-    call s:ExeCmdWithoutAcmds('wincmd p')
-  endif
   " Update the taglist menu
   if g:tlist_show_menu
     call s:MenuUpdateFile(0)
@@ -990,8 +992,7 @@ endfunction
 " Get the tag on or before the specified line number in the
 " current buffer
 function! s:GetTagByLine()
-  " Arguments are not supplied. Use the current buffer name
-  " and line number
+  " Get the current buffer name and line number
   let fname = fnamemodify(bufname('%'), ':p')
   let lnum = line('.')
   " Verify the file name
@@ -1009,6 +1010,77 @@ function! s:GetTagByLine()
   endif
   let [ flag, tidx ] = closest_tag
   return s:tlist_file_cache[fname].flags[flag].tags[tidx]
+endfunction
+
+" Highlight the current tag
+" type == 1, Called by the taglist plugin itself
+" type == 2, Forced by the user through the TlistHighlightTag command
+" center == 1, Center the position of the tag name in the taglist window
+function! s:HighlightTag(type, center)
+  " Highlight the current tag only if the user configured the
+  " taglist plugin to do so or if the user explictly invoked the
+  " command to highlight the current tag.
+  if !g:tlist_auto_highlight_tag && a:type == 1
+    return
+  endif
+ " Make sure the taglist window is present
+  let tlist_winnr = bufwinnr(g:TagList_title)
+  if tlist_winnr == -1
+    call s:WarningMsg('Error: Taglist window is not open')
+    return
+  endif
+  " Get the current buffer name and line number
+  let fname = fnamemodify(bufname('%'), ':p')
+  let lnum = line('.')
+  if !has_key(s:tlist_file_cache, fname)
+    return
+  endif
+  " If the file is not being displayed in the taglist window, then return
+  if !s:tlist_file_cache[fname].visible
+    return
+  endif
+  " If there are no tags for this file, then no need to proceed further
+  if empty(s:tlist_file_cache[fname].flags)
+    return
+  endif
+  " Get the tag index
+  let closest_tag = s:SearchClosestTagIndex(fname, lnum)
+  if empty(closest_tag)
+    return
+  endif
+  let [ flag, tidx ] = closest_tag
+  " Ignore all autocommands
+  let old_ei = &eventignore
+  set eventignore=all
+  " Save the current window number
+  let save_winnr = winnr() 
+  " Go to the taglist window
+  call s:GotoTagListWindow()  
+  " Clear previously selected name
+  match none
+  " Goto the line containing the tag
+  exe s:tlist_file_cache[fname].str + 
+        \ s:tlist_file_cache[fname].flags[flag].offset + tidx
+  " Open the fold
+  if foldclosed('.') != -1
+    .foldopen
+  endif
+  if a:center
+    " Move the tag line to the center of the taglist window
+    normal! z.
+  else
+    " Make sure the current tag line is visible in the taglist window.
+    " Calling the winline() function makes the line visible. Don't know
+    " of a better way to achieve this.
+    call winline()
+  endif
+  " Highlight the tag name
+  call s:WindowHighlightLine()
+  " Go back to the original window
+  exe save_winnr . 'wincmd w'
+  " Restore the autocommands
+  let &eventignore = old_ei
+  return
 endfunction
 
 " Check whether tag listing is supported for the specified file
@@ -1370,8 +1442,7 @@ function! s:WindowRefreshFileInDisplay(fname, ftype)
   endif
   " Process and generate a list of tags defined in the file
   if !file_listed || !s:tlist_file_cache[a:fname].valid
-    call s:ProcessFile(a:fname, a:ftype)
-    if !has_key(s:tlist_file_cache, a:fname)
+    if !s:ProcessFile(a:fname, a:ftype)
       return
     endif
   endif
@@ -1537,8 +1608,8 @@ function! s:WindowRefresh()
       let bnum += 1
     endwhile
   endif
-  " If tlist_file_fold_auto_close option is set, then close all the folds
-  if g:tlist_file_fold_auto_close
+  " If tlist_auto_close_file_fold option is set, then close all the folds
+  if g:tlist_auto_close_file_fold
     " Close all the folds
     silent! %foldclose
   endif
@@ -2372,7 +2443,7 @@ function! s:WindowInit()
       autocmd BufEnter __Tag_List__ nested call s:WindowExitOnlyWindow()
     endif
     " Close the fold for this buffer when leaving the buffer
-    if g:tlist_file_fold_auto_close
+    if g:tlist_auto_close_file_fold
       autocmd BufEnter * silent call s:WindowOpenFileFold(expand('<abuf>'))
     endif
     if !g:tlist_process_file_always &&
