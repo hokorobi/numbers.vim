@@ -138,8 +138,9 @@ command! -nargs=0 -bar                Tlist                  TlistToggle
 command! -nargs=+ -complete=file      TlistAddFiles          call taglist#AddFiles(<f-args>)
 command! -nargs=+ -complete=dir       TlistAddFilesRecursive call taglist#AddFilesRecursive(<f-args>)
 command! -nargs=0 -bar                TlistUpdate            call taglist#UpdateCurrentFile()
-command! -nargs=0 -bar                TlistShowTag           echo taglist#GetTagNameByLine()
-command! -nargs=0 -bar                TlistShowPrototype     echo taglist#GetTagPrototypeByLine()
+command! -nargs=0 -bar                TlistShowTag           call taglist#GetTagNameByLine()
+command! -nargs=0 -bar                TlistShowPrototype     call taglist#GetTagPrototypeByLine()
+command! -nargs=0 -bar                TlistJumpToTag         call taglist#JumpToTagByLine()
 command! -nargs=* -complete=file      TlistSessionLoad       call taglist#SessionLoad(<q-args>)
 command! -nargs=* -complete=file      TlistSessionSave       call taglist#SessionSave(<q-args>)
 " Commands for enabling/disabling debug and to display debug messages

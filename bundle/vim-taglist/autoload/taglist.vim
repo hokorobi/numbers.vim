@@ -308,13 +308,15 @@ function! taglist#UpdateCurrentFile()
   endif
 endfunction
 
-" Get the tag name on or before the specified line number in the
-" current buffer
+" Get the name for the closest tag on or before
+" the current line in the current buffer
 function! taglist#GetTagNameByLine()
   let tag = s:GetTagByLine()
   if empty(tag)
-    return ''
+    return
   endif
+  " Highlight the tag in the taglist window (if opened)
+  call s:HighlightTag(2, 1)
   let name = tag.tag_name
   if g:tlist_display_tag_scope
     " Add the scope of the tag
@@ -323,17 +325,44 @@ function! taglist#GetTagNameByLine()
       let name .= ' [' . tag_scope . ']'
     endif
   endif
-  return name
+  echo name
 endfunction
 
-" Get the prototype for the tag on or before the specified line number in the
-" current buffer
+" Get the prototype for the closest tag on or before
+" the current line in the current buffer
 function! taglist#GetTagPrototypeByLine()
   let tag = s:GetTagByLine()
   if empty(tag)
-    return ''
+    return
   endif
-  return tag.tag_proto
+  " Highlight the tag in the taglist window (if opened)
+  call s:HighlightTag(2, 1)
+  echo tag.tag_proto
+endfunction
+
+" Jump the cursor to the closest tag on or before
+" the current line in the current buffer
+function! taglist#JumpToTagByLine()
+  " Get the current buffer name and line number
+  let fname = fnamemodify(bufname('%'), ':p')
+  let lnum = line('.')
+  " Verify the file name
+  if !has_key(s:tlist_file_cache, fname)
+    return
+  endif
+  " If there are no tags for this file, then no need to proceed further
+  if empty(s:tlist_file_cache[fname].flags)
+    return
+  endif
+  " Get the tag text using the line number
+  let closest_tag = s:SearchClosestTagIndex(fname, lnum)
+  if empty(closest_tag)
+    return
+  endif
+  " Highlight the tag in the taglist window (if opened)
+  call s:HighlightTag(2, 1) | echo
+  " Jump to the tag
+  call call('s:MenuJumpToTag', closest_tag)
 endfunction
 
 " Save a taglist session (information about all the displayed files
@@ -1045,7 +1074,7 @@ function! s:HighlightTag(type, center)
   " Highlight the tag name
   call s:WindowHighlightLine()
   " Go back to the original window
-  exe save_winnr . 'wincmd w'
+  exe s:ExeCmdWithoutAcmds(save_winnr . 'wincmd w')
   " Restore the autocommands
   let &eventignore = old_ei
   return
