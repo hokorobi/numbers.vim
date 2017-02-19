@@ -825,16 +825,16 @@ endfunction
 " Extract the tag prototype from the tag text
 function! s:ExtractTagPrototype(tag_line_parts)
   let tag_proto = (a:tag_line_parts[2][-4: -4] == '$' ?
-          \ a:tag_line_parts[2][2: -5] :
-          \ a:tag_line_parts[2][2: -4])
+        \ a:tag_line_parts[2][2: -5] :
+        \ a:tag_line_parts[2][2: -4])
   return substitute(tag_proto, '^\s\+', '', '')
 endfunction
 
 " Extract the tag search pattern from the tag text
 function! s:ExtractTagSearchPattern(tag_line_parts)
   let tag_pattern = (a:tag_line_parts[2][-4: -4] == '$' ?
-          \ a:tag_line_parts[2][2: -5] :
-          \ a:tag_line_parts[2][2: -4])
+        \ a:tag_line_parts[2][2: -5] :
+        \ a:tag_line_parts[2][2: -4])
   return '\V\^' . tag_pattern . '\$'
 endfunction
 
@@ -1034,7 +1034,7 @@ function! s:HighlightTag(type, center)
   match none
   " Goto the line containing the tag
   exe s:tlist_file_cache[fname].str +
-        \ s:tlist_file_cache[fname].flags[flag].offset + tidx
+        \ s:tlist_file_cache[fname].flags[flag].offset + tidx + 1
   " Open the fold
   if foldclosed('.') != -1
     .foldopen
