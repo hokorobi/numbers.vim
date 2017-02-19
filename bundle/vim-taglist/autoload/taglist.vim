@@ -40,6 +40,7 @@ set cpo&vim
 " name        - Name of the tag type used in the taglist window to display the
 "               tags of this type
 
+" Default file types supported by exuberant ctags
 let s:tlist_def_settings = {
       \ 'ant'       : 'ant;p:projects;t:targets;',
       \ 'asm'       : 'asm;d:define;l:label;m:macro;t:type;',
@@ -114,6 +115,12 @@ let s:tlist_def_settings = {
       \ 'vim'       : 'vim;v:variable;a:autocmds;c:commands;m:map;f:function;',
       \ 'yacc'      : 'yacc;l:label;',
       \ }
+
+" Additional file type settings
+let s:tlist_markdown_settings = 'markdown;h:Heading L1;i:Heading L2;k:Heading L3;'
+let s:tlist_sas_settings      = 'sas;l:libname;f:filename;' .
+      \                         'd:data step;p:procedure;h:hash object;t:format;' .
+      \                         'm:macro function;v:macro variable;'
 " }}}1
 
 " INITIALIZATION: {{{1
@@ -619,6 +626,9 @@ function! s:LogMsg(msg)
     else
       " Log the message into a variable
       " Retain only the last 3000 characters
+      if !exists('s:tlist_msg')
+        let s:tlist_msg = ''
+      endif
       let len = strlen(s:tlist_msg)
       if len > 3000
         let s:tlist_msg = strpart(s:tlist_msg, len - 3000)
@@ -789,6 +799,13 @@ function! s:InitFileTypeSettings(ftype)
     " User specified ctags settings
     let settings = s:ParseRawSettingStrings(eval(
           \ 'g:tlist_' . a:ftype . '_settings'))
+    if empty(settings)
+      return 0
+    endif
+  elseif exists('s:tlist_' . a:ftype . '_settings')
+    " Plugin specified additional ctags settings
+    let settings = s:ParseRawSettingStrings(eval(
+          \ 's:tlist_' . a:ftype . '_settings'))
     if empty(settings)
       return 0
     endif
@@ -1088,6 +1105,7 @@ function! s:SkipFile(fname, ftype)
   " available. If both are not available, then don't list the tags for this
   " filetype
   if !has_key(s:tlist_def_settings, a:ftype) &&
+        \ !exists('s:tlist_' . a:ftype . '_settings') &&
         \ !exists('g:tlist_' . a:ftype . '_settings')
     return 1
   endif
