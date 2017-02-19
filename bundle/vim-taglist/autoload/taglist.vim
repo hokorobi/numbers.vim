@@ -2,15 +2,15 @@
 " Maintainer: Zhenhuan Hu (zhu@mcw.edu)
 " Original Author: Yegappan Lakshmanan (yegappan AT yahoo DOT com)
 " Version: 5.0.0
-" Last Modified: Feb 14, 2017
+" Last Modified: Feb 18, 2017
 " Copyright: Copyright (C) 2002-2013 Yegappan Lakshmanan
 "                          2017      Zhenhuan Hu
 "            Permission is hereby granted to use and distribute this code,
 "            with or without modifications, provided that this copyright
-"            notice is copied with it. Like anything else that's free,
-"            taglist.vim is provided *as is* and comes with no warranty of any
+"            notice is copied with it. Like anything else that is free,
+"            this plugin is provided *as is* and comes with no warranty of any
 "            kind, either expressed or implied. In no event will the copyright
-"            holder be liable for any damamges resulting from the use of this
+"            holder be liable for any damages resulting from the use of this
 "            software.
 
 " LOAD GUARD: {{{1

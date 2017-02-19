@@ -2,60 +2,16 @@
 " Maintainer: Zhenhuan Hu (zhu@mcw.edu)
 " Original Author: Yegappan Lakshmanan (yegappan AT yahoo DOT com)
 " Version: 5.0.0
-" Last Modified: Feb 14, 2017
+" Last Modified: Feb 18, 2017
 " Copyright: Copyright (C) 2002-2013 Yegappan Lakshmanan
 "                          2017      Zhenhuan Hu
 "            Permission is hereby granted to use and distribute this code,
 "            with or without modifications, provided that this copyright
-"            notice is copied with it. Like anything else that's free,
-"            taglist.vim is provided *as is* and comes with no warranty of any
+"            notice is copied with it. Like anything else that is free,
+"            this plugin is provided *as is* and comes with no warranty of any
 "            kind, either expressed or implied. In no event will the copyright
-"            holder be liable for any damamges resulting from the use of this
+"            holder be liable for any damages resulting from the use of this
 "            software.
-"
-" The "TagList" plugin is a source code browser plugin for Vim and provides an
-" overview of the structure of the programming language files and enables you
-" to efficiently browse through source code files for various programming
-" languages.
-"
-" You can visit the taglist plugin home page for more information:
-"
-"       http://vim-taglist.sourceforge.net
-"
-" You can subscribe to the taglist mailing list to post your questions
-" or suggestions for improvement or to report bugs. Visit the following
-" page for subscribing to the mailing list:
-"
-"       http://groups.yahoo.com/group/taglist/
-"
-" For more information about using this plugin, after installing the
-" taglist plugin, use the ":help taglist" command.
-"
-" Installation
-" ------------
-" 1. Download the taglist.zip file and unzip the files to the $HOME/.vim
-"    or the $HOME/vimfiles or the $VIM/vimfiles directory. This should
-"    unzip the following two files (the directory structure should be
-"    preserved):
-"
-"       plugin/taglist.vim - main taglist plugin file
-"       doc/taglist.txt    - documentation (help) file
-"
-"    Refer to the 'add-plugin', 'add-global-plugin' and 'runtimepath'
-"    Vim help pages for more details about installing Vim plugins.
-" 2. Change to the $HOME/.vim/doc or $HOME/vimfiles/doc or
-"    $VIM/vimfiles/doc directory, start Vim and run the ":helptags ."
-"    command to process the taglist help file.
-" 3. If the exuberant ctags utility is not present in your PATH, then set the
-"    tlist_ctags_cmd variable to point to the location of the exuberant ctags
-"    utility (not to the directory) in the .vimrc file.
-" 4. If you are running a terminal/console version of Vim and the
-"    terminal doesn't support changing the window width then set the
-"    'tlist_inc_win_width' variable to 0 in the .vimrc file.
-" 5. Restart Vim.
-" 6. You can now use the ":TlistToggle" command to open/close the taglist
-"    window. You can use the ":help taglist" command to get more
-"    information about using the taglist plugin.
 
 " LOAD GUARD: {{{1
 if exists('g:loaded_taglist')
