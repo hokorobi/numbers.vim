@@ -17,8 +17,8 @@ plugin, use the `:help taglist` command.
 1. Unpackage the plugin to the `$HOME/.vim` or the `$HOME/vimfiles` directory.
 2. Change to the `$HOME/.vim/doc` or `$HOME/vimfiles/doc` directory, start Vim
    and run the `:helptags .` command to process the help file.
-3. The binary file of Exuberant Ctags is always included for Windows. For other
-   systems, if Exuberant Ctags is not present in your `PATH`, set the
+3. The binary file of Exuberant Ctags is already included for Windows. For
+   other systems, if Exuberant Ctags is not present in your `PATH`, set the
    `tlist_ctags_cmd` variable with the location of Exuberant Ctags in the
    `.vimrc` file.
 4. If you are running a terminal/console version of Vim and the terminal does
