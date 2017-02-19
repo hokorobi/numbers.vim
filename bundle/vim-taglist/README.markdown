@@ -30,8 +30,8 @@ plugin, use the `:help taglist` command.
 
 ## Supported file types
 
-All file types supported by Exuberant Ctags. Please see:
-`http://ctags.sourceforge.net/languages.html`.
+All file types supported by Exuberant Ctags. Please see
+[HERE](http://ctags.sourceforge.net/languages.html).
 
 Additional supported languages:
 
