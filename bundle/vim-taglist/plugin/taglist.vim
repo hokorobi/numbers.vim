@@ -118,8 +118,8 @@ let g:tlist_enable_fold_column = get(g:, 'tlist_enable_fold_column', 1)
 let g:tlist_show_one_file = get(g:, 'tlist_show_one_file', 0)
 " Maximum number of items listed in the sub-menu
 let g:tlist_max_submenu_items = get(g:, 'tlist_max_submenu_items', 20)
-" Maximum tag length
-let g:tlist_max_tag_length = get(g:, 'tlist_max_tag_length', 10)
+" Maximum tag length in the menu
+let g:tlist_max_tag_length = get(g:, 'tlist_max_tag_length', 25)
 
 " Do not change the name of the taglist title variable. The winmanager
 " plugin relies on this name to determine the title for the taglist
