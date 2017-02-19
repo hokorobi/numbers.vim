@@ -24,9 +24,9 @@ plugin, use the `:help taglist` command.
    not support changing the window width then set the `tlist_inc_win_width`
    variable to 0 in the `.vimrc` file.
 5. Restart Vim.
-6. You can now use the `:TlistToggle` command to open/close the taglist window.
-   You can use the `:help taglist` command to get more information about using
-   the taglist plugin.
+6. You can now use `<C-j>` or the `:TlistToggle` command to open/close the
+   taglist window. You can use the `:help taglist` command to get more
+   information about using the taglist plugin.
 
 ## Supported file types
 
