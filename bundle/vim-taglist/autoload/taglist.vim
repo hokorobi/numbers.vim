@@ -15,7 +15,7 @@
 
 " LOAD GUARD: {{{1
 if exists('g:loaded_autoload_taglist') ||
-      \ v:version < 800 || !exists('*system')
+      \ v:version < 704 || !exists('*system')
   finish
 endif
 let g:loaded_autoload_taglist = 1

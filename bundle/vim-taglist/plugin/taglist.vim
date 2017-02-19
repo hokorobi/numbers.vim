@@ -16,8 +16,8 @@
 " LOAD GUARD: {{{1
 if exists('g:loaded_taglist')
   finish
-elseif v:version < 800
-  echomsg 'TagList: Vim version >= 8.0 is required. ' .
+elseif v:version < 704
+  echomsg 'TagList: Vim version >= 7.4 is required. ' .
         \ 'Plugin is not loaded.'
   finish
 elseif !exists('*system')
