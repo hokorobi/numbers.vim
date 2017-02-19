@@ -888,6 +888,7 @@ endfunction
 " Returns [flag, tidx] for the flag and index of that tag
 " Returns [], if no tag can be found for the specified line number
 function! s:SearchClosestTagIndex(fname, lnum)
+  call s:LogMsg('SearchClosestTagIndex(' . a:fname . ', ' . a:lnum . ')')
   let sort_type = s:tlist_file_cache[a:fname].sortby
   let closest_tag = []
   for flag in keys(s:tlist_file_cache[a:fname].flags)
@@ -949,7 +950,7 @@ function! s:SearchClosestTagIndex(fname, lnum)
       let closest_tag = [flag, left]
       break
     elseif empty(closest_tag) ||
-          \ lnum > s:GetTagLineNr(a:fname, closest_tag[0], closest_tag[1])
+          \ lnum > str2nr(s:GetTagLineNr(a:fname, closest_tag[0], closest_tag[1]))
       let closest_tag = [flag, left]
     endif
   endfor
@@ -1203,6 +1204,7 @@ function! s:UpdateFile(fname, ftype)
   if has_key(s:tlist_file_cache, a:fname)
     if s:tlist_file_cache[a:fname].visible == -1
       " File is suppressed by the user, then return
+      call s:LogMsg('File is suppressed by the user. Return.')
       return
     elseif s:tlist_file_cache[a:fname].valid &&
           \ s:tlist_file_cache[a:fname].ftime == getftime(a:fname)
