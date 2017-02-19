@@ -474,22 +474,6 @@ function! taglist#DebugShow()
   normal! gg
 endfunction
 
-" When the mouse cursor is over a tag in the taglist window, display the
-" tag prototype (balloon)
-function! taglist#BalloonExpr()
-  " Get the file name
-  let fname = s:WindowGetFileByLineNr(v:beval_lnum)
-  if fname == '' | return '' | endif
-  " Get the flag
-  let flag = s:WindowGetFlagByLineNr(fname, v:beval_lnum)
-  if flag == '' | return '' | endif
-  " Get the tag index
-  let tidx = s:WindowGetTagIndex(fname, flag, v:beval_lnum)
-  if tidx == -1 | return '' | endif
-  " Get the tag search pattern and display it
-  return s:tlist_file_cache[fname].flags[flag].tags[tidx].tag_proto
-endfunction
-
 " Initialize the taglist menu
 function! taglist#MenuInit()
   call s:MenuAddBaseMenu()
@@ -607,6 +591,13 @@ function! taglist#VimSessionLoad()
   call s:WindowRefresh()
 endfunction
 
+" When the mouse cursor is over a tag in the taglist window, display the
+" tag prototype (balloon)
+function! taglist#BalloonExpr()
+  " Get the tag info
+  let info = s:WindowGetInfoByLineNr(v:beval_lnum)
+  return info
+endfunction
 " }}}1
 
 " INTERNAL FUNCTIONS: {{{1
@@ -1023,7 +1014,7 @@ function! s:HighlightTag(type, center)
   if !g:tlist_auto_highlight_tag && a:type == 1
     return
   endif
- " Make sure the taglist window is present
+  " Make sure the taglist window is present
   let tlist_winnr = bufwinnr(g:TagList_title)
   if tlist_winnr == -1
     call s:WarningMsg('Error: Taglist window is not open')
@@ -1124,6 +1115,7 @@ function! s:InitFile(fname, ftype)
           \ 'visible': 0,
           \ 'str'    : 0,
           \ 'end'    : 0,
+          \ 'ntags'  : 0,
           \ 'flags'  : {},
           \ 'mcmd'   : '',
           \ }
@@ -1137,6 +1129,8 @@ function! s:DiscardFileTagInfo(fname)
   if !has_key(s:tlist_file_cache, a:fname)
     return 0
   endif
+  " Discard total number of tags
+  let s:tlist_file_cache[a:fname].ntags = 0
   " Discard information about the tags defined in the file
   let s:tlist_file_cache[a:fname].flags = {}
   " Discard the stored menu command
@@ -1218,6 +1212,7 @@ function! s:ProcessFile(fname, ftype)
   let nparsed = count(map(split(cmd_output, '\n'),
         \ 's:ParseTagLine(v:val, a:fname, a:ftype)'), 1)
   call s:LogMsg('A total of ' . nparsed . ' tags have been parsed')
+  let s:tlist_file_cache[a:fname].ntags = nparsed
   return 1
 endfunction
 
@@ -1600,7 +1595,7 @@ function! s:WindowRefresh()
   " one file. Otherwise, when tlist_show_one_file is configured,
   " tags for the wrong file will be displayed.
   for fname in keys(s:tlist_file_cache)
-    let ftype = s:tlist_file_cache[fname]['ftype']
+    let ftype = s:tlist_file_cache[fname].ftype
     call s:WindowRefreshFileInDisplay(fname, ftype)
   endfor
   if g:tlist_auto_update
@@ -1695,6 +1690,68 @@ function! s:WindowGetFlagByLineNr(fname, lnum)
   return r_flag
 endfunction
 
+" Get tag information based on the line number of the taglist window
+function! s:WindowGetInfoByLineNr(lnum)
+  " Do not process empty or comment lines
+  let line = getline(a:lnum)
+  if line == '' || line[0] == '"'
+    return ''
+  endif
+  " Get the file name
+  let fname = s:WindowGetFileByLineNr(a:lnum)
+  if fname == ''
+    return ''
+  endif
+  " Prepare info text
+  let info = fname
+  if strlen(info) > min([50, &columns - 1])
+    let info = fnamemodify(fname, ':t')
+  endif
+  if a:lnum == s:tlist_file_cache[fname].str
+    " Cursor is on a file name
+    let info .= ', Type: ' . s:tlist_file_cache[fname].ftype .
+          \ ', Total Tag Count: ' . s:tlist_file_cache[fname].ntags
+  else
+    " Get the flag
+    let flag = s:WindowGetFlagByLineNr(fname, a:lnum)
+    if flag == ''
+      let info .= ', Type: ' . s:tlist_file_cache[fname].ftype .
+            \ ', Total Tag Count: ' . s:tlist_file_cache[fname].ntags
+    else
+      " Get the tag proto
+      let tidx = s:WindowGetTagIndex(fname, flag, a:lnum)
+      if tidx == -1
+        let info .= ', Flag: ' . flag .
+              \ ', Tag Count: ' . len(s:tlist_file_cache[fname].flags[flag].tags) .
+              \ ' of ' . s:tlist_file_cache[fname].ntags
+      else
+        let info .= ', Flag: ' . flag . ', Prototype: ' .
+              \ s:tlist_file_cache[fname].flags[flag].tags[tidx]['tag_proto']
+      endif
+    endif
+  endif
+  return info
+endfunction
+
+" Display information about the entry under the cursor
+function! s:WindowShowInfo()
+  call s:LogMsg('WindowShowInfo()')
+  " Clear the previously displayed line
+  echo
+  " If inside a fold, then don't display the prototype
+  if foldclosed('.') != -1
+    return
+  endif
+  " Get the tag info of the current line
+  let info = s:WindowGetInfoByLineNr(line('.'))
+  " Cut info text within the range of the window width
+  if len(info) > &columns - 21
+    let info = strpart(info, 0, &columns - 25) . ' ...'
+  endif
+  echo info
+  return
+endfunction
+
 " Return the tag index for the specified line in the taglist window
 function! s:WindowGetTagIndex(fname, flag, lnum)
   " Compute the index into the displayed tags
@@ -1726,7 +1783,7 @@ function! s:WindowUpdateFile()
   " Invalidate the tags listed for this file
   let s:tlist_file_cache[fname].valid = 0
   " Update the taglist window
-  call s:WindowRefreshFileInDisplay(fname, s:tlist_file_cache[fname]['ftype'])
+  call s:WindowRefreshFileInDisplay(fname, s:tlist_file_cache[fname].ftype)
   " Go back to the tag line before the list is updated
   call search(curline, 'w')
   if g:tlist_show_menu
@@ -2005,54 +2062,6 @@ function! s:WindowJumpToTag(win_ctrl)
   call s:WindowOpenFile(a:win_ctrl, fname, tagpat)
 endfunction
 
-" Display information about the entry under the cursor
-function! s:WindowShowInfo()
-  call s:LogMsg('WindowShowInfo()')
-  " Clear the previously displayed line
-  echo
-  " Do not process comment lines and empty lines
-  let curline = getline('.')
-  if curline =~ '^\s*$' || curline[0] == '"'
-    return
-  endif
-  " If inside a fold, then don't display the prototype
-  if foldclosed('.') != -1
-    return
-  endif
-  let lnum = line('.')
-  " Get the file name
-  let fname = s:WindowGetFileByLineNr(lnum)
-  if fname == ''
-    return
-  endif
-  " Prepare info text
-  let info = fname
-  if strlen(info) > 50
-    let info = fnamemodify(fname, ':t')
-  endif
-  if lnum == s:tlist_file_cache[fname].str
-    " Cursor is on a file name
-    echo info . ', File Type: ' . s:tlist_file_cache[fname]['ftype']
-    return
-  endif
-  " Get the flag
-  let flag = s:WindowGetFlagByLineNr(fname, lnum)
-  if flag == ''
-    echo info . ', File Type: ' . s:tlist_file_cache[fname]['ftype']
-    return
-  endif
-  " Get the tag name
-  let tidx = s:WindowGetTagIndex(fname, flag, lnum)
-  if tidx == -1
-    echo info . ', Flag: ' . flag . ', Tag Count: ' .
-          \ len(s:tlist_file_cache[fname].flags[flag].tags)
-    return
-  endif
-  echo info . ', Tag Prototype: ' .
-        \ s:tlist_file_cache[fname].flags[flag].tags[tidx]['tag_proto']
-  return
-endfunction
-
 " Change the sort order of the tag listing
 " action == 'toggle', toggle sort from name to order and vice versa
 " action == 'set', set the sort order to sort_type
@@ -2081,7 +2090,7 @@ function! s:WindowChangeSort(action, sort_type)
   " Invalidate the tags listed for this file
   let s:tlist_file_cache[fname].valid = 0
   " Update the taglist window
-  call s:WindowRefreshFileInDisplay(fname, s:tlist_file_cache[fname]['ftype'])
+  call s:WindowRefreshFileInDisplay(fname, s:tlist_file_cache[fname].ftype)
   exe s:tlist_file_cache[fname].str . ',' .
         \ s:tlist_file_cache[fname].end . 'foldopen!'
   " Go back to the cursor line before the tag list is sorted
@@ -2445,7 +2454,7 @@ function! s:WindowInit()
   augroup TagListAutoCmds
     autocmd!
     " Display the tag prototype for the tag under the cursor.
-    autocmd CursorHold __Tag_List__ call s:WindowShowInfo()
+    autocmd CursorMoved __Tag_List__ call s:WindowShowInfo()
     " Adjust the Vim window width when taglist window is closed
     autocmd BufUnload __Tag_List__ call s:WindowPostCloseCleanup()
     " Exit Vim itself if only the taglist window is present (optional)
