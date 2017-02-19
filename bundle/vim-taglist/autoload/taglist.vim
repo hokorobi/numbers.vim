@@ -822,28 +822,66 @@ function! s:InitFileTypeSettings(ftype)
   return 1
 endfunction
 
+" Extract the tag type from the tag text
+function! s:ExtractTagFlag(tag_line)
+  " The tag type starts after the tag prototype field
+  " ended with the /;"\t string, and ends before the \tline: string
+  let start = strridx(a:tag_line, '/;"' . "\t") + 4
+  let end   = strridx(a:tag_line, 'line:') - 1
+  return strpart(a:tag_line, start, end - start)
+endfunction
+
+" Extract the tag name from the tag text
+function! s:ExtractTagName(tag_line)
+  return strpart(a:tag_line, 0, stridx(a:tag_line, "\t"))
+endfunction
+
 " Extract the tag prototype from the tag text
-function! s:ExtractTagPrototype(tag_line_parts)
-  let tag_proto = (a:tag_line_parts[2][-4: -4] == '$' ?
-          \ a:tag_line_parts[2][2: -5] :
-          \ a:tag_line_parts[2][2: -4])
-  return substitute(tag_proto, '^\s\+', '', '')
+function! s:ExtractTagPrototype(tag_line)
+  " Parse and extract the tag prototype
+  let start = stridx(a:tag_line, '/^') + 2
+  let end   = stridx(a:tag_line, '/;"' . "\t")
+  if a:tag_line[end - 1] == '$'
+    let end = end - 1
+  endif
+  let tag_proto = strpart(a:tag_line, start, end - start)
+  return substitute(tag_proto, '\s*', '', '')
 endfunction
 
 " Extract the tag search pattern from the tag text
-function! s:ExtractTagSearchPattern(tag_line_parts)
-  let tag_pattern = (a:tag_line_parts[2][-4: -4] == '$' ?
-          \ a:tag_line_parts[2][2: -5] :
-          \ a:tag_line_parts[2][2: -4])
-  return '\V\^' . tag_pattern . '\$'
+function! s:ExtractTagSearchPattern(tag_line)
+  " Parse and extract the tag search pattern
+  let start = stridx(a:tag_line, '/^') + 2
+  let end   = stridx(a:tag_line, '/;"' . "\t")
+  if a:tag_line[end - 1] == '$'
+    let end = end - 1
+  endif
+  return '\V\^' . strpart(a:tag_line, start, end - start) .
+        \ (a:tag_line[end] == '$' ? '\$' : '')
 endfunction
 
 " Extract the tag scope from the tag text
-function! s:ExtractTagScope(tag_line_parts)
-  return len(a:tag_line_parts) > 5 ?
-        \ strpart(a:tag_line_parts[-1],
-        \ stridx(a:tag_line_parts[-1], ':') + 1) :
-        \ ''
+function! s:ExtractTagScope(tag_line)
+  let start = strridx(a:tag_line, 'line:')
+  let end   = strridx(a:tag_line, "\t")
+  if end <= start
+    return ''
+  endif
+  let tag_scope = strpart(a:tag_line, end + 1)
+  return strpart(tag_scope, stridx(tag_scope, ':') + 1)
+endfunction
+
+" Extract the tag line number from the tag text
+function! s:ExtractTagLineNr(tag_line)
+  " Parse and extract the tag line number
+  let start = strridx(a:tag_line, 'line:') + 5
+  let end   = strridx(a:tag_line, "\t")
+  if end < start
+    let tag_lnum = strpart(a:tag_line, start)
+  else
+    let tag_lnum = strpart(a:tag_line, start, end - start)
+  endif
+  return tag_lnum
 endfunction
 
 " Parse a tag line from the ctags output. Separate the tag output based on the
@@ -857,10 +895,8 @@ function! s:ParseTagLine(tag_line, fname, ftype)
     " Skip empty lines
     return 0
   endif
-  " Divide the tag line into parts
-  let tag_line_parts = split(a:tag_line, "\t")
   " Extract tag flag
-  let tag_flag = tag_line_parts[3]
+  let tag_flag = s:ExtractTagFlag(a:tag_line)
   " Make sure the tag flag is a valid and supported one
   if !has_key(s:tlist_filetype_settings[a:ftype].flags, tag_flag)
     return 0
@@ -868,11 +904,11 @@ function! s:ParseTagLine(tag_line, fname, ftype)
   " Extract tag specific information
   let cur_tag = {
         \ 'tag_flag'   : tag_flag,
-        \ 'tag_name'   : tag_line_parts[0],
-        \ 'tag_lnum'   : tag_line_parts[4][5:],
-        \ 'tag_proto'  : s:ExtractTagPrototype(tag_line_parts),
-        \ 'tag_pattern': s:ExtractTagSearchPattern(tag_line_parts),
-        \ 'tag_scope'  : s:ExtractTagScope(tag_line_parts),
+        \ 'tag_name'   : s:ExtractTagName(a:tag_line),
+        \ 'tag_proto'  : s:ExtractTagPrototype(a:tag_line),
+        \ 'tag_pattern': s:ExtractTagSearchPattern(a:tag_line),
+        \ 'tag_scope'  : s:ExtractTagScope(a:tag_line),
+        \ 'tag_lnum'   : s:ExtractTagLineNr(a:tag_line),
         \ }
   " Store flag information if it is not already available
   if !has_key(s:tlist_file_cache[a:fname].flags, tag_flag)
