@@ -4,16 +4,14 @@ A source code browser plugin for Vim based on tags.
 
 ## Introduction
 
-This plugin is a fork of Yegappan Lakshmanan's TagList plugin. The majority
-of the plugin source codes have been completely rewritten using new VimScript
-features provided by the latest version of Vim.
+This plugin is a fork of Yegappan Lakshmanan's TagList plugin. The majority of
+the plugin source codes have been completely rewritten using new VimScript
+features provided by the latest version of Vim. The plugin provides an overview
+of the structure of the programming language files and enables users to
+efficiently browse through source code files for various programming languages.
 
-The plugin provides an overview of the structure of the programming language
-files and enables users to efficiently browse through source code files for
-various programming languages.
-
-For more information about using this plugin, after installing the taglist
-plugin, use the `:help taglist` command.
+For more information about using this plugin, after installation, use the
+`:help taglist` command.
 
 ## Installation
 
