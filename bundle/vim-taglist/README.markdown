@@ -44,7 +44,7 @@ Additional supported languages:
 ## Changes
 
 * Package the latest version of Exuberant Ctags with the plugin (Windows only).
-* Read user language configurations from the `$HOME/vimfiles/tools` directory.
+* Add additional language configurations in `$HOME/vimfiles/tools/ctag.conf`.
 * Show tag information when moving the cursor in the taglist window.
 * Add the default key mapping of `<C-j>` to toggle the taglist window.
 * Add `Toggle Tag List` command to the main menu.
