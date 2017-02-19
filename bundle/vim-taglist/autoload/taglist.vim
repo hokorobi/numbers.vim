@@ -1044,13 +1044,13 @@ function! s:HighlightTag(type, center)
   let old_ei = &eventignore
   set eventignore=all
   " Save the current window number
-  let save_winnr = winnr() 
+  let save_winnr = winnr()
   " Go to the taglist window
-  call s:GotoTagListWindow()  
+  call s:GotoTagListWindow()
   " Clear previously selected name
   match none
   " Goto the line containing the tag
-  exe s:tlist_file_cache[fname].str + 
+  exe s:tlist_file_cache[fname].str +
         \ s:tlist_file_cache[fname].flags[flag].offset + tidx
   " Open the fold
   if foldclosed('.') != -1
@@ -2372,10 +2372,8 @@ function! s:WindowInit()
   nnoremap <buffer> <silent> o             :call <SID>WindowJumpToTag('newwin')<CR>
   nnoremap <buffer> <silent> p             :call <SID>WindowJumpToTag('preview')<CR>
   nnoremap <buffer> <silent> P             :call <SID>WindowJumpToTag('prevwin')<CR>
-  if v:version >= 700
-    nnoremap <buffer> <silent> t           :call <SID>WindowJumpToTag('checktab')<CR>
-    nnoremap <buffer> <silent> <C-t>       :call <SID>WindowJumpToTag('newtab')<CR>
-  endif
+  nnoremap <buffer> <silent> t             :call <SID>WindowJumpToTag('checktab')<CR>
+  nnoremap <buffer> <silent> <C-t>         :call <SID>WindowJumpToTag('newtab')<CR>
   nnoremap <buffer> <silent> <2-LeftMouse> :call <SID>WindowJumpToTag('useopen')<CR>
   nnoremap <buffer> <silent> s             :call <SID>WindowChangeSort('toggle', '')<CR>
   nnoremap <buffer> <silent> u             :call <SID>WindowUpdateFile()<CR>
@@ -2402,10 +2400,8 @@ function! s:WindowInit()
   inoremap <buffer> <silent> o             <C-o>:call <SID>WindowJumpToTag('newwin')<CR>
   inoremap <buffer> <silent> p             <C-o>:call <SID>WindowJumpToTag('preview')<CR>
   inoremap <buffer> <silent> P             <C-o>:call <SID>WindowJumpToTag('prevwin')<CR>
-  if v:version >= 700
-    inoremap <buffer> <silent> t           <C-o>:call <SID>WindowJumpToTag('checktab')<CR>
-    inoremap <buffer> <silent> <C-t>       <C-o>:call <SID>WindowJumpToTag('newtab')<CR>
-  endif
+  inoremap <buffer> <silent> t             <C-o>:call <SID>WindowJumpToTag('checktab')<CR>
+  inoremap <buffer> <silent> <C-t>         <C-o>:call <SID>WindowJumpToTag('newtab')<CR>
   inoremap <buffer> <silent> <2-LeftMouse> <C-o>:call <SID>WindowJumpToTag('useopen')<CR>
   inoremap <buffer> <silent> s             <C-o>:call <SID>WindowChangeSort('toggle', '')<CR>
   inoremap <buffer> <silent> u             <C-o>:call <SID>WindowUpdateFile()<CR>
@@ -2461,6 +2457,8 @@ function! s:WindowInit()
     if g:tlist_exit_onlywindow
       autocmd BufEnter __Tag_List__ nested call s:WindowExitOnlyWindow()
     endif
+    " Clear command line when leaving the taglist window
+    autocmd WinLeave __Tag_List__ echo
     " Close the fold for this buffer when leaving the buffer
     if g:tlist_auto_close_file_fold
       autocmd BufEnter * silent call s:WindowOpenFileFold(expand('<abuf>'))
