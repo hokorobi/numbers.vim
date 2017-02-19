@@ -39,6 +39,10 @@ set cpo&vim
 if !exists('g:tlist_ctags_cmd')
   if has('win32') && len(globpath(&runtimepath, 'tools/ctags.exe', 0, 1)) > 0
     let g:tlist_ctags_cmd = globpath(&runtimepath, 'tools/ctags.exe', 0, 1)[0]
+  elseif executable('/usr/local/bin/ctags')
+    let g:tlist_ctags_cmd = '/usr/local/bin/ctags' " Homebrew
+  elseif executable('/opt/local/bin/ctags')
+    let g:tlist_ctags_cmd = '/opt/local/bin/ctags' " Macports
   elseif executable('exuberant-ctags')
     let g:tlist_ctags_cmd = 'exuberant-ctags' " Debian Linux
   elseif executable('exctags')
@@ -52,7 +56,7 @@ if !exists('g:tlist_ctags_cmd')
   else
     echomsg 'TagList: Exuberant ctags (http://ctags.sf.net) ' .
           \ 'not found in PATH. Plugin is not loaded.'
-    let g:loaded_taglist = 'no'
+    unlet! g:loaded_taglist
     let &cpo = s:cpo_save
     finish
   endif
