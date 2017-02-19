@@ -8,7 +8,7 @@ let s:cpo_save = &cpo
 set cpo&vim
 
 " Local settings
-setlocal textwidth=78 formatoptions+=t
+setlocal textwidth=80 formatoptions+=t colorcolumn=+1
 setlocal spell spelllang=en_us
 setlocal cms=<!--%s-->
 
