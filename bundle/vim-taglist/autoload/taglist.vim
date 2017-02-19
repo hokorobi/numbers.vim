@@ -911,7 +911,7 @@ function! s:GetTagLineNr(fname, flag, tidx)
 endfunction
 
 " Search the closest tag to the supplied line number
-" Returns [ flag, tidx ] for the flag and index of that tag
+" Returns [flag, tidx] for the flag and index of that tag
 " Returns [], if no tag can be found for the specified line number
 function! s:SearchClosestTagIndex(fname, lnum)
   let sort_type = s:tlist_file_cache[a:fname].sortby
@@ -934,7 +934,6 @@ function! s:SearchClosestTagIndex(fname, lnum)
         let middle_lnum = s:GetTagLineNr(a:fname, flag, middle)
         if middle_lnum == a:lnum
           let left = middle
-          let closest_tag = [flag, middle]
           break
         elseif middle_lnum > a:lnum
           let right = middle - 1
@@ -952,14 +951,13 @@ function! s:SearchClosestTagIndex(fname, lnum)
       let final_left = 0
       while left <= right
         let lnum = s:GetTagLineNr(a:fname, flag, left)
-        if lnum < a:lnum && lnum > closest_lnum
+        if lnum == a:lnum
           let closest_lnum = lnum
           let final_left = left
-        elseif lnum == a:lnum
-          let closest_lnum = lnum
-          let final_left = left
-          let closest_tag = [flag, left]
           break
+        elseif lnum < a:lnum && lnum > closest_lnum
+          let closest_lnum = lnum
+          let final_left = left
         else
           let left += 1
         endif
@@ -972,8 +970,12 @@ function! s:SearchClosestTagIndex(fname, lnum)
       endif
     endif
     " Compare tags of other flags
-    if empty(closest_tag) ||
-          \ left > s:GetTagLineNr(a:fname, closest_tag[0], closest_tag[1])
+    let lnum = s:GetTagLineNr(a:fname, flag, left)
+    if lnum  == a:lnum
+      let closest_tag = [flag, left]
+      break
+    elseif empty(closest_tag) ||
+          \ lnum > s:GetTagLineNr(a:fname, closest_tag[0], closest_tag[1])
       let closest_tag = [flag, left]
     endif
   endfor
@@ -999,7 +1001,7 @@ function! s:GetTagByLine()
   if empty(closest_tag)
     return {}
   endif
-  let [ flag, tidx ] = closest_tag
+  let [flag, tidx] = closest_tag
   return s:tlist_file_cache[fname].flags[flag].tags[tidx]
 endfunction
 
@@ -1039,7 +1041,7 @@ function! s:HighlightTag(type, center)
   if empty(closest_tag)
     return
   endif
-  let [ flag, tidx ] = closest_tag
+  let [flag, tidx] = closest_tag
   " Ignore all autocommands
   let old_ei = &eventignore
   set eventignore=all
