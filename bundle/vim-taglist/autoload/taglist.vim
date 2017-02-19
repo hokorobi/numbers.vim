@@ -657,17 +657,17 @@ function! s:GotoTagListWindow()
 endfunction
 
 " Returns 1 if a file is removed by a user from the taglist
-function! s:IsRemovedFile(filename)
-  return index(s:tlist_removed_flist, a:filename) != -1
+function! s:IsRemovedFile(fname)
+  return index(s:tlist_removed_flist, a:fname) != -1
 endfunction
 
 " Update the list of user removed files from the taglist
 " add == 1, Add the file to the removed list
 " add == 0, Delete the file from the removed list
-function! s:UpdateRemovedFileList(filename, add)
-  let idx = index(s:tlist_removed_flist, a:filename)
+function! s:UpdateRemovedFileList(fname, add)
+  let idx = index(s:tlist_removed_flist, a:fname)
   if a:add && idx == -1
-    call add(s:tlist_removed_flist, a:filename)
+    call add(s:tlist_removed_flist, a:fname)
   elseif idx != -1
     call remove(s:tlist_removed_flist, idx)
   endif
