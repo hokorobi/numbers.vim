@@ -206,7 +206,7 @@ function! taglist#WindowOpen()
   " Highlight the current tag
   call s:ExeCmdWithoutAcmds('wincmd p')
   call s:HighlightTag(1, 1)
-  if !g:tlist_gain_focus_on_open
+  if g:tlist_gain_focus_on_open
     " Go back to the taglist window
     call s:GotoTagListWindow()
   endif
@@ -1021,9 +1021,14 @@ function! s:HighlightTag(type, center)
     return
   endif
   " Make sure the taglist window is present
+  let save_winnr = winnr()
   let tlist_winnr = bufwinnr(g:TagList_title)
   if tlist_winnr == -1
+    " Do nothing is the taglist window is not open
     call s:WarningMsg('Error: Taglist window is not open')
+    return
+  elseif tlist_winnr == save_winnr
+    call s:WarningMsg('Error: This is the taglist window')
     return
   endif
   " Get the current buffer name and line number
@@ -1046,11 +1051,6 @@ function! s:HighlightTag(type, center)
     return
   endif
   let [flag, tidx] = closest_tag
-  " Ignore all autocommands
-  let old_ei = &eventignore
-  set eventignore=all
-  " Save the current window number
-  let save_winnr = winnr()
   " Go to the taglist window
   call s:GotoTagListWindow()
   " Clear previously selected name
@@ -1074,9 +1074,7 @@ function! s:HighlightTag(type, center)
   " Highlight the tag name
   call s:WindowHighlightLine()
   " Go back to the original window
-  exe s:ExeCmdWithoutAcmds(save_winnr . 'wincmd w')
-  " Restore the autocommands
-  let &eventignore = old_ei
+  call s:ExeCmdWithoutAcmds('wincmd p')
   return
 endfunction
 
