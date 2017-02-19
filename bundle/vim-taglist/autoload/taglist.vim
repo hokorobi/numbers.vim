@@ -148,8 +148,6 @@ let s:tlist_skip_refresh = 0
 let s:tlist_filetype_settings = {}
 " File cache to store file information
 let s:tlist_file_cache = {}
-" List of files removed on user request
-let s:tlist_removed_flist = []
 " Current file displayed in the taglist window
 let s:tlist_cur_file = ''
 " Last returned file for file lookup.
@@ -403,12 +401,12 @@ function! taglist#SessionLoad(...)
   endif
   if exists('g:tlist_file_cache')
     for fname in keys(g:tlist_file_cache)
-      call s:UpdateRemovedFileList(fname, 0)
-      let g:tlist_file_cache[fname].ftime   = getftime(fname)
-      let g:tlist_file_cache[fname].str   = 0
-      let g:tlist_file_cache[fname].end     = 0
-      let g:tlist_file_cache[fname].valid   = 1
-      let g:tlist_file_cache[fname].visible = 0
+      if g:tlist_file_cache[fname].ftime != getftime(fname)
+        let g:tlist_file_cache[fname].valid = 0
+        let g:tlist_file_cache[fname].ftime = getftime(fname)
+      endif
+      let g:tlist_file_cache[fname].str = 0
+      let g:tlist_file_cache[fname].end = 0
       if !empty(g:tlist_file_cache[fname].flags)
         for flag in keys(g:tlist_file_cache[fname].flags)
           let g:tlist_file_cache[fname].flags[flag].offset = 0
@@ -552,11 +550,6 @@ function! taglist#RefreshCurrentBuffer()
     return
   endif
   if !has_key(s:tlist_file_cache, fname)
-    " Check whether this file is removed based on user request
-    " If it is, then don't display the tags for this file
-    if s:IsRemovedFile(fname)
-      return
-    endif
     " If the taglist should not be auto updated, then return
     if !g:tlist_auto_update
       return
@@ -656,20 +649,20 @@ function! s:GotoTagListWindow()
   endif
 endfunction
 
-" Returns 1 if a file is removed by a user from the taglist
-function! s:IsRemovedFile(fname)
-  return index(s:tlist_removed_flist, a:fname) != -1
-endfunction
-
 " Update the list of user removed files from the taglist
 " add == 1, Add the file to the removed list
 " add == 0, Delete the file from the removed list
 function! s:UpdateRemovedFileList(fname, add)
-  let idx = index(s:tlist_removed_flist, a:fname)
-  if a:add && idx == -1
-    call add(s:tlist_removed_flist, a:fname)
-  elseif idx != -1
-    call remove(s:tlist_removed_flist, idx)
+  if !has_key(s:tlist_file_cache, a:fname)
+    return
+  endif
+  let ftype = s:tlist_file_cache[a:fname].ftype
+  if a:add && s:tlist_file_cache[a:fname].visible != -1
+    call s:DiscardFileInfo(a:fname)
+    call s:InitFile(a:fname, ftype)
+    let s:tlist_file_cache[a:fname].visible = -1
+  elseif s:tlist_file_cache[a:fname].visible == -1
+    let s:tlist_file_cache[a:fname].visible = 0
   endif
 endfunction
 
@@ -1010,7 +1003,7 @@ function! s:HighlightTag(type, center)
     return
   endif
   " If the file is not being displayed in the taglist window, then return
-  if !s:tlist_file_cache[fname].visible
+  if s:tlist_file_cache[fname].visible != 1
     return
   endif
   " If there are no tags for this file, then no need to proceed further
@@ -1207,23 +1200,21 @@ function! s:UpdateFile(fname, ftype)
   if s:SkipFile(a:fname, a:ftype)
     return
   endif
-  if has_key(s:tlist_file_cache, a:fname) &&
-        \ s:tlist_file_cache[a:fname].valid
-    " File exists and the tags are valid
-    " Check whether the file was modified after the last tags update
-    " If it is not modified, no need to update the tags
-    if s:tlist_file_cache[a:fname].ftime == getftime(a:fname)
+  if has_key(s:tlist_file_cache, a:fname)
+    if s:tlist_file_cache[a:fname].visible == -1
+      " File is suppressed by the user, then return
+      return
+    elseif s:tlist_file_cache[a:fname].valid &&
+          \ s:tlist_file_cache[a:fname].ftime == getftime(a:fname)
+      " File exists and the tags are valid
+      " Check whether the file was modified after the last tags update
+      " If it is not modified, no need to update the tags
       return
     else
       " Need to invalidate the file otherwise the taglist window
       " will not update
       let s:tlist_file_cache[a:fname].valid = 0
     endif
-  else
-    " If the tags were removed previously based on a user request,
-    " as we are going to update the tags (based on the user request),
-    " remove the filename from the deleted list
-    call s:UpdateRemovedFileList(a:fname, 0)
   endif
   " If the taglist window is not present, update the taglist
   " of the file and return, otherwise update the taglist window
@@ -1320,6 +1311,13 @@ function! s:BatchProcessFileList(flist)
     endif
     let fname = fnamemodify(fname, ':p')
     let ftype = s:GetFileType(fname)
+    " If the file is suppressed by the user, release it from suppression
+    if has_key(s:tlist_file_cache, fname) &&
+      s:tlist_file_cache[fname].visible == -1
+      call s:LogMsg('Release ' .
+            \ fnamemodify(fname, ':p:t') . 'from suppression')
+      let s:tlist_file_cache[fname].visible = 0
+    endif
     call s:LogMsg('Processing tags for ' . fnamemodify(fname, ':p:t'))
     call s:UpdateFile(fname, ftype)
     let fcnt += 1
@@ -1358,7 +1356,7 @@ function! s:WindowUpdateLineOffsets(fname, increment, offset)
       continue
     endif
     " Update the line offsets only if the file is visible
-    if !s:tlist_file_cache[fname].visible
+    if s:tlist_file_cache[fname].visible != 1
       continue
     endif
     " No need to update for files displayed before the reference file
@@ -1380,9 +1378,9 @@ endfunction
 
 " Remove the file from display
 function! s:WindowRemoveFileFromDisplay(fname)
-  call s:LogMsg('WindowRemoveFileFromDisplay (' . a:fname . ')')
+  call s:LogMsg('WindowRemoveFileFromDisplay(' . a:fname . ')')
   " If the file is not visible then no need to remove it
-  if !s:tlist_file_cache[a:fname].visible
+  if s:tlist_file_cache[a:fname].visible != 1
     return
   endif
   " Remove the tags displayed for the specified file from the window
@@ -1403,37 +1401,34 @@ endfunction
 function! s:WindowRefreshFileInDisplay(fname, ftype)
   call s:LogMsg('WindowRefreshFileInDisplay(' . a:fname . ')')
   " First check whether the file already exists
-  let file_listed = has_key(s:tlist_file_cache, a:fname) ? 1 : 0
-  if !file_listed
-    " Check whether this file is removed based on user request
-    " If it is, then no need to display the tags for this file
-    if s:IsRemovedFile(a:fname)
-      call s:LogMsg('File not listed. User removed file.')
+  if has_key(s:tlist_file_cache, a:fname)
+    if s:tlist_file_cache[a:fname].visible == -1
+      " Check whether this file is removed based on user request
+      " If it is, then no need to display the tags for this file
+      call s:LogMsg('File removed by the user. Return.')
       return
-    endif
-  endif
-  if file_listed && s:tlist_file_cache[a:fname].visible
-    " Check whether the file tags are currently valid
-    if s:tlist_file_cache[a:fname].valid
-      call s:LogMsg('File listed and valid. Only unfold.')
-      " Goto the first line in the file
-      exe s:tlist_file_cache[a:fname].str
-      " If the line is inside a fold, open the fold
-      if foldclosed('.') != -1
-        exe 'silent! ' . s:tlist_file_cache[a:fname].str . ',' .
-              \ s:tlist_file_cache[a:fname].end . 'foldopen!'
+    elseif s:tlist_file_cache[a:fname].visible == 1
+      " Check whether the file tags are currently valid
+      if s:tlist_file_cache[a:fname].valid
+        call s:LogMsg('File listed and valid. Only unfold.')
+        " Goto the first line in the file
+        exe s:tlist_file_cache[a:fname].str
+        " If the line is inside a fold, open the fold
+        if foldclosed('.') != -1
+          exe 'silent! ' . s:tlist_file_cache[a:fname].str . ',' .
+                \ s:tlist_file_cache[a:fname].end . 'foldopen!'
+        endif
+        return
+      else
+        " Discard and remove the tags for this file from display
+        call s:WindowRemoveFileFromDisplay(a:fname)
+        call s:DiscardFileTagInfo(a:fname)
       endif
-      return
     endif
-    " Discard and remove the tags for this file from display
-    call s:DiscardFileTagInfo(a:fname)
-    call s:WindowRemoveFileFromDisplay(a:fname)
   endif
   " Process and generate a list of tags defined in the file
-  if !file_listed || !s:tlist_file_cache[a:fname].valid
-    if !s:ProcessFile(a:fname, a:ftype)
-      return
-    endif
+  if !s:ProcessFile(a:fname, a:ftype)
+    return
   endif
   " Set report option to a huge value to prevent informational messages
   " while adding lines to the taglist window
@@ -1455,7 +1450,7 @@ function! s:WindowRefreshFileInDisplay(fname, ftype)
   " the same line where they were previously present. If the file is not
   " visible, then add it at the end
   if s:tlist_file_cache[a:fname].str == 0 ||
-        \ !s:tlist_file_cache[a:fname].visible
+        \ s:tlist_file_cache[a:fname].visible != 1
     let s:tlist_file_cache[a:fname].str = line('$') + 1
   endif
   let s:tlist_file_cache[a:fname].visible = 1
@@ -1558,7 +1553,9 @@ function! s:WindowRefresh()
   " As we have cleared the taglist window, mark all the files
   " as not visible
   for fname in keys(s:tlist_file_cache)
-    let s:tlist_file_cache[fname].visible = 0
+    if s:tlist_file_cache[fname].visible == 1
+      let s:tlist_file_cache[fname].visible = 0
+    endif
   endfor
   if g:tlist_compact_format == 0
     " Display help in non-compact mode
@@ -1789,8 +1786,6 @@ function! s:WindowRemoveFile()
   " As the user requested to remove the file from taglist,
   " add it to the removed file list
   call s:UpdateRemovedFileList(fname, 1)
-  " Discard the file from the file cache
-  call s:DiscardFileInfo(fname)
   " If the tags for only one file is displayed and if we just
   " now removed that file, then invalidate the current file variable
   if g:tlist_show_one_file
@@ -2523,6 +2518,7 @@ endfunction
 function! s:WindowPostCloseCleanup()
   call s:LogMsg('WindowPostCloseCleanup()')
   " Mark all the files as not visible
+  " This will also release all suppressed files
   for fname in keys(s:tlist_file_cache)
     let s:tlist_file_cache[fname].visible = 0
   endfor
@@ -2679,15 +2675,15 @@ function! s:MenuUpdateFile(clear_menu)
   if s:SkipFile(fname, ftype)
     return
   endif
-  if !has_key(s:tlist_file_cache, fname) ||
-        \ !s:tlist_file_cache[fname].valid
-    " Check whether this file is removed based on user request
-    " If it is, then don't display the tags for this file
-    if s:IsRemovedFile(fname)
+  if has_key(s:tlist_file_cache,fname)
+    if s:tlist_file_cache[fname].visible == -1
       return
     endif
+  endif
+  if !has_key(s:tlist_file_cache, fname) ||
+        \ !s:tlist_file_cache[fname].valid
     " Process the tags for the file
-    if s:ProcessFile(fname, ftype) == 0
+    if !s:ProcessFile(fname, ftype)
       return
     endif
   endif
