@@ -2585,6 +2585,7 @@ function! s:MenuAddBaseMenu()
   call s:LogMsg('Adding the base menu')
   " Add main menu
   an <silent> T&ags.Toggle\ Tag\ List     :call taglist#WindowToggle()<CR>
+  an <silent> T&ags.Jump\ to\ Tag         :call taglist#JumpToTagByLine()<CR>
   an T&ags.-SEP0-                         :
   an <silent> T&ags.Refresh\ Menu         :call <SID>MenuRefresh()<CR>
   an <silent> T&ags.Sort\ Menu\ By.Name   :call <SID>MenuChangeSort('set', 'name')<CR>
@@ -2592,6 +2593,8 @@ function! s:MenuAddBaseMenu()
   " Add popup menu
   if &mousemodel =~ 'popup'
     an PopUp.-TAGLIST-SEP-                        :
+    an <silent> PopUp.T&ags.Jump\ to\ Tag         :call taglist#JumpToTagByLine()<CR>
+    an PopUp.T&ags.-SEP0-                         :
     an <silent> PopUp.T&ags.Refresh\ Menu         :call <SID>MenuRefresh()<CR>
     an <silent> PopUp.T&ags.Sort\ Menu\ By.Name   :call <SID>MenuChangeSort('set', 'name')<CR>
     an <silent> PopUp.T&ags.Sort\ Menu\ By.Order  :call <SID>MenuChangeSort('set', 'order')<CR>
