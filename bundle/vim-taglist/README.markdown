@@ -45,10 +45,12 @@ Additional supported languages:
 ## Changes
 
 * Package the latest version of Exuberant Ctags with the plugin (Windows only).
-* Add additional language configurations in `$HOME/vimfiles/tools/ctag.conf`.
+* Load additional language settings from `$HOME/vimfiles/tools/ctag.conf`.
 * Show tag information when moving the cursor in the taglist window.
+* Add `:TlistJumpToTag` command to jump to the closest tag.
 * Add the default key mapping of `<C-j>` to toggle the taglist window.
 * Add `Toggle Tag List` command to the main menu.
+* Various bug fixes
 
 ## License
 
