@@ -2,7 +2,7 @@
 " Version: 2017-02-03
 
 " User Interface {{{
-set guioptions-=T lines=40 columns=120
+set guioptions-=T lines=60 columns=150
 
 " Set fonts
 if has('gui_macvim')
