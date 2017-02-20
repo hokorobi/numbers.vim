@@ -15,7 +15,7 @@
 
 " LOAD GUARD: {{{1
 if exists('g:loaded_autoload_taglist') ||
-      \ v:version < 704 || !exists('*system')
+      \ v:version < 700 || !exists('*system')
   finish
 endif
 let g:loaded_autoload_taglist = 1
@@ -265,7 +265,11 @@ function! taglist#AddFiles(...)
   let i = 1
   " Get all the files matching the file patterns supplied as argument
   while i <= a:0
-    let flist += glob(a:{i}, 0, 1)
+    if v:version >= 704
+      let flist += glob(a:{i}, 0, 1)
+    else
+      let flist += split(glob(a:{i}, 0), "\n")
+    endif
     let i += 1
   endwhile
   if empty(flist)
@@ -1362,9 +1366,14 @@ function! s:BatchProcessDir(dir_name, pat)
   let top_dir =
         \ (a:dir_name[len - 1] == '\' || a:dir_name[len - 1] == '/') ?
         \ a:dirname : a:dirname . '/'
-  let flist = glob(top_dir . a:pat, 0, 1)
+  if v:version >= 704
+    let flist = glob(top_dir . a:pat, 0, 1)
+    let all_files = glob(top_dir . '*', 0, 1)
+  else
+    let flist = split(glob(top_dir . a:pat, 0), "\n")
+    let all_files = split(glob(top_dir . '*', 0), "\n")
+  endif
   let fcnt = s:BatchProcessFileList(flist)
-  let all_files = glob(top_dir . '*', 0, 1)
   for dir_name in all_files
     " Skip non-directory names
     if dir_name == '' || !isdirectory(dir_name)

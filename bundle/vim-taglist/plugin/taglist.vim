@@ -16,8 +16,8 @@
 " LOAD GUARD: {{{1
 if exists('g:loaded_taglist')
   finish
-elseif v:version < 704
-  echomsg 'TagList: Vim version >= 7.4 is required. ' .
+elseif v:version < 700
+  echomsg 'TagList: Vim version >= 7.0 is required. ' .
         \ 'Plugin is not loaded.'
   finish
 elseif !exists('*system')
@@ -37,8 +37,12 @@ set cpo&vim
 " GLOBAL SETTINGS: {{{1
 " Location of the exuberant ctags tool
 if !exists('g:tlist_ctags_cmd')
-  if has('win32') && len(globpath(&runtimepath, 'tools/ctags.exe', 0, 1)) > 0
-    let g:tlist_ctags_cmd = globpath(&runtimepath, 'tools/ctags.exe', 0, 1)[0]
+  if v:version >= 704 && has('win32') &&
+        \ len(globpath(&rtp, 'tools/ctags.exe', 0, 1)) > 0
+    let g:tlist_ctags_cmd = globpath(&rtp, 'tools/ctags.exe', 0, 1)[0]
+  elseif has('win32') &&
+        \ len(split(globpath(&rtp, 'tools/ctags.exe', 0), "\n")) > 0
+    let g:tlist_ctags_cmd = split(globpath(&rtp, 'tools/ctags.exe', 0), "\n")[0]
   elseif executable('/usr/local/bin/ctags')
     let g:tlist_ctags_cmd = '/usr/local/bin/ctags' " Homebrew
   elseif executable('/opt/local/bin/ctags')
@@ -63,8 +67,10 @@ if !exists('g:tlist_ctags_cmd')
 endif
 " Location of the ctags configuration file
 if !exists('g:tlist_ctags_conf')
-  if len(globpath(&runtimepath, 'tools/ctags.conf', 0, 1)) > 0
-    let g:tlist_ctags_conf = globpath(&runtimepath, 'tools/ctags.conf', 0, 1)[0]
+  if v:version >= 704 && len(globpath(&rtp, 'tools/ctags.conf', 0, 1)) > 0
+    let g:tlist_ctags_conf = globpath(&rtp, 'tools/ctags.conf', 0, 1)[0]
+  elseif len(split(globpath(&rtp, 'tools/ctags.conf', 0), "\n")) > 0
+    let g:tlist_ctags_conf = split(globpath(&rtp, 'tools/ctags.conf', 0), "\n")[0]
   endif
 endif
 
