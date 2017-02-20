@@ -2625,14 +2625,17 @@ function! s:MenuGetTagTypeCmd(fname, ftype, flag)
         let f_tidx = tcnt - 1
       endif
       " Extract the first and last tag names
-      let first_tag = s:tlist_file_cache[a:fname].flags[a:flag].tags[tidx].tag_name
-      let last_tag = s:tlist_file_cache[a:fname].flags[a:flag].tags[f_tidx].tag_name
+      let fst_tag = s:tlist_file_cache[a:fname].flags[a:flag].tags[tidx].tag_name
+      let lst_tag = s:tlist_file_cache[a:fname].flags[a:flag].tags[f_tidx].tag_name
       " Truncate the names if they are greater than the max length
-      let first_tag = strpart(first_tag, 0, g:tlist_max_tag_length)
-      let last_tag = strpart(last_tag, 0, g:tlist_max_tag_length)
+      let fst_tag = strpart(fst_tag, 0, g:tlist_max_tag_length)
+      let lst_tag = strpart(lst_tag, 0, g:tlist_max_tag_length)
+      " Escape illegal characters
+      let fst_tag = substitute(escape(fst_tag, ' .'), '&', '&&', 'g')
+      let lst_tag = substitute(escape(lst_tag, ' .'), '&', '&&', 'g')
       " Form the menu command prefix
       let m_prefix = 'anoremenu <silent> T\&ags.' . flag_fullname .
-            \ '.' . first_tag . '\ \.\.\.\ ' . last_tag . '.'
+            \ '.' . fst_tag . '\ \.\.\.\ ' . lst_tag . '.'
       " Character prefix used to number the menu items (hotkey)
       let m_prefix_idx = 0
       while tidx <= f_tidx
