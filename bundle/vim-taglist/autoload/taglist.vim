@@ -2353,12 +2353,7 @@ function! s:WindowInit()
   silent! setlocal buftype=nofile
   silent! setlocal bufhidden=delete
   silent! setlocal noswapfile
-  " Due to a bug in Vim 6.0, the winbufnr() function fails for unlisted
-  " buffers. So if the taglist buffer is unlisted, multiple taglist
-  " windows will be opened. This bug is fixed in Vim 6.1 and above
-  if v:version >= 601
-    silent! setlocal nobuflisted
-  endif
+  silent! setlocal nobuflisted
 
   silent! setlocal nowrap
   " If the 'number' option is set in the source window, it will affect the
@@ -2370,16 +2365,12 @@ function! s:WindowInit()
   endif
   " Use fixed height when horizontally split window is used
   if g:tlist_use_horiz_window
-    if v:version >= 602
-      set winfixheight
-    endif
+    set winfixheight
   else
-    if v:version >= 700
-      set winfixwidth
-    endif
+    set winfixwidth
   endif
   " Setup balloon evaluation to display tag prototype
-  if v:version >= 700 && has('balloon_eval')
+  if has('balloon_eval')
     setlocal balloonexpr=taglist#BalloonExpr()
     set ballooneval
   endif
@@ -2444,22 +2435,20 @@ function! s:WindowInit()
     " Contributed by Bindu Wavell
     " attempt to perform single click mapping, it would be much
     " nicer if we could nnoremap <buffer> ... however vim does
-    " not fire the <buffer> <leftmouse> when you use the mouse
+    " not fire the <buffer> <LeftMouse> when you use the mouse
     " to enter a buffer.
     let clickmap = ':if bufname("%") =~ "__Tag_List__" <bar> ' .
           \ 'call <SID>WindowJumpToTag("useopen") ' .
           \ '<bar> endif <CR>'
-    if maparg('<leftmouse>', 'n') == ''
-      " no mapping for leftmouse
-      exe ':nnoremap <silent> <leftmouse> <leftmouse>' . clickmap
+    let maparg = maparg('<LeftMouse>', 'n')
+    if maparg == ''
+      " No mapping for leftmouse
+      exe ':nnoremap <silent> <LeftMouse> <LeftMouse>' . clickmap
     else
-      " we have a mapping
-      let mapcmd = ':nnoremap <silent> <leftmouse> <leftmouse>'
-      let mapcmd = mapcmd . substitute(substitute(
-            \ maparg('<leftmouse>', 'n'), '|', '<bar>', 'g'),
-            \ '\c^<leftmouse>', '', '')
-      let mapcmd = mapcmd . clickmap
-      exe mapcmd
+      " We have a mapping
+      exe ':nnoremap <silent> <LeftMouse> <LeftMouse>' .
+            \ substitute(substitute(maparg, '|', '<bar>', 'g'),
+            \ '\c^<LeftMouse>', '', '') . clickmap
     endif
   endif
 
